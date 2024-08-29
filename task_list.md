@@ -2,7 +2,7 @@
 
 ## For September 5
 
-1.
+1. Read Eclipse Paper (Gerber).
 
-2.
+2. Familiarize yourself with soundecology package.
 
