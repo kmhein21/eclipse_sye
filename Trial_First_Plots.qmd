@@ -27,10 +27,26 @@ ggplot(data=df_ACI, aes(x=1:256, y=ACI_01$aci_fl_left_vals))+
 ```
 Not sure about x-axis, how to label for the actual measurement of time present
 
+Other Indices for this file: 
 
 Bioacoustic Index for WAV - 240401_0616100
-
 ```{r}
 Bioindex1<-bioacoustic_index(WAV_0616100_240401)
+```
+
+Acoustic Diversity Index for WAV - 240401_0616100
+```{r}
+ADI1<-acoustic_diversity(WAV_0616100_240401)
+
+ADI1_lv<-as.data.frame(ADI1$left_band_values)
+
+ggplot(data=ADI1_lv, aes(x=1:10, y=ADI1$left_band_values))+
+  geom_point()+
+  theme_minimal()
+```
+
+Acoustic Evenness Index for WAV - 240401_0616100
+```{r}
+AEI_1<-acoustic_evenness(WAV_0616100_240401)
 ```
 
