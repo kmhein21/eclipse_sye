@@ -9,7 +9,7 @@ library(here)
 library(ggplot2)
 ```
 
-Acoustic Complexity scatterplot of WAV labeled 240401_0616100
+Acoustic Complexity Plot of WAV - 240401_0616100
 ```{r}
 WAV_0616100_240401<-readWave(here("wav_files/20240401_061600.WAV"))
 
@@ -24,5 +24,13 @@ ggplot(data=df_ACI, aes(x=1:256, y=ACI_01$aci_fl_left_vals))+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")
 
+```
+Not sure about x-axis, how to label for the actual measurement of time present
+
+
+Bioacoustic Index for WAV - 240401_0616100
+
+```{r}
+Bioindex1<-bioacoustic_index(WAV_0616100_240401)
 ```
 
