@@ -1,5 +1,5 @@
 ---
-title: "Graphing First WAV"
+title: "Graphing First WAV and Obtaining Indices"
 format: html
 ---
 ```{r}
@@ -7,6 +7,7 @@ library(soundecology)
 library(tuneR)
 library(here)
 library(ggplot2)
+library(readr)
 ```
 
 Acoustic Complexity Plot of WAV - 240401_0616100
@@ -49,4 +50,17 @@ Acoustic Evenness Index for WAV - 240401_0616100
 ```{r}
 AEI_1<-acoustic_evenness(WAV_0616100_240401)
 ```
+
+Attempting to use the multiple sounds function (on 5 WAV files)
+
+```{r}
+multiple_sounds(directory = "wav_files", resultfile = "WAV5_ACI.csv", soundindex = "acoustic_complexity", no_cores="max")
+```
+
+```{r}
+WAV5_ACI <- read_csv("WAV5_ACI.csv")
+```
+
+Returns singular indices but does not return the list of values used to create the acoustic complexity plot like above. "aci_fl_left_vals"
+
 
