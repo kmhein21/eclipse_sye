@@ -21,7 +21,7 @@ df_ACI<-as.data.frame(ACI_01$aci_fl_left_vals)
 plot(x=1:256, y=ACI_01_val, col="orange", pch=16)
 
 ggplot(data=df_ACI, aes(x=1:256, y=ACI_01$aci_fl_left_vals))+
-  geom_point(col="orange")+
+  geom_line(col="orange")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")
 
@@ -73,7 +73,7 @@ ACI_02_val<-ACI_02$aci_fl_left_vals
 df_ACI2<-as.data.frame(ACI_02$aci_fl_left_vals)
 
 ggplot(data=df_ACI2, aes(x=1:256, y=ACI_02$aci_fl_left_vals))+
-  geom_point(col="purple")+
+  geom_line(col="purple")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")
 ```
@@ -86,7 +86,7 @@ ACI_03_val<-ACI_03$aci_fl_left_vals
 df_ACI3<-as.data.frame(ACI_03$aci_fl_left_vals)
 
 ggplot(data=df_ACI3, aes(x=1:256, y=ACI_03$aci_fl_left_vals))+
-  geom_point(col="green")+
+  geom_line(col="green")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")
 ```
