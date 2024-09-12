@@ -1,0 +1,30 @@
+---
+title: "Creating Data Frame of ACIs"
+format: html
+---
+
+```{r}
+library(purrr)
+library(soundecology)
+library(tidyverse)
+library(stringr)
+paths <- list.files(here("wav_files"), pattern = "\\.WAV$",
+                    full.names = TRUE)
+
+wav_files <- map(paths, readWave)
+AEI_allWAV<-map(wav_files, acoustic_evenness)
+
+AEI_df<-as.data.frame(AEI_allWAV)|>
+  select(1,3,5,7,9,11,13,15,17,19)|>
+  pivot_longer(cols=c(1:10), names_to = "Name",
+               values_to = "AEI")
+
+paths_date <-str_remove(paths, "/Users/kaitlinheintzman/Desktop/Eclipse_SYE/wav_files/")
+
+cbind(AEI_df,paths_date)|>
+  separate()
+
+
+
+```
+
