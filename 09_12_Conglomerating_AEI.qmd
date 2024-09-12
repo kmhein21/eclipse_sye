@@ -21,10 +21,17 @@ AEI_df<-as.data.frame(AEI_allWAV)|>
 
 paths_date <-str_remove(paths, "/Users/kaitlinheintzman/Desktop/Eclipse_SYE/wav_files/")
 
-cbind(AEI_df,paths_date)|>
-  separate()
+full_WAV_df<-cbind(paths_date, AEI_df)|>
+  separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
+  select(-2,-3)
 
 
+```
 
+```{r}
+ACI_allWAV<-map(wav_files, acoustic_complexity)
+
+ACI_allWAV
+  
 ```
 
