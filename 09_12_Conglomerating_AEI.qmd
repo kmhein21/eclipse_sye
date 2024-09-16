@@ -7,6 +7,7 @@ format: html
 library(purrr)
 library(soundecology)
 library(tidyverse)
+library(here)
 library(stringr)
 paths <- list.files(here("wav_files"), pattern = "\\.WAV$",
                     full.names = TRUE)
@@ -31,7 +32,34 @@ full_WAV_df<-cbind(paths_date, AEI_df)|>
 ```{r}
 ACI_allWAV<-map(wav_files, acoustic_complexity)
 
-ACI_allWAV
-  
+for (x in 1:10) {
+ print(as.data.frame(ACI_allWAV[[x]]$aci_fl_left_vals))
+}
+
+typeof(ACI_allWAV)
+```
+
+```{r}
+ACI_1<-ACI_allWAV[[1]]$aci_fl_left_vals
+ACI_2<-ACI_allWAV[[2]]$aci_fl_left_vals
+ACI_3<-ACI_allWAV[[3]]$aci_fl_left_vals
+ACI_4<-ACI_allWAV[[4]]$aci_fl_left_vals
+ACI_5<-ACI_allWAV[[5]]$aci_fl_left_vals
+ACI_6<-ACI_allWAV[[6]]$aci_fl_left_vals
+ACI_7<-ACI_allWAV[[7]]$aci_fl_left_vals
+ACI_8<-ACI_allWAV[[8]]$aci_fl_left_vals
+ACI_9<-ACI_allWAV[[9]]$aci_fl_left_vals
+ACI_10<-ACI_allWAV[[10]]$aci_fl_left_vals
+
+Val<-c(1:256)
+All_ACI<-cbind(Val,ACI_1,ACI_2,ACI_3,ACI_4,ACI_5,ACI_6,ACI_7,ACI_8,ACI_9,ACI_10)
+All_ACI<-as.data.frame(All_ACI)
+First_10_WAV_ACI<-All_ACI|> pivot_longer(cols = c(2:11), names_to="WAV", values_to = "ACI_vals" )
+
+ggplot(data=First_10_WAV_ACI, aes(x=Val, y=ACI_vals))+
+  geom_line(col="orange")+
+  theme_minimal()+
+  labs(x = "Time(s)", y = "Acoustic Complexity")+
+  facet_wrap(~WAV)
 ```
 
