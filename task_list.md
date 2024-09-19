@@ -1,5 +1,13 @@
 ## Task List
 
+## For September 26
+
+1. Add biophyny.
+
+2. Clean up code a little bit.
+
+3. Get data from erika!
+
 ## For September 19
 
 1. Matt: Email erika for more .WAV files.
