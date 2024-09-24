@@ -19,28 +19,36 @@ AEI_allWAV<-map(wav_files, acoustic_evenness)
 BEI_allWAV<-map(wav_files, bioacoustic_index)
 ADI_allWAV<-map(wav_files, acoustic_diversity)
 ACI_allWAV<-map(wav_files, acoustic_complexity)
+ndsi_allWAV<-map(wav_files, soundecology::ndsi)
+```
+
+Acoustic Evenness, Biophony, and Bioacoustic Indices 
+```{r}
+AEI_df<-as.data.frame(AEI_allWAV)|>
+  select(starts_with("aei_left"))|>
+  pivot_longer(cols = everything(), names_to = "aei_name",
+               values_to = "AEI")
+BEI_df<-as.data.frame(BEI_allWAV)|>
+  select(starts_with("left_area"))|>
+  pivot_longer(cols= everything(), names_to = "bei_name", values_to = "BEI")
+  
+paths_date <-str_remove(paths, paste0(here(), "/wav_files"))
+
+Biophony_all<-as.data.frame(ndsi_allWAV)|>
+  select(starts_with("biophony_left"))|>
+  pivot_longer(cols = everything(), names_to = "biop_name", values_to = "Biophony")
 
 ```
 
-Acoustic Evenness and Bioacoustic Indices 
+Full table containing indicies
+
 ```{r}
-AEI_df<-as.data.frame(AEI_allWAV)|>
-  select(1,3,5,7,9,11,13,15,17,19)|>
-  pivot_longer(cols=c(1:10), names_to = "Name",
-               values_to = "AEI")
-BEI_df<-as.data.frame(BEI_allWAV)|>
-  select(1,3,5,7,9,11,13,15,17,19)|>
-  pivot_longer(cols=c(1:10), names_to = "Area_name", values_to = "BEI")
 
-
-  
-paths_date <-str_remove(paths, "/Users/kaitlinheintzman/Desktop/Eclipse_SYE/wav_files/")
-
-full_WAV_df<-cbind(paths_date, AEI_df, BEI_df)|>
+full_WAV_df<-cbind(paths_date, AEI_df, BEI_df, Biophony_all)|>
   separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
-  select(-2,-3,-5)
+  select(-(ends_with("name")),-2)
 
-
+full_WAV_df
 ```
 
 Obtaining left values for Acoustic Diveristy and Acoustic Complexity indices 
@@ -64,25 +72,25 @@ Creating an Acoustic diversity data frame
 ADI_names<-c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")
 old_adi<-colnames(ADI_df)
 ADI_df
-ADI_df<-ADI_df|>rename(cols = old_adi)
-ADI_df<-ADI_df|>rename("ADI_1" = cols1, "ADI_2" = cols2, "ADI_3" = cols3, "ADI_4" = cols4, "ADI_5" = cols5, "ADI_6" = cols6, "ADI_7" = cols7, "ADI_8" = cols8, "ADI_9" = cols9, "ADI_10" = cols10)
+ADI_newname<-ADI_df|>rename(cols = old_adi)
 
-Val_ADI<-c(1:10)
-ADI_df<-cbind(Val_ADI, ADI_df)
-ADI_df<-ADI_df|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ADI")
+ADI_2<-cbind(c(1:10),ADI_2)
+ADI_2<-ADI_newname|>rename("ADI_1" = cols1, "ADI_2" = cols2, "ADI_3" = cols3, "ADI_4" = cols4, "ADI_5" = cols5, "ADI_6" = cols6, "ADI_7" = cols7, "ADI_8" = cols8, "ADI_9" = cols9, "ADI_10" = cols10)
 
-ADI_df$WAV<-as.factor(ADI_df$WAV)
-ADI_df$WAV<-fct_relevel(ADI_df$WAV, c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10"))
+ADI_3<-ADI_2|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ADI")|>
+  mutate(WAV = as.factor(WAV))|>
+  mutate(WAV = fct_relevel(WAV,c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")))
+
 ```
 
 Creating a line plot for Acoustic Diversity 
 ```{r}
-ggplot(data = ADI_df, aes( x= Val_ADI, y = ADI))+
+ggplot(data = ADI_3, aes(x=row_number(ADI_3), y = ADI))+
   geom_line(col = "green")+
   facet_wrap(~WAV)+
   theme_minimal()
-```
 
+```
 
 Making Acoustic Complexity data frame 
 ```{r}
@@ -91,7 +99,6 @@ old_aci<-colnames(ACI_df)
 ACI_df<-ACI_df|> rename(cols = old_aci)
 ACI_df<-ACI_df|>rename("ACI_1" = cols1, "ACI_2" = cols2, "ACI_3" = cols3, "ACI_4" = cols4, "ACI_5" = cols5, "ACI_6" = cols6, "ACI_7" = cols7, "ACI_8" = cols8, "ACI_9" = cols9, "ACI_10" = cols10)
 
-Val_ACI<-c(1:256)
 ACI_df<-cbind(Val_ACI,ACI_df)
 
 ACI_df<-ACI_df|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ACI")
@@ -102,18 +109,22 @@ ACI_df$WAV<-fct_relevel(ACI_df$WAV, c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5
 
 Creating a line plot for each WAV File
 ```{r}
-ggplot(data=ACI_df, aes(x=Val_ACI, y=ACI))+
+ggplot(data=ACI_df, aes(x=row_number(ACI_df), y=ACI))+
   geom_line(col="orange")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")+
   facet_wrap(~WAV)
 ```
 
-Acoustic complexity does not seem to match completely with the WAV files, specifcally the large spike at the beginning at towards the end of all the graphs. 
+Acoustic complexity does not seem to match completely with the WAV files, specifically the large spike at the beginning at towards the end of all the graphs. 
 
 ```{r}
 arrange(ACI_df, ACI)
 ```
 
 All lowest ACIs fall at "position 176"
+
+
+starts_with()
+Rownumbers()
 
