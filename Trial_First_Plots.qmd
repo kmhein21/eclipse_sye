@@ -51,7 +51,7 @@ Acoustic Evenness Index for WAV - 240401_0616100
 AEI_1<-acoustic_evenness(WAV_0616100_240401)
 ```
 
-Attempting to use the multiple sounds function (on 5 WAV files)
+Attempting to use the multiple sounds function (on 10 WAV files)
 
 ```{r}
 multiple_sounds(directory = "wav_files", resultfile = "WAV5_ACI.csv", soundindex = "acoustic_complexity", no_cores="max")
