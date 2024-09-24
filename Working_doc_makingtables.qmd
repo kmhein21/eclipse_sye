@@ -70,12 +70,10 @@ ACI_df<-unnest(as.data.frame(ACI_all))
 Creating an Acoustic diversity data frame
 ```{r}
 ADI_names<-c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")
-old_adi<-colnames(ADI_df)
-ADI_df
-ADI_newname<-ADI_df|>rename(cols = old_adi)
 
-ADI_2<-cbind(c(1:10),ADI_2)
-ADI_2<-ADI_newname|>rename("ADI_1" = cols1, "ADI_2" = cols2, "ADI_3" = cols3, "ADI_4" = cols4, "ADI_5" = cols5, "ADI_6" = cols6, "ADI_7" = cols7, "ADI_8" = cols8, "ADI_9" = cols9, "ADI_10" = cols10)
+names(ADI_df)<-c(ADI_names)
+
+ADI_2<-cbind(c(1:10),ADI_df)
 
 ADI_3<-ADI_2|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ADI")|>
   mutate(WAV = as.factor(WAV))|>
@@ -94,22 +92,21 @@ ggplot(data = ADI_3, aes(x=row_number(ADI_3), y = ADI))+
 
 Making Acoustic Complexity data frame 
 ```{r}
-old_aci<-colnames(ACI_df)
+ACI_names<-c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5", "ACI_6", "ACI_7", "ACI_8","ACI_9", "ACI_10")
+names(ACI_df)<-c(ACI_names)
 
-ACI_df<-ACI_df|> rename(cols = old_aci)
-ACI_df<-ACI_df|>rename("ACI_1" = cols1, "ACI_2" = cols2, "ACI_3" = cols3, "ACI_4" = cols4, "ACI_5" = cols5, "ACI_6" = cols6, "ACI_7" = cols7, "ACI_8" = cols8, "ACI_9" = cols9, "ACI_10" = cols10)
+ACI_2<-cbind(c(1:256),ACI_df)
 
-ACI_df<-cbind(Val_ACI,ACI_df)
+ACI_3<-ACI_2|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ACI")|>
+  mutate(WAV = as.factor(WAV))|>
+  mutate(WAV = fct_relevel(WAV, c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5", "ACI_6", "ACI_7", "ACI_8","ACI_9", "ACI_10")) )
 
-ACI_df<-ACI_df|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ACI")
 
-ACI_df$WAV<-as.factor(ACI_df$WAV)
-ACI_df$WAV<-fct_relevel(ACI_df$WAV, c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5", "ACI_6", "ACI_7", "ACI_8","ACI_9", "ACI_10"))
 ```
 
 Creating a line plot for each WAV File
 ```{r}
-ggplot(data=ACI_df, aes(x=row_number(ACI_df), y=ACI))+
+ggplot(data=ACI_3, aes(x=row_number(ACI_3), y=ACI))+
   geom_line(col="orange")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")+
@@ -119,12 +116,9 @@ ggplot(data=ACI_df, aes(x=row_number(ACI_df), y=ACI))+
 Acoustic complexity does not seem to match completely with the WAV files, specifically the large spike at the beginning at towards the end of all the graphs. 
 
 ```{r}
-arrange(ACI_df, ACI)
+arrange(ACI_3, ACI)
 ```
 
 All lowest ACIs fall at "position 176"
 
-
-starts_with()
-Rownumbers()
 
