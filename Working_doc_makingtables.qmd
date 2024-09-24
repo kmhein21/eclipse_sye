@@ -75,7 +75,7 @@ names(ADI_df)<-c(ADI_names)
 ADI_2<-ADI_df|> mutate(num = rownames(ADI_df))|>
   select(num, everything())
 
-ADI_3<-ADI_2|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ADI")|>
+ADI_3<-ADI_2|>pivot_longer(cols = starts_with("ADI"), names_to = "WAV", values_to = "ADI")|>
   mutate(WAV = as.factor(WAV), num = as.integer(num))|>
   mutate(WAV = fct_relevel(WAV,c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")))
 
