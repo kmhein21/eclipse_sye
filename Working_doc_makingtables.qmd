@@ -28,6 +28,7 @@ AEI_df<-as.data.frame(AEI_allWAV)|>
   select(starts_with("aei_left"))|>
   pivot_longer(cols = everything(), names_to = "aei_name",
                values_to = "AEI")
+
 BEI_df<-as.data.frame(BEI_allWAV)|>
   select(starts_with("left_area"))|>
   pivot_longer(cols= everything(), names_to = "bei_name", values_to = "BEI")
@@ -41,12 +42,10 @@ Biophony_all<-as.data.frame(ndsi_allWAV)|>
 ```
 
 Full table containing indicies
-
 ```{r}
-
 full_WAV_df<-cbind(paths_date, AEI_df, BEI_df, Biophony_all)|>
   separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
-  select(-(ends_with("name")),-2)
+  select(-(ends_with("name")),-"nonsense")
 
 full_WAV_df
 ```
@@ -73,17 +72,18 @@ ADI_names<-c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI
 
 names(ADI_df)<-c(ADI_names)
 
-ADI_2<-cbind(c(1:10),ADI_df)
+ADI_2<-ADI_df|> mutate(num = rownames(ADI_df))|>
+  select(num, everything())
 
 ADI_3<-ADI_2|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ADI")|>
-  mutate(WAV = as.factor(WAV))|>
+  mutate(WAV = as.factor(WAV), num = as.integer(num))|>
   mutate(WAV = fct_relevel(WAV,c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")))
 
 ```
 
 Creating a line plot for Acoustic Diversity 
 ```{r}
-ggplot(data = ADI_3, aes(x=row_number(ADI_3), y = ADI))+
+ggplot(data = ADI_3, aes(x=num, y = ADI))+
   geom_line(col = "green")+
   facet_wrap(~WAV)+
   theme_minimal()
@@ -95,18 +95,18 @@ Making Acoustic Complexity data frame
 ACI_names<-c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5", "ACI_6", "ACI_7", "ACI_8","ACI_9", "ACI_10")
 names(ACI_df)<-c(ACI_names)
 
-ACI_2<-cbind(c(1:256),ACI_df)
+ACI_2<-ACI_df|> mutate( num = rownames(ACI_df))|>
+  select(num, everything())
 
-ACI_3<-ACI_2|>pivot_longer(cols = c(2:11), names_to = "WAV", values_to = "ACI")|>
-  mutate(WAV = as.factor(WAV))|>
+ACI_3<-ACI_2|>pivot_longer(cols = starts_with("ACI"), names_to = "WAV", values_to = "ACI")|>
+  mutate(WAV = as.factor(WAV), num = as.integer(num))|>
   mutate(WAV = fct_relevel(WAV, c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5", "ACI_6", "ACI_7", "ACI_8","ACI_9", "ACI_10")) )
-
 
 ```
 
 Creating a line plot for each WAV File
 ```{r}
-ggplot(data=ACI_3, aes(x=row_number(ACI_3), y=ACI))+
+ggplot(data=ACI_3, aes(x = num , y=ACI))+
   geom_line(col="orange")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")+
