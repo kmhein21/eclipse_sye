@@ -66,6 +66,20 @@ ACI_df<-unnest(as.data.frame(ACI_all))
 
 ```
 
+```{r}
+all_adi<-as.data.frame(ADI_allWAV)
+New_adi<-all_adi|> select(starts_with("left_band"))|>
+  select("left_bandrange_values", starts_with("left_band_values"))|>
+  mutate("left_bandrange_values" = as.factor(left_bandrange_values))|>
+  pivot_longer(cols = -"left_bandrange_values", names_to = "WAV", values_to = "Band_proportion")
+
+ggplot(data = New_adi, aes( x = left_bandrange_values, y = Band_proportion))+
+  geom_col()+
+  facet_wrap(~WAV)+
+  theme_minimal()
+```
+
+
 Creating an Acoustic diversity data frame
 ```{r}
 ADI_names<-c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")
@@ -75,7 +89,7 @@ names(ADI_df)<-c(ADI_names)
 ADI_2<-ADI_df|> mutate(num = rownames(ADI_df))|>
   select(num, everything())
 
-ADI_3<-ADI_2|>pivot_longer(cols = starts_with("ADI"), names_to = "WAV", values_to = "ADI")|>
+ADI_Final<-ADI_2|>pivot_longer(cols = starts_with("ADI"), names_to = "WAV", values_to = "ADI")|>
   mutate(WAV = as.factor(WAV), num = as.integer(num))|>
   mutate(WAV = fct_relevel(WAV,c("ADI_1", "ADI_2", "ADI_3", "ADI_4", "ADI_5", "ADI_6", "ADI_7", "ADI_8","ADI_9", "ADI_10")))
 
@@ -83,7 +97,7 @@ ADI_3<-ADI_2|>pivot_longer(cols = starts_with("ADI"), names_to = "WAV", values_t
 
 Creating a line plot for Acoustic Diversity 
 ```{r}
-ggplot(data = ADI_3, aes(x=num, y = ADI))+
+ggplot(data = ADI_Final, aes(x=num, y = ADI))+
   geom_line(col = "green")+
   facet_wrap(~WAV)+
   theme_minimal()
@@ -98,7 +112,7 @@ names(ACI_df)<-c(ACI_names)
 ACI_2<-ACI_df|> mutate( num = rownames(ACI_df))|>
   select(num, everything())
 
-ACI_3<-ACI_2|>pivot_longer(cols = starts_with("ACI"), names_to = "WAV", values_to = "ACI")|>
+ACI_Final<-ACI_2|>pivot_longer(cols = starts_with("ACI"), names_to = "WAV", values_to = "ACI")|>
   mutate(WAV = as.factor(WAV), num = as.integer(num))|>
   mutate(WAV = fct_relevel(WAV, c("ACI_1", "ACI_2", "ACI_3", "ACI_4", "ACI_5", "ACI_6", "ACI_7", "ACI_8","ACI_9", "ACI_10")) )
 
@@ -106,7 +120,7 @@ ACI_3<-ACI_2|>pivot_longer(cols = starts_with("ACI"), names_to = "WAV", values_t
 
 Creating a line plot for each WAV File
 ```{r}
-ggplot(data=ACI_3, aes(x = num , y=ACI))+
+ggplot(data=ACI_Final, aes(x = num , y=ACI))+
   geom_line(col="orange")+
   theme_minimal()+
   labs(x = "Time(s)", y = "Acoustic Complexity")+
