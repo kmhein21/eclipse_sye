@@ -67,11 +67,13 @@ ACI_df<-unnest(as.data.frame(ACI_all))
 ```
 
 ```{r}
+
 all_adi<-as.data.frame(ADI_allWAV)
 New_adi<-all_adi|> select(starts_with("left_band"))|>
   select("left_bandrange_values", starts_with("left_band_values"))|>
   mutate("left_bandrange_values" = as.factor(left_bandrange_values))|>
-  pivot_longer(cols = -"left_bandrange_values", names_to = "WAV", values_to = "Band_proportion")
+  pivot_longer(cols = -"left_bandrange_values", names_to = "WAV", values_to = "Band_proportion")|>
+  mutate(WAV = as.factor(WAV))
 
 ggplot(data = New_adi, aes( x = left_bandrange_values, y = Band_proportion))+
   geom_col()+
