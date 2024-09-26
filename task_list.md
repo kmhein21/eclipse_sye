@@ -1,5 +1,9 @@
 ## Task List
 
+## For October 3
+
+1. Download the two large folders (separately). Write a data frame that has as much info as you can, and then delete the large folders.
+
 ## For September 26
 
 1. Add biophyny.
