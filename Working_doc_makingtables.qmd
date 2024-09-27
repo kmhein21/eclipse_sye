@@ -41,15 +41,6 @@ Biophony_all<-as.data.frame(ndsi_allWAV)|>
 
 ```
 
-Full table containing indicies
-```{r}
-full_WAV_df<-cbind(paths_date, AEI_df, BEI_df, Biophony_all)|>
-  separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
-  select(-(ends_with("name")),-"nonsense")
-
-full_WAV_df
-```
-
 Obtaining left values for Acoustic Diveristy and Acoustic Complexity indices 
 ```{r}
 ACI_all<-vector("list", length(c(1:10)))
@@ -136,5 +127,20 @@ arrange(ACI_3, ACI)
 ```
 
 All lowest ACIs fall at "position 176"
+
+
+Creating a full data frame with all indices (5)
+```{r}
+
+single_indices<-as.tibble(cbind(paths_date, AEI_df, BEI_df, Biophony_all))
+multiple_indices<-as.tibble(cbind( ADI_all, ACI_all))
+
+full_WAV_df<-cbind(single_indices, multiple_indices)|>
+  separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
+  select(-(ends_with("name")),-"nonsense")
+
+full_WAV_df
+```
+```
 
 
