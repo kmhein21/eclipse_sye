@@ -1,0 +1,41 @@
+---
+title: "Making Data Frames for 2 Days"
+format: html
+---
+
+A004-SD012-04-07
+
+```{r}
+library(purrr)
+library(soundecology)
+library(tidyverse)
+library(here)
+library(stringr)
+```
+
+```{r}
+A4_7_paths <- list.files(here("A004_SD012_04_07"), pattern = "\\.WAV$",
+                    full.names = TRUE)
+
+wav_files_47 <- map(A4_7_paths, readWave)
+AEI_allWAV_47<-map(wav_files_47, acoustic_evenness)
+BEI_allWAV_47<-map(wav_files_47, bioacoustic_index)
+ADI_allWAV_47<-map(wav_files_47, acoustic_diversity)
+ACI_allWAV_47<-map(wav_files_47, acoustic_complexity)
+ndsi_allWAV_47<-map(wav_files_47, soundecology::ndsi)
+```
+
+Single value indices
+
+```{r}
+
+AEI_4_7<-as.data.frame(AEI_allWAV_47)|>
+  select(starts_with("aei_left"))
+
+BEI_4_7<-as.data.frame(BEI_allWAV_47)|>
+  select(starts_with("left_area"))
+
+
+
+```
+
