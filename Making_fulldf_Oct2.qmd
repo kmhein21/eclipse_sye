@@ -72,7 +72,10 @@ names(Full_4_7_df)<-df_names
 
 Final_4_7<-Full_4_7_df|>
   mutate(ADI = sapply(ADI, function(x) paste(x, collapse = ",")),
-         ACI= sapply(ACI, function(x) paste(x, collapse = ",")))
+         ACI= sapply(ACI, function(x) paste(x, collapse = ",")),
+         Biophony = as.numeric(Biophony),
+         AEI = as.numeric(AEI),
+         BEI = as.numeric(BEI))
 
 write_csv(Final_4_7, "A004_SD012_04_07.csv")
 ```
@@ -131,9 +134,30 @@ names(Full_4_8)<-df_names
 
 Final_4_8<-Full_4_8|>
   mutate(ADI = sapply(ADI, function(x) paste(x, collapse = ",")),
-         ACI= sapply(ACI, function(x) paste(x, collapse = ",")))
+         ACI= sapply(ACI, function(x) paste(x, collapse = ",")),
+         Biophony = as.numeric(Biophony),
+         AEI = as.numeric(AEI),
+         BEI = as.numeric(BEI))
 
 write.csv(Final_4_8, "A004_SD012_04_08.csv")
+```
+
+Biophony visual for the two days 
+```{r}
+ggplot(data = Final_4_8, aes(x= Paths_date, Biophony))+
+  geom_point()
+
+ggplot(data = Final_4_7, aes(x = Paths_date, y = Biophony))+
+  geom_point()
+```
+
+Acoustic Evenness Index for the two days 
+```{r}
+ggplot(data = Final_4_8, aes(x= Paths_date, AEI))+
+  geom_point()
+
+ggplot(data = Final_4_7, aes(x = Paths_date, y = AEI))+
+  geom_point()
 ```
 
 
