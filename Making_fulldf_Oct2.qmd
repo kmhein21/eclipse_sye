@@ -25,17 +25,62 @@ ACI_allWAV_47<-map(wav_files_47, acoustic_complexity)
 ndsi_allWAV_47<-map(wav_files_47, soundecology::ndsi)
 ```
 
-Single value indices
+Single value indices - Biophony, BEI, and AEI
 
 ```{r}
 
 AEI_4_7<-as.data.frame(AEI_allWAV_47)|>
-  select(starts_with("aei_left"))
+  select(starts_with("aei_left"))|>
+  pivot_longer(everything(), names_to = "aei_name", values_to = "AEI")
 
 BEI_4_7<-as.data.frame(BEI_allWAV_47)|>
-  select(starts_with("left_area"))
+  select(starts_with("left_area"))|>
+  pivot_longer(everything(), names_to = "bei_name", values_to = "BEI")
 
+Bio_4_7<-as.data.frame(ndsi_allWAV_47)|>
+  select(starts_with("biophony_left"))|>
+  pivot_longer(everything(), names_to = "biophony_name", values_to = "Biophony")
 
+paths_date <-str_remove(A4_7_paths, paste0(here(), "/A004_SD012_04_07"))
+
+single_indices<-as_tibble(cbind(paths_date, AEI_4_7$AEI, BEI_4_7$BEI, Bio_4_7$Biophony))
 
 ```
+
+Multiple Indices - ACI and ADI 
+
+For loop making lists of left values
+
+```{r}
+ACI_all_47<-vector("list", length(c(1:350)))
+ADI_all_47<-vector("list", length(c(1:350)))
+n<-350
+for (i in 1:n){
+    ACI_all_47[i]<-(as.data.frame(ACI_allWAV_47[[i]]$aci_fl_left_vals))
+    ADI_all_47[i]<-(as.data.frame(ADI_allWAV_47[[i]]$left_band_values))
+} 
+
+```
+
+```{r}
+multiple_indices<-as.tibble(cbind(ADI_all_47, ACI_all_47))
+
+df_names<- c("Paths_date", "AEI", "BEI", "Biophony", "ADI","ACI")
+
+Full_4_7_df<-cbind(single_indices,multiple_indices)
+names(Full_4_7_df)<-df_names
+
+Final_4_7<-Full_4_7_df|>
+  mutate(ADI = sapply(ADI, function(x) paste(x, collapse = ",")),
+         ACI= sapply(ACI, function(x) paste(x, collapse = ",")))
+
+write_csv(Final_4_7, "Final_4_7_df.csv")
+```
+
+
+
+
+
+
+
 
