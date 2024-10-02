@@ -146,6 +146,7 @@ full_WAV_df<-full_WAV_df|>
 
 write_csv(full_WAV_df, "Initial_10_WAV_df.csv")
 
+Initial_10_WAV_df <- read_csv("Initial_10_WAV_df.csv")
 ```
 
 Due to CSV not allowing numeric list columns, I changed them into strings and then saved as a csv
