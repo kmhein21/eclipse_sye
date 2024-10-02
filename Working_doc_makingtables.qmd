@@ -139,11 +139,15 @@ full_WAV_df<-cbind(single_indices, multiple_indices)|>
   separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
   select(-(ends_with("name")),-"nonsense")
 
-saveRDS(full_WAV_df, "initial_10_WAV_df.RDS")
+
+full_WAV_df<-full_WAV_df|>
+  mutate(ADI_all=sapply(full_WAV_df$ADI_all, function(x) paste(x, collapse = ",")),
+         ACI_all = sapply(full_WAV_df$ACI_all, function(x) paste(x, collapse = ",")))
 
 write_csv(full_WAV_df, "Initial_10_WAV_df.csv")
-Initial_10_WAV_df <- read_csv("Initial_10_WAV_df.csv")
+
 ```
 
+Due to CSV not allowing numeric list columns, I changed them into strings and then saved as a csv
 
 
