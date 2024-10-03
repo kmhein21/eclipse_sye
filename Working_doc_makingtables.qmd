@@ -135,12 +135,13 @@ Creating a full data frame with all indices (5)
 single_indices<-as.tibble(cbind(paths_date, AEI_df, BEI_df, Biophony_all))
 multiple_indices<-as.tibble(cbind( ADI_all, ACI_all))
 
-full_WAV_df<-cbind(single_indices, multiple_indices)|>
+full_WAV_df<-bind_cols(single_indices, multiple_indices)|>
   separate(col = paths_date, into = c("Date_time", "nonsense"), sep = -4)|>
   select(-(ends_with("name")),-"nonsense")
 
 
 save(full_WAV_df, file = "Initial_10_WAV.rda")
+load("Initial_10_WAV.rda")
 ```
 
 Due to CSV not allowing numeric list columns, I changed them into strings and then saved as a csv
