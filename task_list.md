@@ -1,5 +1,11 @@
 ## Task List
 
+## For October 10
+
+1. Fix up the plot (put both days on one plot).
+
+2. Plot the other indices for each day.
+
 ## For October 3
 
 1. Download the two large folders (separately). Write a data frame that has as much info as you can, and then delete the large folders.
