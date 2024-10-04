@@ -162,25 +162,63 @@ save(New_df_4_8, file = "A004_SD012_04_08.rda")
 load("A004_SD012_04_08.rda")
 ```
 
-Biophony visual for the two days 
 ```{r}
-ggplot(data = Final_4_8, aes(x= Paths_date, Biophony))+
-  geom_point()
+Same_time_4_8<-Final_4_8|>
+  separate(Paths_date, into = c("Date", "Time"), sep = "_")|>
+  separate(Time, into = c("time", "temp"), sep = "\\.")|>
+  separate(time, into = c("hours","other"), sep = 2)|>
+  separate(other, into = c("min", "sec"), sep = 2)|>
+  unite("time", c(,"hours", "min","sec"), sep = ":")|>
+  mutate(time = hms(time))|>
+  select(-temp)
 
-ggplot(data = New_df_4_8, aes(x = time, y = Biophony))+
-  geom_line()
-
-ggplot(data = Final_4_7, aes(x = Paths_date, y = Biophony))+
-  geom_point()
+Same_time_4_7<-Final_4_7|>
+  separate(Paths_date, into = c("Date", "Time"), sep = "_")|>
+  separate(Time, into = c("time", "temp"), sep = "\\.")|>
+  separate(time, into = c("hours","other"), sep = 2)|>
+  separate(other, into = c("min", "sec"), sep = 2)|>
+  mutate(Date = parse_number(Date))|>
+  unite("time", c("hours", "min","sec"), sep = ":")|>
+  mutate(time = hms(time))|>
+  select(-temp)
 ```
 
-Acoustic Evenness Index for the two days 
-```{r}
-ggplot(data = Final_4_8, aes(x= Paths_date, AEI))+
-  geom_point()
 
-ggplot(data = Final_4_7, aes(x = Paths_date, y = AEI))+
-  geom_point()
+Biophony visual for the two days 
+```{r}
+ggplot(data = New_df_4_8, aes(x = time, y = Biophony))+
+  geom_line()+
+  geom_line(data = New_df_4_7, aes(x = time, y = Biophony))
+
+ggplot(data = Same_time_4_8, aes( x = time, y = Biophony))+
+  geom_line()+
+  geom_line(data = Same_time_4_7, aes( x = time, y = Biophony), col = "orange")
+
+```
+
+
+Acoustic Evenness Index visual for the two days 
+```{r}
+ggplot(data = New_df_4_8, aes(x = time, y = AEI))+
+  geom_line()+
+  geom_line(data = New_df_4_7, aes( x = time, y = AEI))
+
+ggplot(data = Same_time_4_8, aes( x = time, y = AEI))+
+  geom_line()+
+  geom_line(data = Same_time_4_7, aes( x = time, y = AEI), col = "orange")
+```
+
+Bioacoustic Index visual for the two days
+
+```{r}
+ggplot(data = New_df_4_8, aes(x = time, y = BEI))+
+  geom_line()+
+  geom_line(data = New_df_4_7, aes( x = time, y = BEI))
+
+ggplot(data = Same_time_4_8, aes( x = time, y = BEI))+
+  geom_line()+
+  geom_line(data = Same_time_4_7, aes( x = time, y = BEI), col = "orange")
+
 ```
 
 
