@@ -196,7 +196,6 @@ ggplot(data = Same_time_4_8, aes( x = time, y = Biophony))+
 
 ```
 
-
 Acoustic Evenness Index visual for the two days 
 ```{r}
 ggplot(data = New_df_4_8, aes(x = time, y = AEI))+
