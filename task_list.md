@@ -1,5 +1,15 @@
 ## Task List
 
+## For October 24
+
+"Half Week"
+
+1. Clean up file structure.
+
+"Full Week"
+
+2. Write function with folder name as input and with .rda file of cleaned data as output (put in a .R file).
+
 ## For October 10
 
 1. Fix up the plot (put both days on one plot).
