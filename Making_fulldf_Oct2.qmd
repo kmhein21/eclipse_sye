@@ -5,11 +5,9 @@ format: html
 
 A004-SD012-04-07
 ```{r}
-library(purrr)
 library(soundecology)
 library(tidyverse)
 library(here)
-library(stringr)
 library(hms)
 ```
 
@@ -158,31 +156,25 @@ load("A004_SD012_04_08.rda")
 both_days <- bind_rows(New_df_4_7, New_df_4_8) |>
   mutate(day = as.factor(lubridate::day(time)),
          only_time = hms::as_hms(time))
-```
 
-Biophony visual for the two days 
-```{r}
 ggplot(data = both_days, aes(x = only_time, y = Biophony, color = day))+
   geom_line()+
   scale_color_viridis_d()+
-  theme_minimal()
+  theme_minimal()+
+  labs(title = "Biophony")
 
-```
-
-Acoustic Evenness Index visual for the two days 
-```{r}
 ggplot(data = both_days, aes(x = only_time, y = AEI, color = day))+
   geom_line()+
   scale_color_viridis_d()+
-  theme_minimal()
-```
+  theme_minimal()+
+  labs(title = "Acoustic Evenness")
 
-Bioacoustic Index visual for the two days
-```{r}
 ggplot(data = both_days, aes(x = only_time, y = BEI, color = day))+
   geom_line()+
     scale_color_viridis_d()+
-  theme_minimal()
+  theme_minimal()+
+  labs(title = "Bioacoustic Evenness")
+
 ```
 
 
