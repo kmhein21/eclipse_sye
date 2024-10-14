@@ -4,13 +4,13 @@ format: html
 ---
 
 A004-SD012-04-07
-
 ```{r}
 library(purrr)
 library(soundecology)
 library(tidyverse)
 library(here)
 library(stringr)
+library(hms)
 ```
 
 ```{r}
@@ -28,7 +28,6 @@ ndsi_allWAV_47<-map(wav_files_47, soundecology::ndsi)
 Single value indices - Biophony, BEI, and AEI
 
 ```{r}
-
 AEI_4_7<-as.data.frame(AEI_allWAV_47)|>
   select(starts_with("aei_left"))|>
   pivot_longer(everything(), names_to = "aei_name", values_to = "AEI")
@@ -50,7 +49,6 @@ single_indices<-as_tibble(cbind(paths_date, AEI_4_7$AEI, BEI_4_7$BEI, Bio_4_7$Bi
 Multiple Indices - ACI and ADI 
 
 For loop making lists of left values
-
 ```{r}
 ACI_all_47<-vector("list", length(c(1:350)))
 ADI_all_47<-vector("list", length(c(1:350)))
@@ -70,13 +68,10 @@ df_names<- c("Paths_date", "AEI", "BEI", "Biophony", "ADI","ACI")
 Full_4_7_df<-bind_cols(single_indices,multiple_indices)
 names(Full_4_7_df)<-df_names
 
-Final_4_7<-Full_4_7_df|>
-         mutate(Biophony = as.numeric(Biophony),
+New_df_4_7<-Full_4_7_df|>
+  mutate(Biophony = as.numeric(Biophony),
          AEI = as.numeric(AEI),
-         BEI = as.numeric(BEI))
-
-
-New_df_4_7<-Final_4_7|>
+         BEI = as.numeric(BEI))|>
   separate(Paths_date, into = c("Date", "Time"), sep = "_")|>
   separate(Time, into = c("time", "temp"), sep = "\\.")|>
   separate(time, into = c("hours","other"), sep = 2)|>
@@ -142,13 +137,10 @@ Compiling all into one data frame
 Full_4_8<-bind_cols(single_indices_48, multiple_indices_48)
 names(Full_4_8)<-df_names
 
-Final_4_8<-Full_4_8|>
-         mutate(Biophony = as.numeric(Biophony),
+New_df_4_8<-Full_4_8|>
+  mutate(Biophony = as.numeric(Biophony),
          AEI = as.numeric(AEI),
-         BEI = as.numeric(BEI))
-
-
-New_df_4_8<-Final_4_8|>
+         BEI = as.numeric(BEI))|>
   separate(Paths_date, into = c("Date", "Time"), sep = "_")|>
   separate(Time, into = c("time", "temp"), sep = "\\.")|>
   separate(time, into = c("hours","other"), sep = 2)|>
@@ -163,61 +155,34 @@ load("A004_SD012_04_08.rda")
 ```
 
 ```{r}
-Same_time_4_8<-Final_4_8|>
-  separate(Paths_date, into = c("Date", "Time"), sep = "_")|>
-  separate(Time, into = c("time", "temp"), sep = "\\.")|>
-  separate(time, into = c("hours","other"), sep = 2)|>
-  separate(other, into = c("min", "sec"), sep = 2)|>
-  unite("time", c(,"hours", "min","sec"), sep = ":")|>
-  mutate(time = hms(time))|>
-  select(-temp)
-
-Same_time_4_7<-Final_4_7|>
-  separate(Paths_date, into = c("Date", "Time"), sep = "_")|>
-  separate(Time, into = c("time", "temp"), sep = "\\.")|>
-  separate(time, into = c("hours","other"), sep = 2)|>
-  separate(other, into = c("min", "sec"), sep = 2)|>
-  mutate(Date = parse_number(Date))|>
-  unite("time", c("hours", "min","sec"), sep = ":")|>
-  mutate(time = hms(time))|>
-  select(-temp)
+both_days <- bind_rows(New_df_4_7, New_df_4_8) |>
+  mutate(day = as.factor(lubridate::day(time)),
+         only_time = hms::as_hms(time))
 ```
-
 
 Biophony visual for the two days 
 ```{r}
-ggplot(data = New_df_4_8, aes(x = time, y = Biophony))+
+ggplot(data = both_days, aes(x = only_time, y = Biophony, color = day))+
   geom_line()+
-  geom_line(data = New_df_4_7, aes(x = time, y = Biophony))
-
-ggplot(data = Same_time_4_8, aes( x = time, y = Biophony))+
-  geom_line()+
-  geom_line(data = Same_time_4_7, aes( x = time, y = Biophony), col = "orange")
+  scale_color_viridis_d()+
+  theme_minimal()
 
 ```
 
 Acoustic Evenness Index visual for the two days 
 ```{r}
-ggplot(data = New_df_4_8, aes(x = time, y = AEI))+
+ggplot(data = both_days, aes(x = only_time, y = AEI, color = day))+
   geom_line()+
-  geom_line(data = New_df_4_7, aes( x = time, y = AEI))
-
-ggplot(data = Same_time_4_8, aes( x = time, y = AEI))+
-  geom_line()+
-  geom_line(data = Same_time_4_7, aes( x = time, y = AEI), col = "orange")
+  scale_color_viridis_d()+
+  theme_minimal()
 ```
 
 Bioacoustic Index visual for the two days
-
 ```{r}
-ggplot(data = New_df_4_8, aes(x = time, y = BEI))+
+ggplot(data = both_days, aes(x = only_time, y = BEI, color = day))+
   geom_line()+
-  geom_line(data = New_df_4_7, aes( x = time, y = BEI))
-
-ggplot(data = Same_time_4_8, aes( x = time, y = BEI))+
-  geom_line()+
-  geom_line(data = Same_time_4_7, aes( x = time, y = BEI), col = "orange")
-
+    scale_color_viridis_d()+
+  theme_minimal()
 ```
 
 
