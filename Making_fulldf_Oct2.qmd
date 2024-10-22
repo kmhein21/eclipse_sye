@@ -28,19 +28,22 @@ Single value indices - Biophony, BEI, and AEI
 ```{r}
 AEI_4_7<-as.data.frame(AEI_allWAV_47)|>
   select(starts_with("aei_left"))|>
-  pivot_longer(everything(), names_to = "aei_name", values_to = "AEI")
+  pivot_longer(everything(), names_to = "aei_name", values_to = "AEI")|>
+  select("AEI")
 
 BEI_4_7<-as.data.frame(BEI_allWAV_47)|>
   select(starts_with("left_area"))|>
-  pivot_longer(everything(), names_to = "bei_name", values_to = "BEI")
+  pivot_longer(everything(), names_to = "bei_name", values_to = "BEI")|>
+  select("BEI")
 
 Bio_4_7<-as.data.frame(ndsi_allWAV_47)|>
   select(starts_with("biophony_left"))|>
-  pivot_longer(everything(), names_to = "biophony_name", values_to = "Biophony")
+  pivot_longer(everything(), names_to = "biophony_name", values_to = "Biophony")|>
+  select("Biophony")
 
 paths_date <-str_remove(A4_7_paths, paste0(here(), "/A004_SD012_04_07"))
 
-single_indices<-as_tibble(cbind(paths_date, AEI_4_7$AEI, BEI_4_7$BEI, Bio_4_7$Biophony))
+single_indices<-as_tibble(cbind(paths_date, AEI_4_7, BEI_4_7, Bio_4_7))
 
 ```
 
