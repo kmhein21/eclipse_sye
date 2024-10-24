@@ -1,5 +1,15 @@
 ## Task List
 
+## For October 31
+
+1. Clean up file structure.
+
+2. Fix up the function to work with other folders and with general n.
+
+3. Restart R (Sesion -> Restart) and run the function to make sure it works on a "clean slate".
+
+4. Use `map()` with a vector of two folder names to run the function "twice", once for each folder.
+
 ## For October 24
 
 "Half Week"
