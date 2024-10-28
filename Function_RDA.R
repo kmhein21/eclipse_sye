@@ -1,6 +1,8 @@
 test_fun<- function(folder, output) {
   f_list<- list.files(folder, pattern = "\\.WAV$", full.names = TRUE)
-  paths_date <-str_remove(f_list, paste0(here(), "/test_wavs"))
+  paths_date<- str_remove(f_list, paste0(here(folder)))
+  
+  print(paths_date)
   
   WAV_f<-map(f_list, readWave)
   AEI<-map(WAV_f, acoustic_evenness)
@@ -24,17 +26,18 @@ test_fun<- function(folder, output) {
     pivot_longer(everything(), names_to = "bio_name", values_to = "biophony")|>
     select("biophony")
   
-  single<- as.tibble(cbind(paths_date, AEI_df, BEI_df, Biophony_df))
+  single<- as_tibble(cbind(paths_date, AEI_df, BEI_df, Biophony_df))
   
-  ACI_all<-vector("list", length(c(1:3)))
-  ADI_all<-vector("list", length(c(1:3)))
-  n<-3
+  ACI_all<-vector("list", length(folder))
+  ADI_all<-vector("list", length(folder))
+  n<-length(folder)
   for (i in 1:n){
     ACI_all[i]<-(as.data.frame(ACI[[i]]$aci_fl_left_vals))
     ADI_all[i]<-(as.data.frame(ADI[[i]]$left_band_values))
   } 
   multiple<-as.tibble(cbind( ACI_all, ADI_all))
   full<-bind_cols(single, multiple)
+  
   
   final<- full|> mutate(biophony = as.numeric(biophony),
                         aei = as.numeric(aei),
@@ -51,6 +54,15 @@ test_fun<- function(folder, output) {
     
   save(final, file = output)
   load(output)
-} 
+}
+
+
+library(soundecology)
+library(tidyverse)
+library(here)
+library(hms)
+library(tuneR)
 
 test_fun(here("test_wavs"), output = "test_3_wav.rda")
+test_fun(here("CopyOftest_wavs"), output = "Copy_test.rda")
+
