@@ -1,3 +1,9 @@
+library(soundecology)
+library(tidyverse)
+library(here)
+library(hms)
+library(tuneR)
+
 test_fun<- function(folder, output) {
   f_list<- list.files(folder, pattern = "\\.WAV$", full.names = TRUE)
   paths_date<- str_remove(f_list, paste0(here(folder)))
@@ -56,12 +62,6 @@ test_fun<- function(folder, output) {
   load(output)
 }
 
-
-library(soundecology)
-library(tidyverse)
-library(here)
-library(hms)
-library(tuneR)
 
 test_fun(here("test_wavs"), output = "test_3_wav.rda")
 test_fun(here("CopyOftest_wavs"), output = "Copy_test.rda")
