@@ -44,7 +44,7 @@ eclipse_df<- function(folder) {
     ACI_all[i]<-(as.data.frame(ACI[[i]]$aci_fl_left_vals))
     ADI_all[i]<-(as.data.frame(ADI[[i]]$left_band_values))
   } 
-  multiple<-as.tibble(cbind( ACI_all, ADI_all))
+  multiple<-as_tibble(cbind( ACI_all, ADI_all))
   full<-bind_cols(single, multiple)
   
   
