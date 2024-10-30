@@ -4,11 +4,9 @@ library(here)
 library(hms)
 library(tuneR)
 
-test_fun<- function(folder, output) {
+eclipse_df<- function(folder, output) {
   f_list<- list.files(folder, pattern = "\\.WAV$", full.names = TRUE)
   paths_date<- str_remove(f_list, paste0(here(folder)))
-  
-  print(paths_date)
   
   WAV_f<-map(f_list, readWave)
   AEI<-map(WAV_f, acoustic_evenness)
@@ -63,6 +61,8 @@ test_fun<- function(folder, output) {
 }
 
 
-test_fun(here("test_wavs"), output = "test_3_wav.rda")
-test_fun(here("CopyOftest_wavs"), output = "Copy_test.rda")
+eclipse_df(here("test_wavs"), output = "test_3_wav.rda")
+eclipse_df(here("WAV_5_test"), output = "WAV_5.rda" )
 
+folder_group<-c(here("test_wavs"),here("WAV_5_test"))
+map(folder_group, eclipse_df)
