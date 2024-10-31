@@ -1,5 +1,16 @@
 ## Task List
 
+## For November 7
+
+1. Make a variable that has the folder name.
+
+2. MH: look into naming `final` something else for loading in and getting an HPC account.
+
+3. Start short write-up (introducing the data using erika's methods, talking about the different sound metric, introducing some of the coding work you've done so far, in a .qmd file).
+
+4. MH: Make sure that you have an HPC account and I'll figure out the password for my account.
+
+
 ## For October 31
 
 1. Clean up file structure.
