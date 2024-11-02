@@ -60,8 +60,9 @@ eclipse_df<- function(folder) {
     mutate(time= ymd_hms(time))|>
     select(-wav)
 
-    
-  save(final, file = output)
+    assign(test, final)
+  
+  save(test, file = output)
   load(output)
 }
 
