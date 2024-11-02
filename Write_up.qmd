@@ -1,0 +1,82 @@
+---
+title: "Write Up"
+format: html
+---
+
+### Methods (Erika): 
+
+We collected data between March 30 and April XX, 2024 by deploying 20 AudioMothTM acoustic recorders throughout St. Lawrence County, New York. All locations were fully within the path of totality for the April 8, 2024 total solar eclipse. The partial eclipse began at 14:11:38, totality began at 15:23:52, maximum eclipse was at 15:25:29, totality ended at 15:27:05 and the partial eclipse ended at 16:35:38 (all times local, times from https://www.timeanddate.com/eclipse/in/@5111484?iso=20240408) for a total eclipse duration of 2 hours 24 minutes with totality lasting 3 minutes and 13 seconds.  
+
+Each AudioMoth was configured to record within four temporal windows on each day of the deployment. The first window was from 05:45 – 07:15 (approximately 30 minutes before to 45 minutes after sunrise), the second from 14:00 to 16:50 (capturing the full period of time each day corresponding to the eclipse on April 8),  third from 19:00 to 20:00 (approximately 30 minutes before and after sunset) and the last from 23:00 to 23:30 (to sample nocturnal sounds). (Table 1.)
+
+#### Table 1. 
+
+```{r}
+library(pander)
+Times<- c("05:45 - 07:15", "14:00 - 16:50", "19:00- 20:00", "23:00 - 23:30")
+
+Reasoning<- c("30-45 minutes before sunrise", "full period of time corresponding to the eclipse", "~30 minutes before and after sunset", "sample nocturnal activity")
+
+Table1<-cbind(Times, Reasoning)
+Table1|>pander()
+```
+
+
+Within each time window, each AudioMoth recorded in a repeated cycle with 55 seconds of recording and 5 seconds to write data for every minute of the recording window (Table 2). Sample rate measures the density of recordings per unit time and therefore the range of frequencies that can be recorded. High sample rates record a higher range of frequencies but take up more space on the microSD card. We selected a sample rate of 96 kHz to capture sound frequencies up to about 48 kHz, which allowed us to capture common bird and amphibian songs and calls as well as at least some insects and bat echolocation sounds. Gain is a measure of the degree to which the microphone amplifies the sound as it is recorded. Higher gain enables detection of quieter sounds but can also result in clipping and distortion. After collecting pilot recordings near wetlands where wood frogs were calling we determined that a gain setting of 4 would help increase our detection of animal sounds. 
+
+#### Table 2. 
+
+```{r}
+Parameters<- c("Sample Rate (kHz)", "Gain", "Sleep duration (seconds)", "Recording duration (seconds)")
+
+Setting<-c("96", "Relatively high (4 on a 5 point scale)", "5", "55")
+
+Table2<-cbind(Parameters, Setting)
+Table2|> pander()
+```
+
+
+
+We used ArcGIS Pro (version XXXX, ESRI Incorporated, Redlands, California) to identify areas of forest-wetland interface or forested wetland occurring on public or University-owned land. Our intention was to place the recorders at locations where they could capture the sounds of both forest birds and pond-breeding amphibians (as well as other biotic sounds including any active insects or bats). Due to our northern location within the path of the eclipse in North America, the onset of spring was just beginning. Red-winged blackbirds (Agelaius phoeniceus) had returned to the area and were establishing breeding territories and both wood frogs (Lithobates sylvaticus) and spring peepers (Pseudacris crucifer) had begun to chorus at least 5 days prior to deployment of the recorders. To reduce the time required to deploy units, we located the devices near but out of view of hiking trails and within 20 miles of the St. Lawrence University campus (44.58931027483651º N, -75.1613716006626 º W). 
+
+
+### Analysis
+
+Using the $'soundecology'$ package we selected 5 specific indices of interest that we beleived would be important in understanding the changes in acoustic activity. 
+
+Acoustic Evenness Index:
+
+Index which measures the equality and inequality of sound power distribution in different ranges. This index uses the Gini index of evenness. This index is found using the acoustic_evenness() function in the soundecology package
+
+Bioacoustic Evenness Index:
+
+Index is a function of the power and freqeuncy range of biotic sound. This is obtained using the bioacoustic_evenness() function in the soundecology package
+
+Acoustic Diverstiy Index:
+
+Index which generates proportions of data within a specific interval that reach above a specified threshold (default -50dBFS). This index is obtained using the acoustic_diversity() function in the soundecology package
+
+Acoustic Complexity Index:
+
+Index is a function of the amount of variation within frequency bins of a sample. This index is obtained using the acoustic_complexity() function within the soundecology package. 
+
+Biophony: 
+
+Index which calculates the average frequency of biotic sound. This index is obtained as a byproduct from the ndsi() function
+
+
+Initially we approached the data set in an exploratory manner. Using a couple audiofiles (.WAV) we visualized how the indices would appear in graphics and how we should store the indices. 
+
+(PUT DATA AND GRAPHICS FROM THE FIRST COUPLE OF WEEKS HERE)
+
+After this exploration it seemed imperitive to contain the data we would use into one object, so it could be stored and accessed without having to clean the data in the way we would like. The goal was to obtain the dates, times, and the different indices into one data frame per folder. After preforming this task on a couple .WAV files it was automated into its own function $eclipse_df()$ so it could be uploaded to an HPC and mapped on all our recording folders. 
+
+(FUNCTION)
+
+
+
+
+
+
+
+
