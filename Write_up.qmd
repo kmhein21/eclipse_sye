@@ -65,13 +65,52 @@ Biophony:
 Index which calculates the average frequency of biotic sound. This index is obtained as a byproduct from the ndsi() function
 
 
-Initially we approached the data set in an exploratory manner. Using a couple audiofiles (.WAV) we visualized how the indices would appear in graphics and how we should store the indices. 
+Initially we approached the data set in an exploratory manner. Using a couple audiofiles (.WAV) we visualized how the indices would appear in graphics and how we should store the indices. Examples of these graphs are listed below: 
 
-(PUT DATA AND GRAPHICS FROM THE FIRST COUPLE OF WEEKS HERE)
+```{r}
+WAV_0616100_240401<-readWave(here("wav_files/20240401_061600.WAV"))
 
-After this exploration it seemed imperitive to contain the data we would use into one object, so it could be stored and accessed without having to clean the data in the way we would like. The goal was to obtain the dates, times, and the different indices into one data frame per folder. After preforming this task on a couple .WAV files it was automated into its own function $eclipse_df()$ so it could be uploaded to an HPC and mapped on all our recording folders. 
+ACI_01<-acoustic_complexity(WAV_0616100_240401)
+ACI_01_val<-ACI_01$aci_fl_left_vals
+df_ACI<-as.data.frame(ACI_01$aci_fl_left_vals)
 
-(FUNCTION)
+plot(x=1:256, y=ACI_01_val, col="orange", pch=16)
+
+ggplot(data=df_ACI, aes(x=1:256, y=ACI_01$aci_fl_left_vals))+
+  geom_line(col="orange")+
+  theme_minimal()+
+  labs(x = "Time(s)", y = "Acoustic Complexity")
+
+
+ADI1<-acoustic_diversity(WAV_0616100_240401)
+
+ADI1_lv<-as.data.frame(ADI1$left_band_values)
+
+ggplot(data=ADI1_lv, aes(x=1:10, y=ADI1$left_band_values))+
+  geom_point()+
+  theme_minimal()
+```
+
+After this exploration it seemed imperitive to contain the data we would use into one object, so it could be stored and accessed without having to clean the data in the way we would like. The goal was to obtain the dates, times, and the different indices into one data frame per folder. After preforming this task on a couple .WAV files it was automated into its own function $eclipse_df()$ so it could be uploaded to an HPC and mapped on all our recording folders. The main output of this function is the creation of a clean data frame and this code is written below
+
+```{r}
+full|> mutate(biophony = as.numeric(biophony),
+                        aei = as.numeric(aei),
+                        bei = as.numeric(bei))|>
+    separate(paths_date, into = c("date","time_hms"), sep = "_")|>
+    separate(time_hms, into = c("time", "wav"), sep = "\\.")|>
+    separate(time, into = c("hours", "other"), sep = 2)|>
+    separate(other, into = c("min", "sec"), sep = 2)|>
+    mutate(date = parse_number(date))|>
+    unite("time", c("date", "hours", "min", "sec"), sep = ":")|>
+    mutate(time= ymd_hms(time))|>
+    select(-wav)|>
+    mutate(folder_name = deparse(str_remove(folder, here())))|>
+    select(folder_name, everything())
+```
+
+This takes a table of indices for a specific folder and creates a correct time variable, selects the columns that we would like, and creates a "folder_name" variable so the data frame can be identified.  
+
 
 
 

@@ -45,8 +45,7 @@ eclipse_df<- function(folder) {
     ADI_all[i]<-(as.data.frame(ADI[[i]]$left_band_values))
   } 
   multiple<-as_tibble(cbind( ACI_all, ADI_all))
-  name<-c(rep(deparse(substitute(folder)), length(multiple)))
-  full<-bind_cols(single, multiple, name)
+  full<-bind_cols(single, multiple)
 
   
   final<- full|> mutate(biophony = as.numeric(biophony),
@@ -59,18 +58,14 @@ eclipse_df<- function(folder) {
     mutate(date = parse_number(date))|>
     unite("time", c("date", "hours", "min", "sec"), sep = ":")|>
     mutate(time= ymd_hms(time))|>
-    select(-wav)
+    select(-wav)|>
+    mutate(folder_name = deparse(str_remove(folder, here())))|>
+    select(folder_name, everything())
     
   
   save(final, file = output)
   load(output)
 }
-
-name<-c(
-  rep(
-      deparse(
-        substitute(
-          folder)), length(full)))
 
 eclipse_df(here("test_wavs"))
 eclipse_df(here("WAV_5_test"))
