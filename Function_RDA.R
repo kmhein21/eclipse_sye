@@ -62,9 +62,11 @@ eclipse_df<- function(folder) {
     mutate(folder_name = deparse(str_remove(folder, here())))|>
     select(folder_name, everything())
     
-  
   save(final, file = output)
   load(output)
+  
+  #saveRDS(final, file = output)
+  #load(output)
 }
 
 eclipse_df(here("test_wavs"))
