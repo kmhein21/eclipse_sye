@@ -11,7 +11,7 @@ eclipse_df<- function(folder) {
   #b<-str_remove(a, "here\\(")
   #c<-str_remove(b,"\\)")
   #output<-paste0(c,".rda")
-  output<- paste0(deparse(substitute(folder)),".rda")
+  output<- paste0(deparse(substitute(folder)),".rds")
   
   WAV_f<-map(f_list, readWave)
   AEI<-map(WAV_f, acoustic_evenness)
@@ -61,12 +61,8 @@ eclipse_df<- function(folder) {
     select(-wav)|>
     mutate(folder_name = deparse(str_remove(folder, here())))|>
     select(folder_name, everything())
-    
-  save(final, file = output)
-  load(output)
   
-  #saveRDS(final, file = output)
-  #load(output)
+  saveRDS(final, file = output)
 }
 
 eclipse_df(here("test_wavs"))
