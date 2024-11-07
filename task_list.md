@@ -1,5 +1,19 @@
 ## Task List
 
+## For November 14
+
+0. Install Filezilla (or some other free FTP service).
+
+0.5. Remove here from .rds file (and also make sure that it's working).
+
+1. Run test .run file on HPC.
+
+2. MH: Make sure home directory is set up. Send HPC directions.
+
+2.5. MH: Look more at write-up.
+
+3. Install necessary R packages (to make sure there are no issues).
+
 ## For November 7
 
 1. Make a variable that has the folder name.
