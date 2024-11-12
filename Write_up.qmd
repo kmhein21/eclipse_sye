@@ -125,6 +125,7 @@ full|> mutate(biophony = as.numeric(biophony),
 
 This takes a table of indices for a specific folder and creates a correct time variable, selects the columns that we would like, and creates a "folder_name" variable so the data frame can be identified.  
 
+The final output of this function is the creation of an RDS file that can be renamed upon loading into the environment. 
 
 
 
