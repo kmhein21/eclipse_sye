@@ -7,11 +7,12 @@ library(tuneR)
 eclipse_df<- function(folder) {
   f_list<- list.files(folder, pattern = "\\.WAV$", full.names = TRUE)
   paths_date<- str_remove(f_list, paste0(here(folder)))
-  #a<-deparse(substitute(folder))
-  #b<-str_remove(a, "here\\(")
-  #c<-str_remove(b,"\\)")
-  #output<-paste0(c,".rda")
-  output<- paste0(deparse(substitute(folder)),".rds")
+  name<-folder|> substitute()|>
+    deparse()|>
+    str_remove("here")|>
+    str_remove_all("[\\()\"]")
+
+  output<-paste0(name,".rds")
   
   WAV_f<-map(f_list, readWave)
   AEI<-map(WAV_f, acoustic_evenness)
