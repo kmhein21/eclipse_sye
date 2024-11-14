@@ -1,5 +1,13 @@
 ## Task List
 
+## For November 21
+
+1. Get test .run file working on HPC.
+
+2. Upload small folder of .wav files to HPC.
+
+3. Get the script with the function to run on the HPC (and can get rid of the array line in the .run file as well).
+
 ## For November 14
 
 0. Install Filezilla (or some other free FTP service).
