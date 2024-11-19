@@ -67,8 +67,8 @@ eclipse_df<- function(folder) {
 }
 
 eclipse_df(here("test_wavs"))
-eclipse_df(here("WAV_5_test"))
+#eclipse_df(here("WAV_5_test"))
 
-folder_group<-c(here("test_wavs"),here("WAV_5_test"))
+#folder_group<-c(here("test_wavs"),here("WAV_5_test"))
 
-map(folder_group, eclipse_df)
+#map(folder_group, eclipse_df)
