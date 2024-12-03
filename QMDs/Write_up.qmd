@@ -65,47 +65,54 @@ Biophony:
 
 Index which calculates the average frequency of biotic sound. This index is obtained as a byproduct from the ndsi() function and the numerical values used is from subsetting $biophony_left. 
 
-
-Initially we approached the data set in an exploratory manner. Using a couple audiofiles (.WAV) we visualized how the indices would appear in graphics and how we should store the indices. Examples of codes for these graphs are listed below:
-
+Initially the goal was to create a data frame that contained all of the information about the indices that we would like to assess. This allowed us to visualize the indices in graphics and we began with a subset of 10 audiofiles (.WAV). Examples of some of the initial graphs are listed below: 
 ```{r}
-WAV_0616100_240401<-readWave(here("wav_files/20240401_061600.WAV"))
-
-ACI_01<-acoustic_complexity(WAV_0616100_240401)
-ACI_01_val<-ACI_01$aci_fl_left_vals
-df_ACI<-as.data.frame(ACI_01$aci_fl_left_vals)
-
-plot(x=1:256, y=ACI_01_val, col="orange", pch=16)
-
-ggplot(data=df_ACI, aes(x=1:256, y=ACI_01$aci_fl_left_vals))+
+ggplot(data=New_First10_df, aes(x=time, y=as.numeric(BEI)))+
   geom_line(col="orange")+
   theme_minimal()+
-  labs(x = "Time(s)", y = "Acoustic Complexity")
+  labs(x = "Time", y = "Bioacoustic Evenness")
 
+ggplot(data=New_First10_df, aes(x = time, y = as.numeric(AEI)))+
+  geom_line()+
+  theme_minimal()+
+  labs(x = "Time", y = "Acoustic Evenness")
 
-ADI1<-acoustic_diversity(WAV_0616100_240401)
+ggplot(data = New_First10_df, aes(x = time, y = as.numeric(Biophony)))+
+  geom_line(col = "green")+
+  theme_minimal()+
+  labs(x = "Time", y = "Biophony")
 
-ADI1_lv<-as.data.frame(ADI1$left_band_values)
-
-ggplot(data=ADI1_lv, aes(x=1:10, y=ADI1$left_band_values))+
-  geom_point()+
-  theme_minimal()
 ```
 
-After this exploration it seemed imperitive to contain the data we would use into one object, so it could be stored and accessed without having to clean the data in the way we would like. The goal was to obtain the dates, times, and the different indices into one data frame per folder. After preforming this task on a couple .WAV files it was automated into its own function $eclipse_df()$ so it could be uploaded to an HPC and mapped on all our recording folders. In the function initially all indices must be obtained, for single indices this is as simple as saving one value per file into a column. For the two indices that contian multiple values per file we created a for loop that would save only the specific values we wanted ("aci_fl_left_values" for ACI and "left_band_values" for ADI).
+The next step was to increase this creating  a function $eclipse_df()$ that could be used on a folder containing all of the .WAV files for one audiomoth which would return a cleaned data frame which could be manipulated. The goal was to create this function so that it could be uploaded to an HPC and mapped onto all the audiomoth folders that we had access to. In the function this requires saving single indices as one value per file in a column, and saving lists of values as a column for indices such as Acoustic complexity and diversity, which possessed multiple values per recording. Initially this function was used on two folders of audiomoths from April 7th and 8th to create some comparison visuals before we expanded the project to the full set of data we had access to. 
 
+ 
 ```{r}
-  ACI_all<-vector("list", length(folder))
-  ADI_all<-vector("list", length(folder))
-  n<-length(folder)
-  for (i in 1:n){
-    ACI_all[i]<-(as.data.frame(ACI[[i]]$aci_fl_left_vals))
-    ADI_all[i]<-(as.data.frame(ADI[[i]]$left_band_values))
-  } 
-  multiple<-as_tibble(cbind( ACI_all, ADI_all))
+## Fix these graphs so the x-axis is only time, not date as well 
+New_df_4_7
+New_df_4_8
+
+
+ggplot(data = both_days, aes(x = time, y = Biophony, color = day))+
+  geom_line()+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  labs(title = "Biophony")
+
+ggplot(data = both_days, aes(x = only_time, y = AEI, color = day))+
+  geom_line()+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  labs(title = "Acoustic Evenness")
+
+ggplot(data = both_days, aes(x = only_time, y = BEI, color = day))+
+  geom_line()+
+    scale_color_viridis_d()+
+  theme_minimal()+
+  labs(title = "Bioacoustic Evenness")
 ```
 
-These two indices were stored in a separate data frame with list columns. Then both the single and multiple indices could be merged into one messy data frame. The main output of this function is the creation of a clean data frame from this initial messy data frame. The code for this is below: 
+The final step of the function as mentioned before is to create a fully cleaned data frame. Along with the single and multiple sound indices a column was added depicting the data and time, as well as the name of the folder the data came from (note this was not included in the above comparison of 4/7/24 and 4/8/24). The code for this data frame is listed below:
 
 ```{r}
 full|> mutate(biophony = as.numeric(biophony),
@@ -123,9 +130,11 @@ full|> mutate(biophony = as.numeric(biophony),
     select(folder_name, everything())
 ```
 
-This takes a table of indices for a specific folder and creates a correct time variable, selects the columns that we would like, and creates a "folder_name" variable so the data frame can be identified.  
-
 The final output of this function is the creation of an RDS file that can be renamed upon loading into the environment. 
+
+
+
+
 
 
 
