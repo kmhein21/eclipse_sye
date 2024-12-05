@@ -1,5 +1,11 @@
 ## Task List
 
+## For December 12
+
+1. Keep working on write-up
+
+2. Start analyzing output from the single audiomoth (assuming the HPC analysis runs).
+
 ## For November 21
 
 1. Get test .run file working on HPC.
