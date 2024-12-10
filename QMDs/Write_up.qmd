@@ -88,26 +88,24 @@ The next step was to increase this creating  a function $eclipse_df()$ that coul
 
  
 ```{r}
-## Fix these graphs so the x-axis is only time, not date as well 
 New_df_4_7
 New_df_4_8
 
-
-ggplot(data = both_days, aes(x = time, y = Biophony, color = day))+
+ggplot(data = both_days, aes(x = as_hms(time), y = Biophony, color = date(time)))+
   geom_line()+
-  scale_color_viridis_d()+
+  scale_fill_viridis_c()+
   theme_minimal()+
   labs(title = "Biophony")
 
-ggplot(data = both_days, aes(x = only_time, y = AEI, color = day))+
+ggplot(data = both_days, aes(x = as_hms(time), y = AEI, color = date(time)))+
   geom_line()+
-  scale_color_viridis_d()+
+  scale_fill_viridis_c()+
   theme_minimal()+
   labs(title = "Acoustic Evenness")
 
-ggplot(data = both_days, aes(x = only_time, y = BEI, color = day))+
+ggplot(data = both_days, aes(x = as_hms(time), y = BEI, color = date(time)))+
   geom_line()+
-    scale_color_viridis_d()+
+  scale_color_viridis_c()+
   theme_minimal()+
   labs(title = "Bioacoustic Evenness")
 ```
