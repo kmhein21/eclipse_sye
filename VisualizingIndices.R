@@ -33,6 +33,12 @@ ggplot(data = separate_hrdy, aes(x = hours, y = bei))+
   geom_line(data = eclipseonly, aes(x = hours, y = bei), col = "blue", lwd = 1)+
   theme_minimal()
 
+#creating similar graph to Gerber, 2017
+ggplot(data = separate_hrdy, aes(x = hours, y = bei))+
+  geom_point(alpha = 0.2, color = "lightblue")+
+  geom_point(data = eclipseonly, aes(x = hours, y = bei), col = "blue", lwd = 1)+
+  theme_minimal()
+
 #Biophony 
 
 ggplot(data = A001_SD001, aes(x = as_hms(time), y = biophony))+
@@ -43,9 +49,17 @@ ggplot(data = A001_SD001, aes(x = as_hms(time), y = biophony))+
 ggplot(data = separate_hrdy, aes(x = hours, y = biophony))+
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hours, y = biophony), col = "red", lwd = 1)+
-  theme_minimal()
+  theme_minimal()+
+  geom_vline(xintercept = hms(52,23,15), color= "blue", linetype = "dashed") #beginning of totality
 
 ggplot(data = separate_hrdy, aes(x = hours, y = biophony))+
   geom_line()+
+  #geom_vline(xintercept = hms(52,23,15), color = "blue", linetype = "dashed")+
   facet_wrap(~day)+
+  theme_minimal()
+
+# AEI
+
+ggplot(data = A001_SD001, aes(x = as_hms(time), y = (ACI_all))+
+  geom_line()+
   theme_minimal()
