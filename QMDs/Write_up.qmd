@@ -91,21 +91,21 @@ The next step was to increase this creating  a function $eclipse_df()$ that coul
 New_df_4_7
 New_df_4_8
 
-ggplot(data = both_days, aes(x = as_hms(time), y = Biophony, color = date(time)))+
+ggplot(data = both_days, aes(x = as_hms(time), y = Biophony, color = as.factor(date(time))))+
   geom_line()+
-  scale_fill_viridis_c()+
+  scale_color_viridis_d()+
   theme_minimal()+
   labs(title = "Biophony")
 
-ggplot(data = both_days, aes(x = as_hms(time), y = AEI, color = date(time)))+
+ggplot(data = both_days, aes(x = as_hms(time), y = AEI, color = as.factor(date(time))))+
   geom_line()+
-  scale_fill_viridis_c()+
+  scale_color_viridis_d()+
   theme_minimal()+
   labs(title = "Acoustic Evenness")
 
-ggplot(data = both_days, aes(x = as_hms(time), y = BEI, color = date(time)))+
+ggplot(data = both_days, aes(x = as_hms(time), y = BEI, color = as.factor(date(time))))+
   geom_line()+
-  scale_color_viridis_c()+
+  scale_color_viridis_d()+
   theme_minimal()+
   labs(title = "Bioacoustic Evenness")
 ```
