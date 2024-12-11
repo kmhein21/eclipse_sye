@@ -5,7 +5,7 @@ format: html
 
 ### Methods (Erika): 
 
-We collected data between March 30 and April XX, 2024 by deploying 20 AudioMothTM acoustic recorders throughout St. Lawrence County, New York. All locations were fully within the path of totality for the April 8, 2024 total solar eclipse. The partial eclipse began at 14:11:38, totality began at 15:23:52, maximum eclipse was at 15:25:29, totality ended at 15:27:05 and the partial eclipse ended at 16:35:38 (all times local, times from https://www.timeanddate.com/eclipse/in/@5111484?iso=20240408) for a total eclipse duration of 2 hours 24 minutes with totality lasting 3 minutes and 13 seconds.  
+We collected data between March 30 and April 16, 2024 by deploying 20 AudioMothTM acoustic recorders throughout St. Lawrence County, New York. All locations were fully within the path of totality for the April 8, 2024 total solar eclipse. The partial eclipse began at 14:11:38, totality began at 15:23:52, maximum eclipse was at 15:25:29, totality ended at 15:27:05 and the partial eclipse ended at 16:35:38 (all times local, times from https://www.timeanddate.com/eclipse/in/@5111484?iso=20240408) for a total eclipse duration of 2 hours 24 minutes with totality lasting 3 minutes and 13 seconds.  
 
 Each AudioMoth was configured to record within four temporal windows on each day of the deployment. The first window was from 05:45 – 07:15 (approximately 30 minutes before to 45 minutes after sunrise), the second from 14:00 to 16:50 (capturing the full period of time each day corresponding to the eclipse on April 8),  third from 19:00 to 20:00 (approximately 30 minutes before and after sunset) and the last from 23:00 to 23:30 (to sample nocturnal sounds). (Table 1.)
 
@@ -129,6 +129,10 @@ full|> mutate(biophony = as.numeric(biophony),
 ```
 
 The final output of this function is the creation of an RDS file that can be renamed upon loading into the environment. 
+
+Upon running the files onto the HPC, rds files were created which contianed our cleaned data in a format that could be analyzed. The analysis was to first look for patterns across the days of the audiomoths to see if the eclipse data looked different from the other days when sampling occurred and if the time during the eclipse was similar to other times of the day.
+
+
 
 
 
