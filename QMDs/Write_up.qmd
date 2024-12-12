@@ -132,7 +132,16 @@ The final output of this function is the creation of an RDS file that can be ren
 
 Upon running the files onto the HPC, rds files were created which contianed our cleaned data in a format that could be analyzed. The analysis was to first look for patterns across the days of the audiomoths to see if the eclipse data looked different from the other days when sampling occurred and if the time during the eclipse was similar to other times of the day.
 
+Through analyzing the first folder and indices returned from the one audiomoth, I analyzed both the full series and the segment that corresponded to the eclipse. Through analyzing the full series, it didn't seem that there was anything sticking out immensely. I created faceted graphs as well as layered graphics to display the patterns from the different days. 
 
+```{r}
+ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
+  geom_line()+
+  theme_minimal()+
+  facet_wrap(~date(time))
+```
+
+From my larger data frame I subset just the time series portion that corresponded to the eclipse from April 8th. This analysis showed a couple of interesting points to take note of. In the biophony analysis, when a vertical line is added at the point of totality 
 
 
 

@@ -2,6 +2,7 @@ library(tidyverse)
 library(lubridate)
 library(hms)
 library(forecast)
+library(soundecology)
 
 #Visualizing BEI
 #Full audio files
@@ -44,6 +45,7 @@ ggplot(data = eclipse_time, aes(x = hours, y = bei))+
   geom_point(data = eclipseonly, aes(x = hours, y = bei), col = "lightblue", lwd = 1)+
   labs(title = "Bioacoustic evenness over the Duration of the Eclipse")+
   theme_minimal()
+
 
 #creating similar graph to Gerber, 2017
 ggplot(data = eclipse_time, aes(x = hours, y = bei))+
@@ -105,6 +107,15 @@ ggplot(data = eclipse_time, aes(x = hours, y = aei))+
   geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
   theme_minimal()+
   labs(title = "Acoustic evenness over the Eclipse Duration")
+
+ggplot(data = eclipse_time, aes(x = hours, y = aei))+
+  geom_point(alpha = 0.2, color = "salmon")+
+  geom_point(data = eclipseonly, aes(x = hours, y = aei), col = "red")+
+  theme_minimal()
+
+
+  
+
 
 
 
