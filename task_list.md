@@ -1,5 +1,12 @@
 ## Task List
 
+
+## For December 19
+
+1. Clean up the visualization code a little bit.
+
+2. Modify function to add time and day.
+
 ## For December 12
 
 1. Keep working on write-up
