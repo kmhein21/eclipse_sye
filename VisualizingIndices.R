@@ -11,16 +11,12 @@ ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
   theme_minimal()+
   facet_wrap(~date(time))
 
-ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
-  geom_line(aes(col = ifelse(date(time) == "2024-04-08", "orange","pink"),
-            alpha = ifelse(date(time) == "2024-04-08", 0.8, 0.1 )))+
+eclipse_yesno<-A001_SD001|> mutate( eclipse = ifelse(date(time) == "2024-04-08", "yes", "no"))
+
+ggplot(data = eclipse_yesno, aes( x = as_hms(time), y = bei))+
+  geom_line(aes(col = eclipse, alpha= eclipse))+
   theme_minimal()+
   labs(title = "Full Duration Comparison of BEI")
-
-ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
-  geom_line(col = ifelse(date(A001_SD001$time) == "2024-04-08", "blue", "lightblue" ),
-            alpha = ifelse(date(A001_SD001$time) == "2024-04-08", 0.8, 0.2))+
-  theme_minimal()
 
 #Only eclipse duration 
 eclipse_start<-hms(00,00,14)
@@ -32,20 +28,11 @@ eclipse_time<-A001_SD001|> mutate(day = date(time), hours = as_hms(time))|>
 eclipseonly<-A001_SD001|> mutate(day = date(time), hours = as_hms(time))|> 
   filter(hours>= eclipse_start & hours<= eclipse_end)|> filter((date(time) == "2024-04-08")) #ONLY 4-8-24 through eclipse
 
-ggplot(data = eclipse_time, aes(x = hours, y = bei))+
+ggplot(data = eclipse_time, aes(x = hours, y = bei, group = day))+
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hours, y = bei), col = "blue", lwd = 1)+
   theme_minimal()+
   labs(title = "Bioacoustic evenness over the Duration of the Eclipse")
-
-#Attempt at comparison to common beis at specific times 
-ggplot(data = eclipse_time, aes(x = hours, y = bei))+
-  geom_density_2d_filled(contour_var = "count")+
-  scale_fill_viridis_d(option = "E")+
-  geom_point(data = eclipseonly, aes(x = hours, y = bei), col = "lightblue", lwd = 1)+
-  labs(title = "Bioacoustic evenness over the Duration of the Eclipse")+
-  theme_minimal()
-
 
 #creating similar graph to Gerber, 2017
 ggplot(data = eclipse_time, aes(x = hours, y = bei))+
@@ -60,12 +47,7 @@ ggplot(data = A001_SD001, aes( x = as_hms(time), y = biophony))+
   theme_minimal()+
   facet_wrap(~date(time))
 
-ggplot(data = A001_SD001, aes(x = as_hms(time), y = biophony))+
-  geom_line()+
-  theme_minimal()+
-  facet_wrap(~date(time))
-
-ggplot(data = eclipse_time, aes(x = hours, y = biophony))+
+ggplot(data = eclipse_time, aes(x = hours, y = biophony, group = day))+
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hours, y = biophony), col = "red", lwd = 1)+
   theme_minimal()+
@@ -74,7 +56,7 @@ ggplot(data = eclipse_time, aes(x = hours, y = biophony))+
 
 ggplot(data = eclipse_time, aes(x = hours, y = biophony))+
   geom_line()+
-  #geom_vline(xintercept = hms(52,23,15), color = "blue", linetype = "dashed")+
+  geom_vline(xintercept = hms(52,23,15), color = "blue", linetype = "dashed")+
   facet_wrap(~day)+
   theme_minimal()+
   labs(title = "Biophony over the Eclipse Duration")
@@ -93,7 +75,6 @@ ggplot(data = eclipse_time, aes( x = hours, y = biophony))+
   facet_wrap(~date(time))+
   theme_minimal()
 
-
 # AEI
 
 ggplot(data = eclipse_time, aes( x =hours , y = aei))+
@@ -101,7 +82,7 @@ ggplot(data = eclipse_time, aes( x =hours , y = aei))+
   facet_wrap(~date(time))+
   theme_minimal()
 
-ggplot(data = eclipse_time, aes(x = hours, y = aei))+
+ggplot(data = eclipse_time, aes(x = hours, y = aei, group = day))+
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hours, y = aei), col = "red", lwd =1)+
   geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
