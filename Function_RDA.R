@@ -59,6 +59,8 @@ eclipse_df<- function(folder) {
     mutate(date = parse_number(date))|>
     unite("time", c("date", "hours", "min", "sec"), sep = ":")|>
     mutate(time= ymd_hms(time))|>
+    mutate(day = date(time))|>
+    mutate(hour = as_hms(time))|>
     select(-wav)|>
     mutate(folder_name = deparse(str_remove(folder, here())))|>
     select(folder_name, everything())
@@ -66,7 +68,7 @@ eclipse_df<- function(folder) {
   saveRDS(final, file = output)
 }
 
-eclipse_df(here("test_wavs"))
+eclipse_df(here("A001_SD001"))
 #eclipse_df(here("WAV_5_test"))
 
 #folder_group<-c(here("test_wavs"),here("WAV_5_test"))
