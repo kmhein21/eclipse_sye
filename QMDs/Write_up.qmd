@@ -42,9 +42,12 @@ We used ArcGIS Pro (version XXXX, ESRI Incorporated, Redlands, California) to id
 
 ### Analysis
 
+#### Indices and Packages
+
 The analysis of this data uses many packages included "Tidyverse", "hms", "soundecology", "here", and "tuneR"
 
-Using the $'soundecology'$ package we selected 5 specific indices of interest that we believed would be important in understanding the changes in acoustic activity. For all the functions used a specific numerical value was obtained as data was only available for the left channel of the recorder. 
+Using the $'soundecology'$ package we selected 5 specific indices of interest that we believed would be important in understanding the changes in acoustic activity. For all the functions used values were obtained from the left channel of the recorder, as the "right channel values" were not available, likely due to the recording device itself.
+
 Acoustic Evenness Index:
 
 Index which measures the equality and inequality of sound power distribution in different ranges. This index uses the Gini index of evenness. This index is found using the acoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting $aei_left. 
@@ -53,43 +56,74 @@ Bioacoustic Evenness Index:
 
 Index is a function of the power and freqeuncy range of biotic sound. This is obtained using the bioacoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting $left_area.  
 
-Acoustic Diverstiy Index:
-
-Index which generates proportions of data within a specific interval that reach above a specified threshold (default -50dBFS). This index is obtained using the acoustic_diversity() function in the soundecology package. The specific numerical value used is from subsetting $left_band_values.  
-
-Acoustic Complexity Index:
-
-Index is a function of the amount of variation within frequency bins of a sample. This index is obtained using the acoustic_complexity() function within the soundecology package. The specific numerical value used is from subsetting $acl_left_vals.  
-
 Biophony: 
 
 Index which calculates the average frequency of biotic sound. This index is obtained as a byproduct from the ndsi() function and the numerical values used is from subsetting $biophony_left. 
 
-Initially the goal was to create a data frame that contained all of the information about the indices that we would like to assess. This allowed us to visualize the indices in graphics and we began with a subset of 10 audiofiles (.WAV). Examples of some of the initial graphs are listed below: 
+Acoustic Diverstiy Index:
+
+Index which generates proportions of data within a specific interval that reach above a specified threshold (default -50dBFS). This index is obtained using the acoustic_diversity() function in the soundecology package. The specific numerical values used are from subsetting $left_band_values. 
+
+Acoustic Complexity Index:
+
+Index is a function of the amount of variation within frequency bins of a sample. This index is obtained using the acoustic_complexity() function within the soundecology package. The specific numerical values used are from subsetting $acl_left_vals.  
+
+For both the Acoustic Diversity index and the Acoustic Complexity index multiple values are stored per .WAV audio file, in this analysis this list of values can be visualized across the sample and therefore specific intervals of time or these values can be summed to produce the "total" ACI/ADI respectively, which corresponds to the whole audio file. 
+
+#### Creating a cleaned data frame 
+
+The initial goal was to create a data frame that contained all of the information that we would like to assess from each of our audio files. This would allow us to visualize the indices in graphics, allowing us to look for patterns across time. Due to the large amount of recordings at our disposal we began using a subset of 5 audio files (.WAV) explore the possibilities of the graphics and the best ways to display the indices, while not wasting computation time.  Examples of some of the initial graphs for Bioacoustic evenness, Biophony, and Acoustic evenness are displayed below: 
+
 ```{r}
-ggplot(data=New_First10_df, aes(x=time, y=as.numeric(BEI)))+
+ggplot(data=WAV_5_test, aes(x=time, y=as.numeric(bei)))+
   geom_line(col="orange")+
   theme_minimal()+
   labs(x = "Time", y = "Bioacoustic Evenness")
 
-ggplot(data=New_First10_df, aes(x = time, y = as.numeric(AEI)))+
+ggplot(data=WAV_5_test, aes(x = time, y = as.numeric(aei)))+
   geom_line()+
   theme_minimal()+
   labs(x = "Time", y = "Acoustic Evenness")
 
-ggplot(data = New_First10_df, aes(x = time, y = as.numeric(Biophony)))+
+ggplot(data = WAV_5_test, aes(x = time, y = as.numeric(biophony)))+
   geom_line(col = "green")+
   theme_minimal()+
   labs(x = "Time", y = "Biophony")
 
 ```
 
-The next step was to increase this creating  a function $eclipse_df()$ that could be used on a folder containing all of the .WAV files for one audiomoth which would return a cleaned data frame which could be manipulated. The goal was to create this function so that it could be uploaded to an HPC and mapped onto all the audiomoth folders that we had access to. In the function this requires saving single indices as one value per file in a column, and saving lists of values as a column for indices such as Acoustic complexity and diversity, which possessed multiple values per recording. Initially this function was used on two folders of audiomoths from April 7th and 8th to create some comparison visuals before we expanded the project to the full set of data we had access to. 
+Although this initial introduction failed to show any patterns from the data, it gave us examples of the ranges that these values followed, as well as helped with testing the code that was written so far. The above graphics correspond to the indices which are "singular", with just one value per WAV file. The indices that are contained in a "list" format (Acoustic Complexity and Acoustic Diversity), were displayed in a different way (below).
 
+*GRAPHICS FOR ACI AND ADI WITH INITIAL 5
+
+The next step was to expand our code to create a function $eclipse_df()$ that could be used on a folder containing all of the .WAV files for one audiomoth. This function would return a cleaned data frame which could be saved in the environment and therefore containing all of the information we need without taking up too much space. The code for the final data frame is listed below, this leads to a data frame which contains all of our indices, date/time information, and a column with the folder name. 
  
+
+```{r}
+full|> mutate(biophony = as.numeric(biophony),
+                        aei = as.numeric(aei),
+                        bei = as.numeric(bei))|>
+    separate(paths_date, into = c("date","time_hms"), sep = "_")|>
+    separate(time_hms, into = c("time", "wav"), sep = "\\.")|>
+    separate(time, into = c("hours", "other"), sep = 2)|>
+    separate(other, into = c("min", "sec"), sep = 2)|>
+    mutate(date = parse_number(date))|>
+    unite("time", c("date", "hours", "min", "sec"), sep = ":")|>
+    mutate(time= ymd_hms(time))|>
+    select(-wav)|>
+    mutate(folder_name = deparse(str_remove(folder, here())))|>
+    select(folder_name, everything())
+```
+ 
+Initially this function was used on two folders of audiomoths from April 7th and 8th.
+
 ```{r}
 New_df_4_7
 New_df_4_8
+
+both_days <- bind_rows(New_df_4_7, New_df_4_8) |>
+  mutate(day = as.factor(lubridate::day(time)),
+         only_time = hms::as_hms(time))
 
 ggplot(data = both_days, aes(x = as_hms(time), y = Biophony, color = as.factor(date(time))))+
   geom_line()+
@@ -110,29 +144,19 @@ ggplot(data = both_days, aes(x = as_hms(time), y = BEI, color = as.factor(date(t
   labs(title = "Bioacoustic Evenness")
 ```
 
-The final step of the function as mentioned before is to create a fully cleaned data frame. Along with the single and multiple sound indices a column was added depicting the data and time, as well as the name of the folder the data came from (note this was not included in the above comparison of 4/7/24 and 4/8/24). The code for this data frame is listed below:
+*ADD GRAPHICS FOR ACI AND ADI
 
-```{r}
-full|> mutate(biophony = as.numeric(biophony),
-                        aei = as.numeric(aei),
-                        bei = as.numeric(bei))|>
-    separate(paths_date, into = c("date","time_hms"), sep = "_")|>
-    separate(time_hms, into = c("time", "wav"), sep = "\\.")|>
-    separate(time, into = c("hours", "other"), sep = 2)|>
-    separate(other, into = c("min", "sec"), sep = 2)|>
-    mutate(date = parse_number(date))|>
-    unite("time", c("date", "hours", "min", "sec"), sep = ":")|>
-    mutate(time= ymd_hms(time))|>
-    select(-wav)|>
-    mutate(folder_name = deparse(str_remove(folder, here())))|>
-    select(folder_name, everything())
-```
+Visualizing these two data sets was beneficial in understanding the patterns across a full day of recording and the potential for differences between two days, specifically between a normal day and the day of the eclipse. Although just a comparison between two days we can see variation in the patterns for all the indices above, yet it remains unknown whether this is a random sound variation in sound or whether the eclipse played a role in these changes. Having produced these two data frames, we then started to question how we would obtain all of the data for each of our WAV files. 
 
-The final output of this function is the creation of an RDS file that can be renamed upon loading into the environment. 
+#### Using the HPC 
 
-Upon running the files onto the HPC, rds files were created which contianed our cleaned data in a format that could be analyzed. The analysis was to first look for patterns across the days of the audiomoths to see if the eclipse data looked different from the other days when sampling occurred and if the time during the eclipse was similar to other times of the day.
+To assist in efficiently expanding to the full set of our audio files, we decided to utilize an HPC to run our function on the large files for each audiomoth, returning our desired data frame, and decreasing the amount of space utilized by WAV files on our desktops. To avoid any chance of overwriting through this process, the function was altered to change the final output from an RDA to an RDS file, so that it could be renamed upon loading into the environment. 
 
-Through analyzing the first folder and indices returned from the one audiomoth, I analyzed both the full series and the segment that corresponded to the eclipse. Through analyzing the full series, it didn't seem that there was anything sticking out immensely. I created faceted graphs as well as layered graphics to display the patterns from the different days. 
+The analysis consisted of first looking for patterns across the days of the audiomoths to see if the eclipse data looked different from the other days when sampling occurred and if the time during the eclipse was similar to other times of the day. We began by running one folder corresponding to one audiomoth on the HPC to assess the efficiency of our function,  understand how the HPC would work, and begin our visualization of the full recording time. 
+
+#### Analyzing one full file from an audiomoth
+
+Through analyzing the first folder and indices returned from one audiomoth (A001_SD001), we analyzed both the full time series and the time segment that corresponded to the eclipse. Through analyzing the full series, it didn't seem that there was anything sticking out immensely. To display the patterns from different days we created faceted graphs. One downside to these graphics is the continuity between points where there was not active recording, this leads to stagnant lines which distract from the overall image. 
 
 ```{r}
 ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
@@ -141,7 +165,65 @@ ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
   facet_wrap(~date(time))
 ```
 
-From my larger data frame I subset just the time series portion that corresponded to the eclipse from April 8th. This analysis showed a couple of interesting points to take note of. In the biophony analysis, when a vertical line is added at the point of totality 
+Subsetting the time series to the period that corresponded to the eclipse on April 8th showed a few interesting patterns, specifically in biophony analysis. 
+
+```{r}
+ggplot(data = eclipse_time, aes(x = hours, y = biophony, group = day))+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hours, y = biophony), col = "red", lwd = 1)+
+  theme_minimal()+
+  labs(title = "Biophony over Eclipse Duration")
+```
+
+Looking at the graph above we can see a decrease in the overall biological noise around what seems to be the time of the eclipse. The lightly shaded background shows that this is not a normal pattern across other days, and it is clear by looking at the red line that this portion varies from the rest of that day. 
+
+```{r}
+ggplot(data = eclipse_time, aes(x = hours, y = biophony, group = day))+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hours, y = biophony), col = "red", lwd = 1)+
+  theme_minimal()+
+  geom_vline(xintercept = hms(52,23,15), color= "blue", linetype = "dashed")+
+  labs(title = "Biophony over Eclipse Duration")
+```
+
+By adding a vertical line that corresponds to the beginning of totality (TIME), we can add to the observation above by showing that this decrease in biological sound is extremely close to the beginning of totality. 
+
+```{r}
+ggplot(data = eclipse_time, aes(x = hours, y = biophony))+
+  geom_line()+
+  geom_vline(xintercept = hms(52,23,15), color = "blue", linetype = "dashed")+
+  facet_wrap(~day)+
+  theme_minimal()+
+  labs(title = "Biophony over the Eclipse Duration")
+```
+
+Looking across all the days separately we can see that this stark decrease in sound is not common and does not seem to occur in any day at this time, other than on April 8th.  
+
+Preforming a similar type of analysis to Acoustic evenness and Bioacoustic evenness returns the following:
+```{r}
+ggplot(data = eclipse_time, aes(x = hours, y = aei, group = day))+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hours, y = aei), col = "red", lwd =1)+
+  geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
+  theme_minimal()+
+  labs(title = "Acoustic evenness over the Eclipse Duration")
+
+```
+
+```{r}
+ggplot(data = eclipse_time, aes(x = hours, y = bei, group = day))+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hours, y = bei), col = "blue", lwd = 1)+
+  geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
+  theme_minimal()+
+  labs(title = "Bioacoustic evenness over the Duration of the Eclipse")
+
+```
+
+In these graphs we can see that again there is a change in the indices from the regular pattern at the time of totality, although this pattern is slightly less convincing in the Acoustic evenness index. In the Bioacoustic evenness visual, the time of totality causes a massive increase compared to the rest of that time segment. 
+
+Another point of interest during this analysis is this difference in indices between the duration of the eclipse and at dawn. 
+
 
 
 
