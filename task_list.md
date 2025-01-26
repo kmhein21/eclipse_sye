@@ -1,5 +1,13 @@
 ## Task List
 
+## For January 30
+
+1. Run about 5 or so audiomoths on the HPC.
+
+2. Compile the 5 data sets into one .rds file.
+
+3. Do some visualization with a faceted (by audiomoth) plot.
+
 
 ## For December 19
 
