@@ -93,6 +93,20 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei))+
   theme_minimal()
 
 
+### Combining RDS files into one df
+
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012)|>
+  group_by(folder_name)
+
+onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
+onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
+
+ggplot(onlyEclipseTime, aes(x = hour, y = biophony))+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
+  facet_wrap(~folder_name)
+  
+
   
 
 
