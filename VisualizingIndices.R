@@ -18,7 +18,7 @@ ggplot(data = eclipse_yesno, aes( x = hour, y = bei))+
   theme_minimal()+
   labs(title = "Full Duration Comparison of BEI")
 
-#Only eclipse duration 
+#Only duration around time of eclipse 
 eclipse_start<-hms(00,00,14)
 eclipse_end<-hms(00,50,16)
 
@@ -28,7 +28,7 @@ eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> fi
 
 ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
   geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hours, y = bei), col = "blue", lwd = 1)+
+  geom_line(data = eclipseonly, aes(x = hour, y = bei), col = "blue", lwd = 1)+
   theme_minimal()+
   labs(title = "Bioacoustic evenness over the Duration of the Eclipse")
 
@@ -46,15 +46,15 @@ ggplot(data = A001_SD001, aes( x = hour, y = biophony))+
   facet_wrap(~date(time))
 
 ggplot(data = eclipse_time, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+ #totality
   geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hour, y = biophony), col = "red", lwd = 1)+
+  geom_line(data = eclipseonly, aes(x = hour, y = biophony), col = "blue", lwd = 1)+
   theme_minimal()+
-  geom_vline(xintercept = hms(52,23,15), color= "blue", linetype = "dashed")+ #beginning of totality
   labs(title = "Biophony over Eclipse Duration")
 
 ggplot(data = eclipse_time, aes(x = hour, y = biophony))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
   geom_line()+
-  geom_vline(xintercept = hms(52,23,15), color = "blue", linetype = "dashed")+
   facet_wrap(~day)+
   theme_minimal()+
   labs(title = "Biophony over the Eclipse Duration")
@@ -80,9 +80,9 @@ ggplot(data = eclipse_time, aes( x =hour , y = aei))+
   theme_minimal()
 
 ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightpink", alpha = 0.3)+
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hour, y = aei), col = "red", lwd =1)+
-  geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
   theme_minimal()+
   labs(title = "Acoustic evenness over the Eclipse Duration")
 
@@ -94,21 +94,29 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei))+
 
 
 ### Combining RDS files into one df
+###Displaying ONLY time of eclipse and totality 
 
-fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012)|>
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002)|>
   group_by(folder_name)
 
 onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
 onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
 
-ggplot(onlyEclipseTime, aes(x = hour, y = biophony))+
+ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
   geom_line(alpha = 0.2)+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
-  facet_wrap(~folder_name)
+  facet_wrap(~folder_name)+
+  theme_minimal()
   
 
-  
+#Expanding to show time before eclipse started, rectangle containing beginning to end of "partial eclipse"
 
-
+ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()
 
 
