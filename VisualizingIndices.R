@@ -119,4 +119,16 @@ ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
+#Creating a similar graphic for dawn 
+#Dawn segment records ~30 min before and ~45 min after sunrise 
 
+dawn_start<-hms(00,45,05)
+dawn_end<-hms(00,15,07)
+
+onlyDawn<- fullAudio|> filter(hour>= dawn_start & hour<= dawn_end)
+
+ggplot(onlyDawn, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  facet_wrap(~folder_name)+
+  theme_minimal()
