@@ -1,5 +1,13 @@
 ## Task List
 
+## For February 6
+
+1. Figure out why ACI and ADI values are the same for each file (look at vector/list indexing).
+
+2. Run about 5 more audiomoths on the HPC.
+
+3. Plot all 5 indices and write a short description about each (remind ourselves which one the paper found to be different).
+
 ## For January 30
 
 1. Run about 5 or so audiomoths on the HPC.
