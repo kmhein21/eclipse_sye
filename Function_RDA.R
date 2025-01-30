@@ -38,9 +38,9 @@ eclipse_df<- function(folder) {
   
   single<- as_tibble(cbind(paths_date, AEI_df, BEI_df, Biophony_df))
   
-  ACI_all<-vector("list", length(folder))
-  ADI_all<-vector("list", length(folder))
-  n<-length(folder)
+  ACI_all<-vector("list", length(f_list))
+  ADI_all<-vector("list", length(f_list))
+  n<-length(f_list)
   for (i in 1:n){
     ACI_all[i]<-(as.data.frame(ACI[[i]]$aci_fl_left_vals))
     ADI_all[i]<-(as.data.frame(ADI[[i]]$left_band_values))
@@ -68,9 +68,20 @@ eclipse_df<- function(folder) {
   saveRDS(final, file = output)
 }
 
-eclipse_df(here("A001_SD001"))
+eclipse_df(here("A005_SD002"))
 #eclipse_df(here("WAV_5_test"))
 
 #folder_group<-c(here("test_wavs"),here("WAV_5_test"))
 
 #map(folder_group, eclipse_df)
+
+#map("WAV_5_test", acoustic_complexity)
+
+#paths <- list.files(here("WAV_5_test"), pattern = "\\.WAV$",
+                         full.names = TRUE)
+#WAV_5 <- map(paths, readWave)
+
+#map(WAV_5, acoustic_complexity)
+
+#eclipse_df(here("WAV_5_test"))
+
