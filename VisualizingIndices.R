@@ -132,3 +132,22 @@ ggplot(onlyDawn, aes(x = hour, y = biophony, group = day))+
   geom_line(alpha = 0.2)+
   facet_wrap(~folder_name)+
   theme_minimal()
+
+# Similar graphics for the Acoustic evenness 
+
+ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
+  geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= aei), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()
+
+ggplot(onlyDawn, aes(x = hour, y = aei, group = day))+
+  geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  facet_wrap(~folder_name)+
+  theme_minimal()
+
+
+
+
