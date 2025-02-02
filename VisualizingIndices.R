@@ -4,6 +4,24 @@ library(hms)
 library(forecast)
 library(soundecology)
 
+#Subsets of the larger data frame - only showing one folder at a time 
+
+eclipse_yesno<-A001_SD001|> mutate( eclipse = ifelse(day == "2024-04-08", "yes", "no"))
+
+
+eclipse_start<-hms(00,00,14)
+eclipse_end<-hms(00,50,16)
+
+eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end) #contains all days through time of eclipse
+
+eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08") #ONLY 4-8-24 through eclipse
+
+
+dawn_start<-hms(00,45,05)
+dawn_end<-hms(00,15,07)
+
+dawn<-A001_SD001|> filter(hour>= dawn_start & hour<= dawn_end)
+
 #Visualizing BEI
 #Full audio files
 ggplot(data = A001_SD001, aes( x = hour, y = bei))+
@@ -11,20 +29,12 @@ ggplot(data = A001_SD001, aes( x = hour, y = bei))+
   theme_minimal()+
   facet_wrap(~date(time))
 
-eclipse_yesno<-A001_SD001|> mutate( eclipse = ifelse(day == "2024-04-08", "yes", "no"))
-
 ggplot(data = eclipse_yesno, aes( x = hour, y = bei))+
   geom_line(aes(col = eclipse, alpha= eclipse))+
   theme_minimal()+
   labs(title = "Full Duration Comparison of BEI")
 
 #Only duration around time of eclipse 
-eclipse_start<-hms(00,00,14)
-eclipse_end<-hms(00,50,16)
-
-eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end) #contains all days through time of eclipse
-
-eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08") #ONLY 4-8-24 through eclipse
 
 ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
   geom_line(alpha = 0.3)+
@@ -59,19 +69,6 @@ ggplot(data = eclipse_time, aes(x = hour, y = biophony))+
   theme_minimal()+
   labs(title = "Biophony over the Eclipse Duration")
 
-# Dawn vs. Eclipse 
-
-dawn_start<-hms(00,45,05)
-dawn_end<-hms(00,15,07)
-
-dawn<-A001_SD001|> filter(hour>= dawn_start & hour<= dawn_end)
-
-ggplot(data = eclipse_time, aes( x = hour, y = biophony))+
-  geom_line()+
-  geom_line(data = dawn, aes( x = hour, y = biophony))+
-  facet_wrap(~day)+
-  theme_minimal()
-
 # AEI
 
 ggplot(data = eclipse_time, aes( x =hour , y = aei))+
@@ -93,7 +90,9 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei))+
   theme_minimal()
 
 
-### Combining RDS files into one df
+
+
+### Combining multiple RDS files into one df
 ###Displaying ONLY time of eclipse and totality 
 
 fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002)|>
@@ -119,7 +118,7 @@ ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
-#Creating a similar graphic for dawn 
+#Creating a biophony graphic for dawn 
 #Dawn segment records ~30 min before and ~45 min after sunrise 
 
 dawn_start<-hms(00,45,05)
@@ -133,7 +132,7 @@ ggplot(onlyDawn, aes(x = hour, y = biophony, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
-# Similar graphics for the Acoustic evenness 
+# Acoustic evenness 
 
 ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
   geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
@@ -147,6 +146,10 @@ ggplot(onlyDawn, aes(x = hour, y = aei, group = day))+
   geom_line(alpha = 0.2)+
   facet_wrap(~folder_name)+
   theme_minimal()
+
+
+
+
 
 
 
