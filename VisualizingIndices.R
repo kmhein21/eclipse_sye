@@ -8,12 +8,10 @@ library(soundecology)
 
 eclipse_yesno<-A001_SD001|> mutate( eclipse = ifelse(day == "2024-04-08", "yes", "no"))
 
-
 eclipse_start<-hms(00,00,14)
 eclipse_end<-hms(00,50,16)
 
 eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end) #contains all days through time of eclipse
-
 eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08") #ONLY 4-8-24 through eclipse
 
 
@@ -41,12 +39,6 @@ ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
   geom_line(data = eclipseonly, aes(x = hour, y = bei), col = "blue", lwd = 1)+
   theme_minimal()+
   labs(title = "Bioacoustic evenness over the Duration of the Eclipse")
-
-#creating similar graph to Gerber, 2017
-ggplot(data = eclipse_time, aes(x = hour, y = bei))+
-  geom_point(alpha = 0.2, color = "lightblue")+
-  geom_point(data = eclipseonly, aes(x = hour, y = bei), col = "blue")+
-  theme_minimal()
 
 #Biophony 
 
@@ -83,33 +75,26 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
   theme_minimal()+
   labs(title = "Acoustic evenness over the Eclipse Duration")
 
-#Like Gerber, 2017
-ggplot(data = eclipse_time, aes(x = hour, y = aei))+
-  geom_point(alpha = 0.2, color = "salmon")+
-  geom_point(data = eclipseonly, aes(x = hour, y = aei), col = "red")+
-  theme_minimal()
-
-
-
-
 ### Combining multiple RDS files into one df
-###Displaying ONLY time of eclipse and totality 
 
 fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002)|>
   group_by(folder_name)
 
+
 onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
 onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
 
-ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
-  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
-  geom_line(alpha = 0.2)+
-  geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
-  facet_wrap(~folder_name)+
-  theme_minimal()
-  
+#Remove this next plot after finished, used to look at general index patterns between the folders "whats their normal"
+ggplot(fullAudio, aes(x = hour, y = bei))+
+  geom_line()+
+  facet_wrap(~folder_name)
+# NOTE: At the time of using only 5 folders
+# When looking at a full visual of the plots, biophony and acoustic evenness daily patterns seem to match up well
+# There isn't any outlying pattern across the folder locations 
+# In BEI the 2nd and 5th folders have low BEI in the middle of the day compared to the other
 
-#Expanding to show time before eclipse started, rectangle containing beginning to end of "partial eclipse"
+#First graph: showing partial eclipse
+#Second graph: Zooming into the time of totality 
 
 ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
@@ -117,6 +102,15 @@ ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
   facet_wrap(~folder_name)+
   theme_minimal()
+
+
+ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) ### To gain a clearer view of totality 
 
 #Creating a biophony graphic for dawn 
 #Dawn segment records ~30 min before and ~45 min after sunrise 
@@ -132,7 +126,8 @@ ggplot(onlyDawn, aes(x = hour, y = biophony, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
-# Acoustic evenness 
+### Acoustic evenness 
+### follows same plot setup, partial eclipse, totality, dawn
 
 ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
   geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
@@ -141,15 +136,48 @@ ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
+ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= aei), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+
 ggplot(onlyDawn, aes(x = hour, y = aei, group = day))+
   geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
   geom_line(alpha = 0.2)+
   facet_wrap(~folder_name)+
   theme_minimal()
 
+### Bioacoustic Evenness
 
+ggplot(onlyEclipseTime, aes(x = hour, y = bei, group = day))+
+  geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= bei), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()
 
+ggplot(onlyEclipseTime, aes(x = hour, y = bei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= bei), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
 
+#### At time of 5 RDS files, potential increase in BEI as eclipse starts
+
+ggplot(onlyDawn, aes(x = hour, y = bei, group = day))+
+  geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  facet_wrap(~folder_name)+
+  theme_minimal()
+
+### Acoustic Complexity 
+
+### Acoustic Diversity 
 
 
 
