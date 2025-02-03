@@ -50,23 +50,45 @@ Using the $'soundecology'$ package we selected 5 specific indices of interest th
 
 Acoustic Evenness Index:
 
-Index which measures the equality and inequality of sound power distribution in different ranges. This index uses the Gini index of evenness. This index is found using the acoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting $aei_left. 
+Measures how even the distribution of sound is across different frequncy bands. AEI specifies by measuring the equality and inequality of sound power distribution in different ranges by using the Gini index of evenness. This index does not separate anthropogenic and biological sound
+
+A high AEI value signifies a more even soundscape, within the audio there aren't any sound domination from one type of sound/species. A low AEI signifies that the sound is not as even, there may only be a few loud similar sounds which disrupt the consistency of the sound level. 
+
+In the paper by Gerber et. al in 2017, this was found to be a statistically significant predictor in their model. Here they found that the AEI was highest right before the eclipse began and it rose until period of totality. (Gerber attributes this likely to the increase in human sounds near their recording locations)
+
+This index is found using the acoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting $aei_left. 
 
 Bioacoustic Evenness Index:
 
-Index is a function of the power and freqeuncy range of biotic sound. This is obtained using the bioacoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting $left_area.  
+Similar to the acoustic evenness index, this index assesses the evenness of sound, however it focuses only on the biological sound. Interpretation of high and low values are similar to AEI above, a high BEI signifies more unevenness within the habitat and a low value attributed to evenness in sound within the landscape. 
+
+This index was not analyzed in the Gerber et. al paper from 2017
+
+ This is obtained using the bioacoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting $left_area.  
 
 Biophony: 
 
-Index which calculates the average frequency of biotic sound. This index is obtained as a byproduct from the ndsi() function and the numerical values used is from subsetting $biophony_left. 
+Index which calculates the average frequency of biotic sound. This index is much more straightforward as high biophony means that there is more sound and low values mean less.
+
+Within the Gerber et. al paper in 2017, the biophony was found to increase at the beginning and end of the eclipse, akin to the dawn/dusk choruses. In this paper biophony was a significant predictor in their model 
+
+This index is obtained as a byproduct from the ndsi() function and the numerical values used is from subsetting $biophony_left. 
 
 Acoustic Diverstiy Index:
 
-Index which generates proportions of data within a specific interval that reach above a specified threshold (default -50dBFS). This index is obtained using the acoustic_diversity() function in the soundecology package. The specific numerical values used are from subsetting $left_band_values. 
+This index assesses both the variety and evenness in the sound distribution across different bands. A higher ADI value corresponds to a increase in diversity within a habitat and a low ADI refers to a less biodiverse location. It does so by generating proportions of data within a specific interval that reach above a specified threshold (default -50dBFS). 
+
+In the Gerber et. al paper in 2017, this index was not found to be significant in their model but it was apparent that ADI was highest at the times right before and after the eclipse.
+
+This index is obtained using the acoustic_diversity() function in the soundecology package. The specific numerical values used are from subsetting $left_band_values. 
 
 Acoustic Complexity Index:
 
-Index is a function of the amount of variation within frequency bins of a sample. This index is obtained using the acoustic_complexity() function within the soundecology package. The specific numerical values used are from subsetting $acl_left_vals.  
+This index focuses on understanding the spatial and temporal complexity of sound. It does so by numerically portraying the variation in sound signal over a time frame (the audio file). This index will reflect intensity and frequency shifts in an environment. ACI is interpretted similarly to ADI where a higher value indicates a more diversity soundscape compared to a lower value (could indicate more monotone and stable sounds). 
+
+In the Gerber et. al paper in 2017, this index was not found to be significant in their model but it was apparent that ACI was greatest during totality. 
+
+This index is obtained using the acoustic_complexity() function within the soundecology package. The specific numerical values used are from subsetting $acl_left_vals.  
 
 For both the Acoustic Diversity index and the Acoustic Complexity index multiple values are stored per .WAV audio file, in this analysis this list of values can be visualized across the sample and therefore specific intervals of time or these values can be summed to produce the "total" ACI/ADI respectively, which corresponds to the whole audio file. 
 
