@@ -3,6 +3,7 @@ library(lubridate)
 library(hms)
 library(forecast)
 library(soundecology)
+library(purr)
 
 #Subsets of the larger data frame - only showing one folder at a time 
 
@@ -78,7 +79,10 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
 ### Combining multiple RDS files into one df
 
 fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002)|>
-  group_by(folder_name)
+  group_by(folder_name)|>
+  mutate(fullACI = sapply(ACI_all,sum))|>
+  mutate(fullADI = sapply(ADI_all, sum))
+
 
 
 onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
@@ -126,6 +130,12 @@ ggplot(onlyDawn, aes(x = hour, y = biophony, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
+### Not seeing any obvious patterns in biophony, potentially lower than the other days A003, A004, and A005
+## Would like more data to really rule out the lack of pattern for this index
+## Interestingly there isn't an obvious increase in biophony during the time attributed to dawn either
+# potentially the pattern we may be looking for is not what we would expect.
+
+
 ### Acoustic evenness 
 ### follows same plot setup, partial eclipse, totality, dawn
 
@@ -150,6 +160,9 @@ ggplot(onlyDawn, aes(x = hour, y = aei, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
+## Not really seeing any obvious patterns in these graphs around the time of eclipse. Patterns seem quite similar to the dawn 
+
+
 ### Bioacoustic Evenness
 
 ggplot(onlyEclipseTime, aes(x = hour, y = bei, group = day))+
@@ -167,17 +180,71 @@ ggplot(onlyEclipseTime, aes(x = hour, y = bei, group = day))+
   theme_minimal()+
   scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
 
-#### At time of 5 RDS files, potential increase in BEI as eclipse starts
-
 ggplot(onlyDawn, aes(x = hour, y = bei, group = day))+
   geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
   geom_line(alpha = 0.2)+
   facet_wrap(~folder_name)+
   theme_minimal()
 
+#### Potential slight increase in BEI once totality begins
+#but nothing relative to the partial eclipse
+## dawn shows variation in this index, but a darker line falling around 0.5-1.5 
+
 ### Acoustic Complexity 
 
+ggplot(onlyEclipseTime, aes(x = hour, y = fullACI, group = day))+
+  geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullACI), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_y_continuous(limits = c(1500,2000)) 
+
+ggplot(onlyEclipseTime, aes(x = hour, y = fullACI, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullACI), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))
+
+ggplot(onlyDawn, aes(x = hour, y = fullACI, group = day))+
+  geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_y_continuous(limits = c(1500,2000)) 
+
+## when y-axis is limited we can see that the day of the eclipse has quite low ACI, is this related to the eclipse or due to chance? 
+## Pattern in the dawn shows there are a lot of days which stick closely to the 1650 mark at all times
+# suggests that likely this is not due to the eclipse, maybe more data would increase this conclusion 
+
 ### Acoustic Diversity 
+
+ggplot(onlyEclipseTime, aes(x = hour, y = fullADI, group = day))+
+  geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 12, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullADI), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()
+
+ggplot(onlyEclipseTime, aes(x = hour, y = fullADI, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 12, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullADI), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+
+ggplot(onlyDawn, aes(x = hour, y = fullADI, group = day))+
+  geom_rect(xmin =  hms(00,15, 06), xmax = hms(00,30,06), ymin = 0, ymax = 12, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  facet_wrap(~folder_name)+
+  theme_minimal()
+
+## Does seem like there are any obvious patterns relating to the eclipse in this data
+## Like AEI it seems like the dawn and time during the eclipse match pretty well in their ranges 
+
 
 
 
