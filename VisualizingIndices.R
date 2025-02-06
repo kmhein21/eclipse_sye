@@ -78,7 +78,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
 
 ### Combining multiple RDS files into one df
 
-fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002)|>
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007)|>
   group_by(folder_name)|>
   mutate(fullACI = sapply(ACI_all,sum))|>
   mutate(fullADI = sapply(ADI_all, sum))
@@ -89,13 +89,12 @@ onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
 onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
 
 #Remove this next plot after finished, used to look at general index patterns between the folders "whats their normal"
-ggplot(fullAudio, aes(x = hour, y = bei))+
+ggplot(fullAudio, aes(x = hour, y = fullACI))+
   geom_line()+
   facet_wrap(~folder_name)
-# NOTE: At the time of using only 5 folders
-# When looking at a full visual of the plots, biophony and acoustic evenness daily patterns seem to match up well
-# There isn't any outlying pattern across the folder locations 
 # In BEI the 2nd and 5th folders have low BEI in the middle of the day compared to the other
+# In the 1st and 7th folders, there is a very sharp dip in the middle of the day for one of the days
+# No concerning patterns or differences between the audiomoths 
 
 #First graph: showing partial eclipse
 #Second graph: Zooming into the time of totality 
@@ -119,6 +118,7 @@ ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
 #Creating a biophony graphic for dawn 
 #Dawn segment records ~30 min before and ~45 min after sunrise 
 
+
 dawn_start<-hms(00,45,05)
 dawn_end<-hms(00,15,07)
 
@@ -130,7 +130,8 @@ ggplot(onlyDawn, aes(x = hour, y = biophony, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
-### Not seeing any obvious patterns in biophony, potentially lower than the other days A003, A004, and A005
+# Very sharp decline in the 8th folder at the time the exlipse began, almost no sound afterwards 
+### potentially lower than the other days A003, A004, and A005
 ## Would like more data to really rule out the lack of pattern for this index
 ## Interestingly there isn't an obvious increase in biophony during the time attributed to dawn either
 # potentially the pattern we may be looking for is not what we would expect.
@@ -186,9 +187,9 @@ ggplot(onlyDawn, aes(x = hour, y = bei, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
-#### Potential slight increase in BEI once totality begins
+#### Potential slight increase in BEI once totality begins for some of the folders 
 #but nothing relative to the partial eclipse
-## dawn shows variation in this index, but a darker line falling around 0.5-1.5 
+## dawn shows variation in this index, but a lot of lines seems to fall around 0.5-1.5 range
 
 ### Acoustic Complexity 
 
@@ -215,9 +216,9 @@ ggplot(onlyDawn, aes(x = hour, y = fullACI, group = day))+
   theme_minimal()+
   scale_y_continuous(limits = c(1500,2000)) 
 
-## when y-axis is limited we can see that the day of the eclipse has quite low ACI, is this related to the eclipse or due to chance? 
+## when y-axis is limited we can see that the day of the eclipse has quite low ACI, is this related to the eclipse or because this is the normal? 
 ## Pattern in the dawn shows there are a lot of days which stick closely to the 1650 mark at all times
-# suggests that likely this is not due to the eclipse, maybe more data would increase this conclusion 
+# suggests that likely this is not due to the eclipse, maybe more data would solidify this conclusion 
 
 ### Acoustic Diversity 
 
@@ -242,7 +243,8 @@ ggplot(onlyDawn, aes(x = hour, y = fullADI, group = day))+
   facet_wrap(~folder_name)+
   theme_minimal()
 
-## Does seem like there are any obvious patterns relating to the eclipse in this data
+## Doesn't seem like there are any obvious patterns relating to the eclipse in this data
+## A reduction in ADI around the beginning of the eclipse in folder 8, aligns with biophony?
 ## Like AEI it seems like the dawn and time during the eclipse match pretty well in their ranges 
 
 
