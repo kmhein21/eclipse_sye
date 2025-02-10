@@ -78,7 +78,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
 
 ### Combining multiple RDS files into one df
 
-fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007)|>
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014)|>
   group_by(folder_name)|>
   mutate(fullACI = sapply(ACI_all,sum))|>
   mutate(fullADI = sapply(ADI_all, sum))
