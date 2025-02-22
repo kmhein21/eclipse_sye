@@ -247,7 +247,20 @@ ggplot(onlyDawn, aes(x = hour, y = fullADI, group = day))+
 ## A reduction in ADI around the beginning of the eclipse in folder 8, aligns with biophony?
 ## Like AEI it seems like the dawn and time during the eclipse match pretty well in their ranges 
 
+# facet by day and average over the day from all audiomoths
+# potentially limiting days - 2 days before and after (look as weather)
+# bei 
 
+# Graphics using geom_smooth
+ggplot(data = onlyEclipseTime, aes(x = hour, y = bei)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  theme_minimal() +
+  facet_wrap(~ day)
+
+# Clear change in the pattern compared to all of the 15 days that we now have
+# Increase during the time of eclipse, the other days do not show this, the lines are much flatter
 
 
 
