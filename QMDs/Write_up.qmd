@@ -17,6 +17,7 @@ library(tuneR)
 library(pander)
 ```
 
+## Abstract: 
 
 ## Data Collection Methods :
 
@@ -167,7 +168,32 @@ The three first plots (points in red) are those which correspond to singular val
 
 ### Creating a cleaned data frame
 
-The next step was to expand our code to create a function "eclipse_df()" that could be used on a folder containing all of the .WAV files for one audiomoth. This function would return a cleaned data frame which could be saved in the environment and therefore would contain all of the information we need without taking up too much space. Initially indexes are formed for all the WAV files and stored in their own data frames. These data frames are then bound together into one. The code listed below is for the final data frame which creates all our indices, date/time information, and the name of the folder that the data corresponds to. 
+To expand the collection of data that we could visualize it was best to generalize our code and create a function, "eclipse_df()" which would use a folder containing all .WAV files for one audiomoth as an input and then would return a cleaned data frame. This data frame would then be saved in our environment and would contain all the data that we would need from this point forward.  
+
+Initially indexes are formed for all the WAV files and stored in their own data frames. For the Bioacoustic index, Acoustic eveness index, and biophony all values are subsetted from the original output of the soundecology function. These three indices are then bound into one tibble. 
+
+```{r}
+#| eval: false
+BEI<-as.data.frame(BEI_ALL)|>
+  select(starts_with("left_area"))|>
+  pivot_longer(everything(), names_to= "bei_name", values_to = "BEI")
+```
+
+For the Acoustic Complexity and the Acoustic diversity to obtain the full list of values for each folder a for loop is incorporated into the function. This obtains all the left channel values and combines them into a list.
+
+```{r}
+#| eval: false
+
+ACI_all<-vector("list", length(c(1:n)))
+ADI_all<-vector("list", length(c(1:n)))
+
+for (i in 1:n){
+    ACI_all[i]<-(as.data.frame(ACI[[i]]$aci_fl_left_vals))
+    ADI_all[i]<-(as.data.frame(ADI[[i]]$left_band_values))
+} 
+```
+
+After they have been calculated the data frames are  bound together into one. The code listed below is for the final data frame which creates all our indices, date/time information, and the name of the folder that the data corresponds to. 
 
 ```{r}
 #| eval: false
@@ -186,7 +212,7 @@ full|> mutate(biophony = as.numeric(biophony),
     select(folder_name, everything())
 ```
 
-Initially we tested this function on two folders which are a part of the larger collection of data from the audiomoth A004_SD012. These two folders corresponding to April 7th and 8th. 
+Initially we tested this function on two folders which are a part of the larger collection of data from the audiomoth A004_SD012. These two folders correspond to April 7th and 8th. Graphs from the indexes across the four different recording times are shown below
 
 ```{r}
 #| echo: false 
@@ -197,40 +223,85 @@ New_df_4_8 <- readRDS(here("Old_rda_csv/A004_SD012_04_08.rds"))
 ```
 
 ```{r}
+#| echo: false
 both_days <- bind_rows(New_df_4_7, New_df_4_8) |>
-  mutate(day = as.factor(lubridate::day(time)),
-         only_time = hms::as_hms(time))
+  mutate(day = as.factor(day(time)),
+         only_time = as_hms(time))
 
-ggplot(data = both_days, aes(x = as_hms(time), y = Biophony, color = as.factor(date(time))))+
-  geom_line()+
-  scale_color_viridis_d()+
-  theme_minimal()+
-  labs(title = "Biophony")
-
-ggplot(data = both_days, aes(x = as_hms(time), y = AEI, color = as.factor(date(time))))+
-  geom_line()+
-  scale_color_viridis_d()+
-  theme_minimal()+
-  labs(title = "Acoustic Evenness")
-
-ggplot(data = both_days, aes(x = as_hms(time), y = BEI, color = as.factor(date(time))))+
-  geom_line()+
-  scale_color_viridis_d()+
-  theme_minimal()+
-  labs(title = "Bioacoustic Index")
+dawn<- both_days|> filter(only_time >= as_hms("05:45:00") & only_time <= as_hms("07:15:00"))
+eclipse<- both_days|> filter(only_time >= as_hms("14:00:00") & only_time <= as_hms("16:00:00"))
+afternoon<- both_days|> filter(only_time >= as_hms("19:00:00") & only_time <= as_hms("21:00:00"))
+night<- both_days|> filter(only_time >= as_hms("23:00:00") & only_time <= as_hms("23:30:00"))
 ```
 
-\*ADD GRAPHICS FOR ACI AND ADI
+```{r}
+#| echo: false
 
-Visualizing these two data sets was beneficial in understanding the patterns across a full day of recording and the potential for differences between two days, specifically between a normal day and the day of the eclipse. Although just a comparison between two days we can see variation in the patterns for all the indices above, yet it remains unknown whether this is a random sound variation in sound or whether the eclipse played a role in these changes. 
+ggplot(data = dawn, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line(data = afternoon, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line(data = night, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  guides(color = guide_legend("Day"))+
+  labs(title = "Biophony", x = "Time")
+
+
+ggplot(data = dawn, aes(x = only_time, y = AEI, color = as.factor(date(time))))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = only_time, y = AEI, color = as.factor(date(time))))+
+  geom_line(data = afternoon, aes(x = only_time, y = AEI, color = as.factor(date(time))))+
+  geom_line(data = night, aes(x = only_time, y = AEI, color = as.factor(date(time))))+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  guides(color = guide_legend("Day"))+
+  labs(title = "Biophony", x = "Time")
+
+ggplot(data = dawn, aes(x = only_time, y = BEI, color = as.factor(date(time))))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = only_time, y = BEI, color = as.factor(date(time))))+
+  geom_line(data = afternoon, aes(x = only_time, y = BEI, color = as.factor(date(time))))+
+  geom_line(data = night, aes(x = only_time, y = BEI, color = as.factor(date(time))))+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  guides(color = guide_legend("Day"))+
+  labs(title = "Biophony", x = "Time")
+
+ggplot(data = dawn, aes(x = only_time, y = sapply(ADI, sum), color = as.factor(date(time))))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line(data = afternoon, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line(data = night, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  guides(color = guide_legend("Day"))+
+  labs(title = "Biophony", x = "Time")
+
+
+ggplot(data = dawn, aes(x = only_time, y = sapply(ACI, sum), color = as.factor(date(time))))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line(data = afternoon, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  geom_line(data = night, aes(x = only_time, y = Biophony, color = as.factor(date(time))))+
+  scale_color_viridis_d()+
+  theme_minimal()+
+  guides(color = guide_legend("Day"))+
+  labs(title = "Biophony", x = "Time")
+```
+
+
+Visualizing these two data sets help us understand the patterns that occur across a full day of recording as well, and a pattern we can see that across the day we can see that ADI, ACI, and biophony are higher during the dawn segment and then decrease to similar low levels across the rest of the day. Another thing these graphs can shed light on are the potential differences between a normal day and the day of the elipse. in these graphs we can see some differences between the indices, but as this is just a comparison from two folders we can't assume this is a result of the eclipse. 
 
 ### Using the HPC
 
-To assist in efficiently expanding to the full set of our audio files, we decided to utilize the HPC to run our function on the large files for each audiomoth and to extract the cleaned data. This would assist in speeding up the computation time, and decreasing the amount of space utilized by WAV files on a desktop.  To avoid any chance of overwriting through this process, the function created a final output of an RDS file, so that it could be renamed as the audiomoth name upon loading into the environment.
+To assist in efficiently expanding to the full set of our audio files, we decided to utilize the HPC to run our function on the large files for each audiomoth and to extract the cleaned data. This would assist in speeding up the computation time, and decreasing the amount of space utilized by WAV files on a desktop.  To avoid any chance of overwriting through this process, the function created a final output of an RDS file, so that it could be renamed as the audiomoth name upon loading into the environment. The total amount of data run on the HPC was 15 folders corresponding to 15 of the 20 audiomoths. 
 
-The analysis consisted of first looking for patterns across the days of the audiomoths to see if the eclipse data looked different from the other days when sampling occurred and if the time during the eclipse was similar to other times of the day. We began by running one folder corresponding to the first audiomoth (A001_SD001) on the HPC to assess the efficiency of our function, understand how the HPC would work, and begin our visualization of the full recording time.
+Through using the HPC it was discovered that some of the audiomoth folders contained empty .WAV files which would kill the HPC job before the RDS was finished and saved. To combat this any folder which contained empty .WAV files, small .WAV files (<1 MB ), and alternate file types were deleted from the folder before running on the HPC. As this was only about ~5-8 files this did not cause concern about missing data or unequal RDS file sizes. 
 
 ### Analyzing one full file from an audiomoth
+
+We began by running one folder corresponding to the first audiomoth (A001_SD001) on the HPC to assess the efficiency of our function, understand how the HPC would work, and begin our visualization of the full recording time. To analyze these full files we decided to focus on looking for patterns across the days that the audiomoths were recording. We wanted to see if the eclipse data looked different from the other days when sampling occurred and if the time during the eclipse was similar to the dawn. 
 
 ```{r}
 #| echo: false
@@ -241,76 +312,155 @@ eclipse_end<-hms(00,50,16)
 
 eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)
 eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
+
+dawn<- A001_SD001|> filter(hour >= as_hms("05:45:00") & hour <= as_hms("07:15:00"))
+eclipse<- A001_SD001|> filter(hour >= as_hms("14:00:00") & hour <= as_hms("16:00:00"))
+afternoon<- A001_SD001|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("21:00:00"))
+night<- A001_SD001|> filter(hour >= as_hms("23:00:00") & hour <= as_hms("23:30:00"))
 ```
 
-Through analyzing the first folder and indices returned from one audiomoth (A001_SD001), we analyzed both the full time series and the time segment that corresponded to the eclipse. Through analyzing the full series, it didn't seem that there was anything sticking out immensely. To display the patterns from different days we created faceted graphs. Similar to our exploration of April 7th and 8th above, one downside to these graphics is the continuity between points where there was not active recording, this leads to stagnant lines which distract from the overall image.
+Through analyzing the first folder and indices returned from one audiomoth (A001_SD001), we analyzed both the full time series and the time segment that corresponded to the eclipse. To display the patterns from different days we created faceted graphs. Through analyzing the full series, it seemed that day to day the indices fluctuated, and that there wasn't a specific difference between April 8th daily pattern and the other days. 
 
 ```{r}
+#| echo: false
 ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
   geom_line()+
   theme_minimal()+
   facet_wrap(~date(time))
+
+ggplot(data = dawn, aes( x = hour, y = bei))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = hour, y = bei))+
+  geom_line(data = afternoon, aes(x = hour, y = bei))+
+  geom_line(data = night, aes(x = hour, y = bei))+
+  theme_minimal()+
+  facet_wrap(~day)
+  
 ```
 
-Subsetting the time series to the period that corresponded to the eclipse on April 8th showed a few interesting patterns, specifically in biophony analysis.
+To look for more variations, we subsetted the portion of the day that corresponded to time of the eclipse and changed the color of the line corresponding to April 8th. In doing this we could see more variation and found an interesting pattern by looking at biophony.
 
 ```{r}
+#| echo: false
 ggplot(data = eclipse_time, aes(x = hour, y = biophony, group = day))+
   geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hour, y = biophony), col = "red", lwd = 1)+
+  geom_line(data = eclipseonly, aes(x = hour, y = biophony), col = "blue", lwd = 1)+
   theme_minimal()+
   labs(title = "Biophony over Eclipse Duration")
 ```
 
-Looking at the graph above we can see a decrease in the overall biological noise around what seems to be the time of the eclipse. The lightly shaded background shows that this is not a normal pattern across other days, and it is clear by looking at the red line that this portion varies from the rest of that day.
+Looking at the graph above we can see a decrease in the overall biological noise around the middle portion of the graph which would be during the time of the eclipse. The shaded portion during this increase shows that this decrease is not common to the time of day, and it is clear by looking at the rest of the daily pattern this varies. 
 
 ```{r}
 ggplot(data = eclipse_time, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
   geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hour, y = biophony), col = "red", lwd = 1)+
+  geom_line(data = eclipseonly, aes(x = hour, y = biophony), col = "blue", lwd = 1)+
   theme_minimal()+
-  geom_vline(xintercept = hms(52,23,15), color= "blue", linetype = "dashed")+
   labs(title = "Biophony over Eclipse Duration")
 ```
 
-By adding a vertical line that corresponds to the beginning of totality (TIME), we can add to the observation above by showing that this decrease in biological sound is extremely close to the beginning of totality.
+To further understand why this pattern could be arising we added a rectangle corresponding to the time of totality (15:27:05 to 15:23:52). Once this is added we can see that this strong decrease occurs around the exact time totality begins. 
 
 ```{r}
+#| echo: false
 ggplot(data = eclipse_time, aes(x = hour, y = biophony))+
   geom_line()+
-  geom_vline(xintercept = hms(52,23,15), color = "blue", linetype = "dashed")+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
   facet_wrap(~day)+
   theme_minimal()+
   labs(title = "Biophony over the Eclipse Duration")
 ```
 
-Looking across all the days separately we can see that this stark decrease in sound is not common and does not seem to occur in any day at this time, other than on April 8th.
+Creating this similar graph across all of the days we can see that this stark decrease in sound is not common and does not seem to occur in any day at this time, other than on April 8th. Although this is not a statistical conclusion, it is an interesting pattern worthy of notice. 
 
-Preforming a similar type of analysis to Acoustic evenness and Bioacoustic evenness returns the following:
+We preformed the same type of visualization across the other indices, however if there didn't seem to be any interesting patterns a faceted graph across all the days will not be included here. 
 
 ```{r}
+#| echo: false
 ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "green", alpha = 0.3)+
   geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hour, y = aei), col = "red", lwd =1)+
-  geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
+  geom_line(data = eclipseonly, aes(x = hour, y = aei), col = "blue", lwd =1)+
   theme_minimal()+
   labs(title = "Acoustic evenness over the Eclipse Duration")
 
 ```
 
+In acoustic evenness this pattern is not as pronounced but there is an increase of AEI during the time of totality. Throughout this day we can see that this is the highest the AEI value gets, but comparitively to the other days it doesn't seem to stick out. 
+
 ```{r}
+#| echo: false
 ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "green", alpha = 0.3)+
   geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hour, y = bei), col = "blue", lwd = 1)+
-  geom_vline(xintercept = hms(53,23,15), color = "darkred", linetype = "dashed")+
+  geom_line(data = eclipseonly, aes(x = hour, y = bei), col = "blue", lwd =1)+
   theme_minimal()+
-  labs(title = "Bioacoustic evenness over the Duration of the Eclipse")
+  labs(title = "Bioacoustic Index over the Duration of the Eclipse")
 
 ```
 
-In these graphs we can see that again there is a change in the indices from the regular pattern at the time of totality, although this pattern is slightly less convincing in the Acoustic evenness index. In the Bioacoustic evenness visual, the time of totality causes a massive increase compared to the rest of that time segment.
+In this graph we see another striking pattern, the BEI increasing significantly at the beginning of totality compared to the rest of this period. We can also see there are not a lot of days which have this high BEI at this time, or during this period of day. 
 
-Another point of interest during this analysis is this difference in indices between the duration of the eclipse and at dawn.
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = bei))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
+  geom_line()+
+  facet_wrap(~day)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Eclipse Duration")
+```
+
+Faceting the graph we can get a better look at the patterns occurring at the times corresponding to totality on April 8th. From this we can see that this stark increase is not common across the other days, with the only other day where this pattern looks similar is on April 1st. Besides this one occurance, this pattern does not appear in any other day, and even on April 1st it is not as severe as the day of the eclipse. 
+
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum), group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "green", alpha = 0.3)+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hour, y = sapply(ACI_all,sum)), col = "blue", lwd =1)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Duration of the Eclipse", y = "ACI")
+```
+
+For the ACI there seems to be the potentially for an interesting pattern, however we created a faceted graph we can see that the ACI is often at this 1600 level and is actually quite common across all the days. 
+
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum)))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.3)+
+  geom_line()+
+  facet_wrap(~day)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Eclipse Duration")
+```
+
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum), group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 12, fill = "green", alpha = 0.3)+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hour, y = sapply(ADI_all,sum)), col = "blue", lwd =1)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Duration of the Eclipse", y = "ADI")
+```
+
+COMMENTS ON THIS PLOT 
+
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum)))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.3)+
+  geom_line()+
+  facet_wrap(~day)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Eclipse Duration")
+```
+KEEP PLOT ABOVE?
+
+## Dawn to Eclipse comparison ?
+
 
 ## Full data visualization 
 
