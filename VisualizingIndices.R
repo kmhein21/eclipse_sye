@@ -4,6 +4,8 @@ library(hms)
 library(forecast)
 library(soundecology)
 library(purr)
+library(here)
+
 
 #Subsets of the larger data frame - only showing one folder at a time 
 
@@ -247,7 +249,59 @@ ggplot(onlyDawn, aes(x = hour, y = fullADI, group = day))+
 ## A reduction in ADI around the beginning of the eclipse in folder 8, aligns with biophony?
 ## Like AEI it seems like the dawn and time during the eclipse match pretty well in their ranges 
 
+# bei 
+# facet by day and average over the day from all audiomoths
+# Graphics using geom_smooth
+ggplot(data = onlyEclipseTime, aes(x = hour, y = bei)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  theme_minimal() +
+  facet_wrap(~ day)
 
+# Clear change in the pattern compared to all days in our data set
+# Increase during the time of eclipse, the other days do not show this, the lines are much flatter
+
+#potential changes in other indices:
+ggplot(data = onlyEclipseTime, aes(x = hour, y = aei)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  theme_minimal() +
+  facet_wrap(~ day)
+
+ggplot(data = onlyEclipseTime, aes(x = hour, y = fullADI)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  theme_minimal() +
+  facet_wrap(~ day)
+
+
+# potentially limiting days - 2 days before and after (look as weather)
+# April 2nd-4th: Gusts throughout the day 
+# April 5th - small amount of rain
+# April 6th - 9th:  middle of day clear (small amount of rain on the 7th and 8th in the evening) 
+# April 10th: Gusts in the middle of the day, rain in the morning 
+# April 11th: rain throughout the afternoon 
+# April 12th - 13th: Lots of wind and some rain during morning and middle of day 
+# April 14th-15th: lighter rain and some gusts
+# April 16th: slight rain and one gust 
+# Based on the weather I think that we should use a buffer of 2-3 days. Using the 6th and 7th for before the eclipse and the 9th and 11th for after
+# Due to the weather on the 10th and then the weather after the 11th (being very windy) I think that is the limit of days after the eclipse which have the same weather conditions 
+# Due to bad weather after eclipse potentially take into account patterns days before eclipse? 
+
+fiveDaySubset<- onlyEclipseTime|>
+  filter(day == "2024-04-06" | day == "2024-04-07"| day == "2024-04-08"| day == "2024-04-09" | day == "2024-04-11")
+
+
+# bei graph using the subset of 5 days 
+ggplot(data = fiveDaySubset, aes(x = hour, y = bei)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  theme_minimal() +
+  facet_wrap(~ day)
 
 
 
