@@ -1,5 +1,11 @@
 ## Task List
 
+## For February 27
+
+1. Visualize each metric with all 15 audiomoth data sets.
+
+2. Think more about which dates to include in the plot.
+
 ## For February 6
 
 1. Figure out why ACI and ADI values are the same for each file (look at vector/list indexing).
