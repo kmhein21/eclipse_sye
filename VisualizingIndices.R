@@ -325,24 +325,24 @@ fiveDaySubset<- onlyEclipseTime|>
 
 # bei graph using the subset of 5 days 
 ggplot(data = fiveDaySubset, aes(x = hour, y = bei)) +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_smooth() +
-  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
   theme_minimal() +
   facet_wrap(~ day)
 
 # Other potential metrics with patterns? 
 ggplot(data = fiveDaySubset, aes(x = hour, y = aei)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
-  geom_smooth() +
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  geom_smooth() +
   theme_minimal() +
   facet_wrap(~ day)
 
 ggplot(data = fiveDaySubset, aes(x = hour, y = fullADI)) +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_smooth() +
-  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 10, fill = "lightblue", alpha = 0.2) +
   theme_minimal() +
   facet_wrap(~ day)
 
