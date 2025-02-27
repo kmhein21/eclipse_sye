@@ -1,5 +1,13 @@
 ## Task List
 
+## For March 6
+
+1. Read 7.7 and Lab 7.8.3 on GAM models.
+
+2. Fit some gam models (even if they are not going to be our final model) on the eclipse data.
+
+3. Review eclipse 207 paper for how they fit the GAM models to their data.
+
 ## For February 27
 
 1. Visualize each metric with all 15 audiomoth data sets.
