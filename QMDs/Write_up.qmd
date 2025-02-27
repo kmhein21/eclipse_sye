@@ -459,9 +459,14 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum)))+
 ```
 KEEP PLOT ABOVE?
 
-## Dawn to Eclipse comparison ?
-
-
 ## Full data visualization 
+
+Notes for this section: 
+By day 
+By audiomoth 
+adding rect for both totality and full eclipse 
+subsetting days 
+choosing indices that look like they display patterns 
+
 
 ## Conclusion
