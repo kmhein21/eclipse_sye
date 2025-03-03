@@ -1,13 +1,14 @@
+# Visualizations of the data
+
+# Packages
 library(tidyverse)
 library(lubridate)
 library(hms)
 library(forecast)
 library(soundecology)
-library(purr)
 library(here)
 
-
-#Subsets of the larger data frame - only showing one folder at a time 
+# Using only 1 folder - A001_SD001
 
 eclipse_yesno<-A001_SD001|> mutate( eclipse = ifelse(day == "2024-04-08", "yes", "no"))
 
@@ -23,8 +24,7 @@ dawn_end<-hms(00,15,07)
 
 dawn<-A001_SD001|> filter(hour>= dawn_start & hour<= dawn_end)
 
-#Visualizing BEI
-#Full audio files
+##Visualizing BEI
 ggplot(data = A001_SD001, aes( x = hour, y = bei))+
   geom_line()+
   theme_minimal()+
@@ -35,7 +35,7 @@ ggplot(data = eclipse_yesno, aes( x = hour, y = bei))+
   theme_minimal()+
   labs(title = "Full Duration Comparison of BEI")
 
-#Only duration around time of eclipse 
+## Only duration around time of eclipse 
 
 ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
   geom_line(alpha = 0.3)+
@@ -43,7 +43,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
   theme_minimal()+
   labs(title = "Bioacoustic evenness over the Duration of the Eclipse")
 
-#Biophony 
+## Biophony 
 
 ggplot(data = A001_SD001, aes( x = hour, y = biophony))+
   geom_line()+
@@ -64,7 +64,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = biophony))+
   theme_minimal()+
   labs(title = "Biophony over the Eclipse Duration")
 
-# AEI
+## AEI
 
 ggplot(data = eclipse_time, aes( x =hour , y = aei))+
   geom_line()+
@@ -78,7 +78,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
   theme_minimal()+
   labs(title = "Acoustic evenness over the Eclipse Duration")
 
-### Combining multiple RDS files into one df
+# Creating the full Data frame of all the soundfiles 
 
 fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016)|>
   group_by(folder_name)|>
@@ -86,12 +86,12 @@ fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006
   mutate(fullADI = sapply(ADI_all, sum))
 
 
-
 onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
 onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
 
-#First graph: showing partial eclipse
-#Second graph: Zooming into the time of totality 
+# Visualizations 
+## First graph: showing partial eclipse
+## Second graph: Zooming into the time of totality 
 
 ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   geom_rect(xmin =  hms(38,11,14), xmax = hms(38,35,16), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
@@ -109,8 +109,8 @@ ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   theme_minimal()+
   scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) ### To gain a clearer view of totality 
 
-#Creating a biophony graphic for dawn 
-#Dawn segment records ~30 min before and ~45 min after sunrise 
+## Creating a biophony graphic for dawn 
+## Dawn segment records ~30 min before and ~45 min after sunrise 
 
 
 dawn_start<-hms(00,45,05)
@@ -241,7 +241,6 @@ ggplot(onlyDawn, aes(x = hour, y = fullADI, group = day))+
 ## A reduction in ADI around the beginning of the eclipse in folder 8, aligns with biophony?
 ## Like AEI it seems like the dawn and time during the eclipse match pretty well in their ranges 
 
-# NEW GRAPHICS BELOW
 # Graphics using geom_smooth()
 
 # Bioacoustic index  
@@ -302,19 +301,19 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
 # pattern from the eclipse day is extremely flat, this is similar to many other days in our data set 
 # No pattern here
 
+# Deciding on potential subset of the days
 # Weather using:  https://www.wunderground.com/history/daily/us/ny/ogdensburg/KOGS/date/2024-4-10
-# potentially limiting days - 2 days before and after (look as weather)
-# March 30 - April 4th: Gusts throughout the day 
-# April 5th - small amount of rain and gust (9pm)
-# April 6th - 9th:  middle of day clear (small amount of rain on the 7th and 8th after 5pm) 
-# April 10th: Gusts in the middle of the day, rain in the morning 
-# April 11th: rain throughout the afternoon 
-# April 12th - 13th: Lots of wind and some rain during morning and middle of day 
-# April 14th: gust in the morning and rain ~2 hours after
-# April 15th: lighter rain and some gusts (during the 4-6 pm region)
-# April 16th: slight rain and one gust (~2pm)
+## March 30 - April 4th: Gusts throughout the day 
+## April 5th - small amount of rain and gust (9pm)
+## April 6th - 9th:  middle of day clear (small amount of rain on the 7th and 8th after 5pm) 
+## April 10th: Gusts in the middle of the day, rain in the morning 
+## April 11th: rain throughout the afternoon 
+## April 12th - 13th: Lots of wind and some rain during morning and middle of day 
+## April 14th: gust in the morning and rain ~2 hours after
+## April 15th: lighter rain and some gusts (during the 4-6 pm region)
+## April 16th: slight rain and one gust (~2pm)
 
-# Based on the weather I think that we could potentially use a buffer of 2-3 days. Using the 6th and 7th for before the eclipse and the 9th and 11th for after
+# Based on the weather potentially use a buffer of 2-3 days. Using the 6th and 7th for before the eclipse and the 9th and 11th for after
 # Due to the amount of days that have bad weather after the eclipse I think that there are few days to use after the day of the eclipse.
 # Could add in 5th, gusts are after 4-6 region
 # potentially 14th and 16th, gusts happen earlier than the eclipse 
@@ -340,9 +339,13 @@ ggplot(data = fiveDaySubset, aes(x = hour, y = aei)) +
   facet_wrap(~ day)
 
 ggplot(data = fiveDaySubset, aes(x = hour, y = fullADI)) +
-  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 10, fill = "lightblue", alpha = 0.2) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_smooth() +
   theme_minimal() +
   facet_wrap(~ day)
+
+
+# gam - spline on time, eclipse or not, interaction 
+# other non-linear options? 
 
