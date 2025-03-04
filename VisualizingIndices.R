@@ -346,6 +346,5 @@ ggplot(data = fiveDaySubset, aes(x = hour, y = fullADI)) +
   facet_wrap(~ day)
 
 
-# gam - spline on time, eclipse or not, interaction 
-# other non-linear options? 
+
 

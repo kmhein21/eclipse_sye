@@ -3,6 +3,7 @@ title: "Organizing and Visualizing Biological Audio Data from the 2024 Total Sol
 author: "Kaitlin Heintzman"
 format: 
   pdf:
+    warning: false
     toc: true
 ---
 ```{r}
@@ -16,6 +17,14 @@ library(hms)
 library(tuneR)
 library(pander)
 ```
+
+TO DO:
+ better format 
+  figure sizing
+  titles
+  axis labels 
+  code thats included - go through 
+ cut down on plots - only select most important 
 
 ## Abstract: 
 
@@ -34,7 +43,7 @@ Each AudioMoth was configured to record within four temporal windows on each day
 | 19:00 - 20:00 | \~30 minutes before and after sunset             |
 | 23:00 - 23:30 | sample nocturnal activity                        |
 
-: Table 1 {.striped .hover}
+: Recording Times {.striped .hover}
 
 Within each time window, each AudioMoth recorded in a repeated cycle with 55 seconds of recording and 5 seconds to write data for every minute of the recording window (Table 2). Sample rate measures the density of recordings per unit time and therefore the range of frequencies that can be recorded. High sample rates record a higher range of frequencies but take up more space on the microSD card. We selected a sample rate of 96 kHz to capture sound frequencies up to about 48 kHz, which allowed us to capture common bird and amphibian songs and calls as well as at least some insects and bat echolocation sounds. Gain is a measure of the degree to which the microphone amplifies the sound as it is recorded. Higher gain enables detection of quieter sounds but can also result in clipping and distortion. After collecting pilot recordings near wetlands where wood frogs were calling we determined that a gain setting of 4 would help increase our detection of animal sounds.
 
@@ -45,7 +54,7 @@ Within each time window, each AudioMoth recorded in a repeated cycle with 55 sec
 | Sleep Duration (seconds) | 5             |
 | Recording Duration (seconds) | 55                     |
 
-: Table 2 {.striped .hover}
+: Recording Parameters {.striped .hover}
 
 We used ArcGIS Pro (version XXXX, ESRI Incorporated, Redlands, California) to identify areas of forest-wetland interface or forested wetland occurring on public or University-owned land. Our intention was to place the recorders at locations where they could capture the sounds of both forest birds and pond-breeding amphibians (as well as other biotic sounds including any active insects or bats). Due to our northern location within the path of the eclipse in North America, the onset of spring was just beginning. Red-winged blackbirds (Agelaius phoeniceus) had returned to the area and were establishing breeding territories and both wood frogs (Lithobates sylvaticus) and spring peepers (Pseudacris crucifer) had begun to chorus at least 5 days prior to deployment of the recorders. To reduce the time required to deploy units, we located the devices near but out of view of hiking trails and within 20 miles of the St. Lawrence University campus (44.58931027483651º N, -75.1613716006626 º W).
 
@@ -295,7 +304,7 @@ Visualizing these two data sets help us understand the patterns that occur acros
 
 ### Using the HPC
 
-To assist in efficiently expanding to the full set of our audio files, we decided to utilize the HPC to run our function on the large files for each audiomoth and to extract the cleaned data. This would assist in speeding up the computation time, and decreasing the amount of space utilized by WAV files on a desktop.  To avoid any chance of overwriting through this process, the function created a final output of an RDS file, so that it could be renamed as the audiomoth name upon loading into the environment. The total amount of data run on the HPC was 15 folders corresponding to 15 of the 20 audiomoths. 
+To assist in efficiently expanding to the full set of our audio files, we decided to utilize the HPC to run our function on the large files for each audiomoth and to extract the cleaned data. This would assist in speeding up the computation time, and decreasing the amount of space utilized by WAV files on a desktop.  To avoid any chance of overwriting through this process, the function created a final output of an RDS file, so that it could be renamed as the audiomoth name upon loading into the environment. We ran, visualized, and analyzed all of the data collected by the biology department, which ended up belonging to 20 audiomoths. Each audiomoth was processed through our function eclipse_df, and on average the task took ~ 10.5 hours. 
 
 Through using the HPC it was discovered that some of the audiomoth folders contained empty .WAV files which would kill the HPC job before the RDS was finished and saved. To combat this any folder which contained empty .WAV files, small .WAV files (<1 MB ), and alternate file types were deleted from the folder before running on the HPC. As this was only about ~5-8 files this did not cause concern about missing data or unequal RDS file sizes. 
 
@@ -433,7 +442,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum)))+
   geom_line()+
   facet_wrap(~day)+
   theme_minimal()+
-  labs(title = "Bioacoustic Index over the Eclipse Duration")
+  labs(title = "Acoustic Complexity Index over the Eclipse Duration")
 ```
 
 ```{r}
@@ -443,10 +452,10 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum), group = day)
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hour, y = sapply(ADI_all,sum)), col = "blue", lwd =1)+
   theme_minimal()+
-  labs(title = "Bioacoustic Index over the Duration of the Eclipse", y = "ADI")
+  labs(title = "Acoustic Diversity Index over the Duration of the Eclipse", y = "ADI")
 ```
 
-COMMENTS ON THIS PLOT 
+Lastly looking at the ADI across this folder we can see that there is potentially a decrease at the point of totality. This suggests perhaps we should continue to look into this index as we expand our data set.
 
 ```{r}
 #| echo: false
@@ -457,16 +466,185 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum)))+
   theme_minimal()+
   labs(title = "Bioacoustic Index over the Eclipse Duration")
 ```
-KEEP PLOT ABOVE?
+
+The difficulty in assessing the plot above is that due to the noise in this index, it is difficult to assess whether this pattern is uncommon across the rest of the days. 
 
 ## Full data visualization 
 
-Notes for this section: 
-By day 
-By audiomoth 
-adding rect for both totality and full eclipse 
-subsetting days 
-choosing indices that look like they display patterns 
+```{r}
+#| echo: false
+
+A002_SD013<-readRDS(here("rds_files/A002_SD013.rds"))
+A003_SD005<-readRDS(here("rds_files/A003_SD005.rds"))
+A004_SD012<-readRDS(here("rds_files/A004_SD012.rds"))
+A005_SD002<-readRDS(here("rds_files/A005_SD002.rds"))
+A006_SD006<-readRDS(here("rds_files/A006_SD006.rds"))
+A007_SD017<-readRDS(here("rds_files/A007_SD017.rds"))
+A008_SD007<-readRDS(here("rds_files/A008_SD007.rds"))
+A009_SD009<-readRDS(here("rds_files/A009_SD009.rds"))
+A010_SD014<-readRDS(here("rds_files/A010_SD014.rds"))
+A011_SD018<-readRDS(here("rds_files/A011_SD018.rds"))
+A013_SD016<-readRDS(here("rds_files/A013_SD016.rds"))
+A014_SD021<-readRDS(here("rds_files/A014_SD021.rds"))
+A015_SD010<-readRDS(here("rds_files/A015_SD010.rds"))
+A016_SD022<-readRDS(here("rds_files/A016_SD022.rds"))
+
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016, A014_SD021, A015_SD010, A016_SD022)|>
+  group_by(folder_name)|>
+  mutate(fullACI = sapply(ACI_all,sum))|>
+  mutate(fullADI = sapply(ADI_all, sum))|>
+  filter(day == "2024-04-06" | day == "2024-04-07"| day == "2024-04-08"| day == "2024-04-09" | day == "2024-04-11")
+
+
+onlyEclipseTime<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)
+onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
+
+```
+
+Due to concerns about changes in weather, time from eclipse, and to improve readability we utilized a subset of the recording days. To assess the weather conditions across the days we used the website:
+
+<https://www.wunderground.com/history/daily/us/ny/ogdensburg>
+
+from looking at this website across our days of recording we decided to use the 2 days buffering the eclipse, however due to wind gusts around the midday on the 10th we opted for the 11th. This created a subset of days which had similar weather patterns to the day of the eclipse, and were close to April 8th which decreased concern about migratory changes that could alter the soundscape. This created a subset of the days: April 6th, 7th, 8th, 9th, and 11th. 
+
+We approached the full visualization of our data through two avenues: faceting by audiomoth and by day. This allowed us to search for patterns on April 8th across the different recording devices, and then to look specifically at all the data from the 8th and to look for patterns across the rest of our chosen days. In our visualizations which facet by day we used a geom_smooth() layer to display a smoothed Generalized Additive Model line to display patterns more clearly.
+
+### Acoustic Complexity 
+
+```{r}
+#| echo: false
+
+ggplot(onlyEclipseTime, aes(x = hour, y = fullACI, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullACI), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))
+
+ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.2) +
+  geom_smooth() +
+  theme_minimal() +
+  facet_wrap(~ day)
+
+```
+
+We can see in both of these graphs that there is not likely to be a significant pattern in this index. The most common pattern here is very flat and falls around the same y value for the majority of the days. 
+
+### Acoustic Diversity 
+
+```{r}
+#| echo: false
+
+ggplot(onlyEclipseTime, aes(x = hour, y = fullADI, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 12, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullADI), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+
+ggplot(data = onlyEclipseTime, aes(x = hour, y = fullADI)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 10, fill = "lightblue", alpha = 0.2) +
+  geom_smooth() +
+  theme_minimal() +
+  facet_wrap(~ day)
+```
+
+COMMENTS 
+
+### Acoustic Evenness 
+
+
+```{r}
+#| echo: false
+
+ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= aei), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+
+ggplot(data = onlyEclipseTime, aes(x = hour, y = aei)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  theme_minimal() +
+  facet_wrap(~ day)
+```
+
+COMMENTS 
+
+### Bioacoustic Index 
+
+```{r}
+#| echo: false
+
+ggplot(onlyEclipseTime, aes(x = hour, y = bei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= bei), col = "blue")+
+  facet_wrap(~folder_name)+
+  labs(title = "Bioacoustic index Across all Audiomoths")+
+  theme_minimal()+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+
+ggplot(data = onlyEclipseTime, aes(x = hour, y = bei)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_smooth() +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
+  labs(title = "Bioacoustic index Across all Days")+
+  theme_minimal() +
+  facet_wrap(~ day)
+
+```
+
+In this index we can see some interesting patterns. Looking across audiomoth it is harder to see, but there is potentially a pattern where the index increases around the time of totality. When we then facet by day we can see a very striking pattern, where the only increase seen across all the days occurs on April 8th around the time of totality. 
+
+### Biophony
+
+```{r}
+#| echo: false
+
+ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2)+
+  geom_line(alpha = 0.2)+
+  geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  labs(title = " Biophony across all Audiomoths")+
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))
+
+ggplot(data = onlyEclipseTime, aes(x = hour, y = biophony)) +
+  geom_line(aes(group = folder_name), alpha = 0.4) +
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 10, fill = "lightblue", alpha = 0.2) +
+  geom_smooth() +
+  labs(title = " Biophony across all Days")+
+  theme_minimal() +
+  facet_wrap(~ day)
+```
+
+COMMENTS 
+
+
+## Modeling 
+
+To include in this section:
+choosing specific indices
+GAM 
+
 
 
 ## Conclusion
+
+## Citations 
+
+Eclipse Paper
+
+Intro to Statistical Machine learning 
+

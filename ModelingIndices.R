@@ -1,6 +1,9 @@
 # Modelling the eclipse data 
 # using GAMs 
 
+# Eclipse paper - created GAMs which included functions of time and functions of time and % development 
+# Checked p-val and checked residuals to meet normality assumptions 
+
 # Packages
 library(tidyverse)
 library(splines)
@@ -40,11 +43,20 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 # Creating a similar model to mh_exploration 
 # Spline on Time, Least squares for 'eclipse or not', and interaction between the two 
 
+
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = eclipse)+
-                      eclipse 
-                    , data = modelEclipse_df)
+                      eclipse,
+                     data = modelEclipse_df)
+
+bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = eclipse)+
+                      eclipse+
+                      folder_name, 
+                    data = modelEclipse_df)
+# adding the folder_name increases the deviance explained and makes the residuals look better
 
 summary(bei_mod)
+
+gam.check(bei_mod)
 
 grid <- modelEclipse_df |> ungroup() |>
   data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
