@@ -1,5 +1,15 @@
 ## Task List
 
+## For March 13
+
+1. Use `scale_x_continuous()`? to change what appears as the tick marks on the plot.
+
+2. Moon phases on plot (set the max y-axis value to be some number, look into different types of points in R, create 5 data frames, each one row, with the hour_numeric and the max y-axis value as variables). Then use 5 geom_points() with different shapes.
+
+3. Write up on fitted model. Keep in mind if there is a statisical test showing that the eclipse day has a different pattern.
+
+
+
 ## For March 6
 
 1. Read 7.7 and Lab 7.8.3 on GAM models.
