@@ -15,7 +15,9 @@ library(hms)
 eclipse_start<-hms(00,00,14)
 eclipse_end<-hms(00,50,16)
 
-fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016)|>
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, 
+                 A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016,A014_SD021, A015_SD010, A016_SD022,
+                 A017_SD024, A018_SD011, A019_SD008)|>
   group_by(folder_name)|>
   mutate(fullACI = sapply(ACI_all,sum))|>
   mutate(fullADI = sapply(ADI_all, sum))
@@ -44,11 +46,6 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 
 # Creating a similar model to mh_exploration 
 # Spline on Time, Least squares for 'eclipse or not', and interaction between the two 
-
-
-bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = eclipse)+
-                      eclipse,
-                     data = modelEclipse_df)
 
 # by day 
 
