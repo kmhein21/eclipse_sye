@@ -11,6 +11,7 @@ library(here)
 library(mgcv)
 library(modelr)
 library(hms)
+
 # Loading in the full data set 
 eclipse_start<-hms(00,00,14)
 eclipse_end<-hms(00,50,16)
@@ -47,6 +48,12 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 # Creating a similar model to mh_exploration 
 # Spline on Time, Least squares for 'eclipse or not', and interaction between the two 
 
+
+# custom point shapes 
+
+partial_begin = tibble(bei = (3.5), hour_numeric = hms(38,11,14))
+totality = tibble(bei = (3.5), hour_numeric = hms(52,23,15))
+partial_end = tibble(bei = (3.5), hour_numeric = hms(38,35,16))
 # by day 
 
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
@@ -71,8 +78,12 @@ gam_aug <- broom::augment(bei_mod, newdata = grid)
 # visual across the time of eclipse
 ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(data = modelEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
-  geom_line(aes(colour = day_factor),
-            linewidth = 2) +
+  geom_line(aes(colour = day_factor), linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = bei),pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = bei),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
   scale_colour_viridis_d() +
   theme_minimal() +
   labs(colour = "eclipse_or_not",
@@ -105,8 +116,6 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
        y = "bei")+
   scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
 
-
-# custom point shapes 
 
 
 ## Practice making other models 
