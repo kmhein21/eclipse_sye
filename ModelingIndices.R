@@ -74,23 +74,23 @@ grid <- modelEclipse_df |>
 gam_aug <- broom::augment(bei_mod, newdata = grid)
 
 
-
 # visual across the time of eclipse
 ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(data = modelEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
   geom_line(aes(colour = day_factor), linewidth = 2) +
-  geom_point(data = totality, aes(x = hour_numeric, y = bei),pch = 15, size = 6)+
+  geom_point(data = totality, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
   geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_text(data = partial_begin, aes(x = hour_numeric, y = bei), label = "\u263D", size = 4, family = "Arial Unicode MS")+
   geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 3.5, size = 2)+
   geom_point(data = partial_end, aes(x = hour_numeric, y = bei),pch = 15 , size = 6)+
   geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
   scale_colour_viridis_d() +
   theme_minimal() +
   labs(colour = "eclipse_or_not",
        y = "bei")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
-
-# x-axis: find some way to denote when totality is? Moon picture 
 
 # model and visual including time before eclipse
 
