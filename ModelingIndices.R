@@ -52,7 +52,9 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 # custom point shapes 
 
 partial_begin = tibble(bei = (3.5), hour_numeric = hms(38,11,14))
+second_df = tibble(bei = (3.5), hour_numeric = hms(00,45,14))
 totality = tibble(bei = (3.5), hour_numeric = hms(52,23,15))
+fourth_df = tibble(bei = (3.5), hour_numeric = hms(00,00,16))
 partial_end = tibble(bei = (3.5), hour_numeric = hms(38,35,16))
 # by day 
 
@@ -80,9 +82,14 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_line(aes(colour = day_factor), linewidth = 2) +
   geom_point(data = totality, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
   geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
-  geom_text(data = partial_begin, aes(x = hour_numeric, y = bei), label = "\u263D", size = 4, family = "Arial Unicode MS")+
   geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
   geom_point(x = hms(00,10,14), y = 3.5, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 3.5, size = 3)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 3.5, size = 3)+
   geom_point(data = partial_end, aes(x = hour_numeric, y = bei),pch = 15 , size = 6)+
   geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
   geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
