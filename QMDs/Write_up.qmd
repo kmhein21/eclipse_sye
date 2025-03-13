@@ -16,6 +16,8 @@ library(here)
 library(hms)
 library(tuneR)
 library(pander)
+library(mgcv)
+library(modelr)
 ```
 
 TO DO:
@@ -25,6 +27,8 @@ TO DO:
   axis labels 
   code thats included - go through 
  cut down on plots - only select most important 
+ add more theoretical aspects of GAMs and smoothing spline
+ Interpret second BEI model 
 
 ## Abstract: 
 
@@ -146,26 +150,12 @@ ggplot(data=WAV_5_test, aes(x=time, y=as.numeric(bei)))+
   theme_minimal()+
   labs(x = "Time", y = "BEI", title = "First Graphic of Bioacoustic Index")
 
-ggplot(data=WAV_5_test, aes(x = time, y = as.numeric(aei)))+
-  geom_point(col = "red")+
-  theme_minimal()+
-  labs(x = "Time", y = "AEI", title = "First Graphic of Acoustic Evenness")
-
-ggplot(data = WAV_5_test, aes(x = time, y = as.numeric(biophony)))+
-  geom_point(col = "red")+
-  theme_minimal()+
-  labs(x = "Time", y = "Biophony", title = "First Graphic of Biophony")
-
 ```
 
 
 ```{r}
 #| echo: false
 #| fig-align: center
-ggplot(data = WAV_5_test, aes(x = time, y = sapply(ACI_all, sum)))+
-  geom_point(col = "blue")+
-  theme_minimal()+
-  labs(x = "Time", y = "ACI", title = "First Graphic of Acoustic Complexity")
 
 ggplot(data = WAV_5_test, aes(x = time, y = sapply(ADI_all, sum)))+
   geom_point(col = "blue")+
@@ -173,7 +163,19 @@ ggplot(data = WAV_5_test, aes(x = time, y = sapply(ADI_all, sum)))+
   labs(x = "Time", y = "ADI", title = "First Graphic of Acoustic Diversity")
 ```
 
-The three first plots (points in red) are those which correspond to singular values, and the plots in blue correspond to the indices which are stored as list columns. As mentioned above, these values were summed across the full list. Although this initial introduction was not for the purpose of finding any patterns in our data, it displayed the ranges that we could expect these values to fall in. 
+These example plots show the initial visualization that was done for each of these indices. To save space we have included only the Bioacoustic index and Acoustic Diversity plots. Although these initial visualizations did not help us assess patterns, the graphics helped us gain an understanding of the ranges that we could expect these values to fall in. 
+
+
+| Index         | Range                                        |
+|---------------|--------------------------------------------------|
+| Acoustic Complexity | 1600 - 1700                |
+| Acoustic Diversity | 0 - 10  |
+| Acoustic Evenness | 0 - 0.5         |
+| Bioacoustic Index | 0 - 1.5                    |
+| Biophony| 1 - 3 |
+
+: Assessment of Index Ranges {.striped .hover}
+
 
 ### Creating a cleaned data frame
 
@@ -634,9 +636,113 @@ COMMENTS
 
 ## Modeling 
 
-To include in this section:
-choosing specific indices
-GAM 
+```{r}
+#| echo: false
+modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
+                                                     "eclipse", 
+                                                     "not_eclipse"))|>
+  mutate(eclipse = as_factor(eclipse))|>
+  mutate(hour_numeric = as.numeric(hour))|>
+  filter(hour>= eclipse_start & hour<= eclipse_end &
+           day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
+                    "2024-04-09", "2024-04-11"))|>
+  mutate(day_factor = as.factor(day))|>
+  select(hour, hour_numeric, everything())
+
+modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
+                                                            "eclipse", 
+                                                            "not_eclipse"))|>
+  mutate(eclipse = as_factor(eclipse))|>
+  mutate(hour_numeric = as.numeric(hour))|>
+  filter(hour < eclipse_start & day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
+                   "2024-04-09", "2024-04-11")) |>
+  mutate(day_factor = as.factor(day))
+
+```
+
+From the visualization we decided to focus on specifically the Bioacoustic index as it seemed like this index which would show a clear connection to the eclipse. To maintain additivity and account for the non-linear patterns in the data we analyzed the data using Generalized Additive Models. These models were made using a smoothing spline for hour separated by day along with a function of day. 
+
+```{r}
+bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
+                      day_factor,
+                    data = modelEclipse_df)
+
+summary(bei_mod)
+
+```
+
+From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th posesses the most flexible trend line with an edf of 8.79. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 11th being the most flexibile, but with about half the edf value as April 8th, at 4.033. 
+
+We can also note from this output that the model has a explained deviance value of 11.1%, meaning that using our smoothing spline and day variable explain  11.1% of the variability in the bioacoustic index.
+
+```{r}
+#| echo: false
+par(mfrow = c(3,2))
+plot(bei_mod)
+```
+
+When we plot the effects of each day we can see April 8th's flexibility. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibilty as we expected with no major maximums or minimums. 
+
+```{r}
+#| echo: false
+grid <- modelEclipse_df |> 
+  ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+    day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(bei_mod, newdata = grid)
+
+
+
+# visual across the time of eclipse
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "bei")+
+  scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
+
+```
+
+INTERPRET 
+
+
+To expand our understanding of the relationships in this model we created the same GAM on the time from the dawn. 
+
+```{r}
+bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
+                      day_factor
+                    , data = modelBeforeEclipse_df)
+summary(bei_mod2)
+```
+
+
+```{r}
+#| echo: false
+grid <- modelBeforeEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(bei_mod2, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelBeforeEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "bei")+
+  scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
+
+```
+
+INTERPRET
 
 
 

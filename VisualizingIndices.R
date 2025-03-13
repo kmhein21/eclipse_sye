@@ -80,7 +80,9 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei, group = day))+
 
 # Creating the full Data frame of all the soundfiles 
 
-fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016)|>
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, 
+                 A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016,A014_SD021, A015_SD010, A016_SD022,
+                 A017_SD024, A018_SD011, A019_SD008)|>
   group_by(folder_name)|>
   mutate(fullACI = sapply(ACI_all,sum))|>
   mutate(fullADI = sapply(ADI_all, sum))
