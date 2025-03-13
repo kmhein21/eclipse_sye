@@ -1,5 +1,15 @@
 ## Task List
 
+## For March 27
+
+1. Continue write up on fitted model. Keep in mind if there is a statisical test showing that the eclipse day has a different pattern.
+
+2. Fit model and make the plots (adding the moon!) for the other metrics (all 5).
+
+3. Keep in mind if there is a statistical test for difference in "wiggliness" across the different days.
+
+4. Make plot of raw eclipse data (time series plot of data on day of eclipse to see natural variability in the metric).
+
 ## For March 13
 
 1. Use `scale_x_continuous()`? to change what appears as the tick marks on the plot.
