@@ -348,5 +348,12 @@ ggplot(data = fiveDaySubset, aes(x = hour, y = fullADI)) +
   facet_wrap(~ day)
 
 
+# Raw eclipse data faceted by the audiomoth
+
+ggplot(data = onlyEclipseDAY, aes(x = hour, y= bei))+
+  geom_line()+
+  facet_wrap(~folder_name)+
+  theme_minimal()
+
 
 

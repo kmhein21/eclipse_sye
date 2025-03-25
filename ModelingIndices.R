@@ -129,7 +129,6 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
 
 
-
 ## Models for Other Indices 
 
 # Acoustic Evenness 
