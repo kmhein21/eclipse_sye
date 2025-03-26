@@ -681,7 +681,7 @@ par(mfrow = c(3,2))
 plot(bei_mod)
 ```
 
-When we plot the effects of each day we can see April 8th's flexibility. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibilty as we expected with no major maximums or minimums. 
+When we plot the effects of each day we can see April 8th's flexibility. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibility as we expected with no major maximums or minimums. 
 
 ```{r}
 #| echo: false
@@ -708,8 +708,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-INTERPRET 
-
+This plot is similar to the one above, but it compiles all of the daya on top of eachother for easier comparison. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. 
 
 To expand our understanding of the relationships in this model we created the same GAM on the time from the dawn. 
 
@@ -720,6 +719,9 @@ bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
 summary(bei_mod2)
 ```
 
+Using this model we can see that a majority of the splines are still significant, however the only non-significant spline is actually occuring on the 8th. In this summary we can also see based on the edf the 8th is actually the least flexible day during this time period. This helps us understand that there is not any special pattern that occured on the 8th and provides evidence that it was a normal day. 
+
+We can also see that this model has an explained deviance value of 8.8%, meaning that our model explains 8.8% of the variability in the bioacoustic index during this time frame. 
 
 ```{r}
 #| echo: false
@@ -742,9 +744,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-INTERPRET
-
-
+Looking at this graph we can see that there is nothing setting any of the days apart, and like what we found in the summary we can see there is no special pattern occurring in the morning on the 8th, and that the bioacoustic index on this day is quite similar to the patterns that occurred on our subset of other days. 
 
 ## Conclusion
 

@@ -104,6 +104,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
        y = "Bioacoustic Index")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
 
+
 # model and visual including time before eclipse
 
 bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+

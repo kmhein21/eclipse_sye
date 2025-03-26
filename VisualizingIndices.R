@@ -353,7 +353,8 @@ ggplot(data = fiveDaySubset, aes(x = hour, y = fullADI)) +
 ggplot(data = onlyEclipseDAY, aes(x = hour, y= bei))+
   geom_line()+
   facet_wrap(~folder_name)+
-  theme_minimal()
+  theme_minimal()+
+  labs(title = "BEI from April 8th")
 
 
 
