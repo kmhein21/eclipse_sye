@@ -490,8 +490,13 @@ A013_SD016<-readRDS(here("rds_files/A013_SD016.rds"))
 A014_SD021<-readRDS(here("rds_files/A014_SD021.rds"))
 A015_SD010<-readRDS(here("rds_files/A015_SD010.rds"))
 A016_SD022<-readRDS(here("rds_files/A016_SD022.rds"))
+A017_SD024<-readRDS(here("rds_files/A017_SD024.rds"))
+A018_SD011<-readRDS(here("rds_files/A018_SD011.rds"))
+A019_SD008<-readRDS(here("rds_files/A019_SD008.rds"))
+A021_SD023<-readRDS(here("rds_files/A021_SD023.rds"))
+A022_SD019<-readRDS(here("rds_files/A022_SD019.rds"))
 
-fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016, A014_SD021, A015_SD010, A016_SD022)|>
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016, A014_SD021, A015_SD010, A016_SD022, A017_SD024, A018_SD011, A019_SD008, A021_SD023, A022_SD019)|>
   group_by(folder_name)|>
   mutate(fullACI = sapply(ACI_all,sum))|>
   mutate(fullADI = sapply(ADI_all, sum))|>
@@ -660,7 +665,7 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 
 ```
 
-From the visualization we decided to focus on specifically the Bioacoustic index as it seemed like this index which would show a clear connection to the eclipse. To maintain additivity and account for the non-linear patterns in the data we analyzed the data using Generalized Additive Models. These models were made using a smoothing spline for hour separated by day along with a function of day. 
+From our visualization, we decided to focus on specifically the Bioacoustic index as it seemed like this index which would show a clear connection to the eclipse. To maintain additivity and account for the non-linear patterns in the data we analyzed the data using Generalized Additive Models. These models were made using a smoothing spline for hour separated by day along with a function of day. 
 
 ```{r}
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
@@ -671,9 +676,9 @@ summary(bei_mod)
 
 ```
 
-From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th posesses the most flexible trend line with an edf of 8.79. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 11th being the most flexibile, but with about half the edf value as April 8th, at 4.033. 
+From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses the most flexible trend line with an edf of 8.774. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 7th being the most flexibile, but with less than half the edf value as April 8th, at 3.632. 
 
-We can also note from this output that the model has a explained deviance value of 11.1%, meaning that using our smoothing spline and day variable explain  11.1% of the variability in the bioacoustic index.
+We can also note from this output that the model has a explained deviance value of 10.7%, meaning that using our smoothing spline and day variable explain  10.7% of the variability in the bioacoustic index.
 
 ```{r}
 #| echo: false
@@ -719,9 +724,9 @@ bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
 summary(bei_mod2)
 ```
 
-Using this model we can see that a majority of the splines are still significant, however the only non-significant spline is actually occuring on the 8th. In this summary we can also see based on the edf the 8th is actually the least flexible day during this time period. This helps us understand that there is not any special pattern that occured on the 8th and provides evidence that it was a normal day. 
+Using this model we can see that a majority of the splines are still significant, however the only non-significant spline is actually occurring on the 8th. In this summary we can also see based on the edf the 8th is actually the least flexible day during this time period. This helps us understand that there is not any special pattern that occured on the 8th and provides evidence that it was a normal day. 
 
-We can also see that this model has an explained deviance value of 8.8%, meaning that our model explains 8.8% of the variability in the bioacoustic index during this time frame. 
+We can also see that this model has an explained deviance value of 9.1%, meaning that our model explains 9.1% of the variability in the bioacoustic index during this time frame. 
 
 ```{r}
 #| echo: false
@@ -745,6 +750,9 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 ```
 
 Looking at this graph we can see that there is nothing setting any of the days apart, and like what we found in the summary we can see there is no special pattern occurring in the morning on the 8th, and that the bioacoustic index on this day is quite similar to the patterns that occurred on our subset of other days. 
+
+
+ADD OTHER MODELS?
 
 ## Conclusion
 
