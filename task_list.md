@@ -1,5 +1,15 @@
 ## Task List
 
+## For April 3
+
+1. Adjust the model to include `+ s(folder, bs = "re")` so that audiomoth/location is part of the model.
+
+2. Adjust plots and tweak model summaries.
+
+3. Continue write-up.
+
+4. Think about permutation test / run code sent.
+
 ## For March 27
 
 1. Continue write up on fitted model. Keep in mind if there is a statisical test showing that the eclipse day has a different pattern.
