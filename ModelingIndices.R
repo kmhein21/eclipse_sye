@@ -168,6 +168,32 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   labs(colour = "eclipse_or_not",
        y = "Acoustic Evenness")
 
+# AEI and the Dawn 
+
+aei_mod2<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
+                       day_factor
+                     , data = modelBeforeEclipse_df)
+summary(aei_mod2)
+
+grid <- modelBeforeEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(aei_mod2, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelBeforeEclipse_df, aes(y = aei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Eveness Index")+
+  scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
+
+
+
 # Acoustic Diversity 
 
 ADI_mod<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
@@ -204,6 +230,32 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   labs(colour = "eclipse_or_not",
        y = "Acoustic Diversity ")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
+
+
+# ADI and Dawn 
+
+ADI_mod2<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
+                       day_factor
+                     , data = modelBeforeEclipse_df)
+summary(ADI_mod2)
+
+grid <- modelBeforeEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(ADI_mod2, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelBeforeEclipse_df, aes(y = fullADI, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Diversity Index")+
+  scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
+
 
 # Acoustic Complexity 
 
