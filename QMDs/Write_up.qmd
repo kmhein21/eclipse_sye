@@ -651,13 +651,13 @@ modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
   filter(hour>= eclipse_start & hour<= eclipse_end &
            day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
                     "2024-04-09", "2024-04-11"))|>
-  mutate(day_factor = as.factor(day))|>
+  mutate(day_factor = as.factor(day), folder_name = as_factor(folder_name))|>
   select(hour, hour_numeric, everything())
 
 modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
                                                             "eclipse", 
                                                             "not_eclipse"))|>
-  mutate(eclipse = as_factor(eclipse))|>
+  mutate(eclipse = as_factor(eclipse), folder_name = as_factor(folder_name))|>
   mutate(hour_numeric = as.numeric(hour))|>
   filter(hour < eclipse_start & day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
                    "2024-04-09", "2024-04-11")) |>
@@ -665,20 +665,20 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 
 ```
 
-From our visualization, we decided to focus on specifically the Bioacoustic index as it seemed like this index which would show a clear connection to the eclipse. To maintain additivity and account for the non-linear patterns in the data we analyzed the data using Generalized Additive Models. These models were made using a smoothing spline for hour separated by day along with a function of day. 
+From our visualization, we decided to focus on specifically the Bioacoustic index as it seemed like this index which would show a clear connection to the eclipse. To maintain additivity and account for the non-linear patterns in the data we analyzed the data using Generalized Additive Models. These models were made using a smoothing spline for hour separated by day, an additional spline for folder_name which would help us account for the different audiomoths/locations, and lastly a function of day. 
 
 ```{r}
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
-                      day_factor,
+                      day_factor + s(folder_name, bs = "re"),
                     data = modelEclipse_df)
 
 summary(bei_mod)
 
 ```
 
-From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses the most flexible trend line with an edf of 8.774. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 7th being the most flexibile, but with less than half the edf value as April 8th, at 3.632. 
+From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses the most flexible trend line with an edf of 8.861. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
 
-We can also note from this output that the model has a explained deviance value of 10.7%, meaning that using our smoothing spline and day variable explain  10.7% of the variability in the bioacoustic index.
+We can also note from this output that the model has a explained deviance value of 44%, meaning that using our smoothing spline and day variable explain  44% of the variability in the bioacoustic index.
 
 ```{r}
 #| echo: false
@@ -692,7 +692,7 @@ When we plot the effects of each day we can see April 8th's flexibility. We can 
 #| echo: false
 grid <- modelEclipse_df |> 
   ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A014_SD021",
     day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -713,25 +713,25 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-This plot is similar to the one above, but it compiles all of the daya on top of eachother for easier comparison. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. 
+This plot is similar to the one above, but it compiles all of the data on top of eachother for easier comparison. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. To produce this graph, we needed to specify one of our folders which lies close to the middle of the response ("A014_SD021") to create predictions using our model.  
 
 To expand our understanding of the relationships in this model we created the same GAM on the time from the dawn. 
 
 ```{r}
 bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
-                      day_factor
+                      day_factor + s(folder_name, bs = "re")
                     , data = modelBeforeEclipse_df)
 summary(bei_mod2)
 ```
 
-Using this model we can see that a majority of the splines are still significant, however the only non-significant spline is actually occurring on the 8th. In this summary we can also see based on the edf the 8th is actually the least flexible day during this time period. This helps us understand that there is not any special pattern that occured on the 8th and provides evidence that it was a normal day. 
+Using this model we can see that a majority of the splines are still significant, however the only non-significant spline is actually occurring on the 8th. In this summary we can also see based on the edf the 8th is actually the least flexible day during this time period. This helps us understand that there is not any special pattern that occurred on the 8th and provides evidence that it was a normal day. 
 
-We can also see that this model has an explained deviance value of 9.1%, meaning that our model explains 9.1% of the variability in the bioacoustic index during this time frame. 
+We can also see that this model has an explained deviance value of 56.7%, meaning that our model explains 56.7% of the variability in the bioacoustic index during this time frame. 
 
 ```{r}
 #| echo: false
 grid <- modelBeforeEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "A014_SD021",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -752,7 +752,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 Looking at this graph we can see that there is nothing setting any of the days apart, and like what we found in the summary we can see there is no special pattern occurring in the morning on the 8th, and that the bioacoustic index on this day is quite similar to the patterns that occurred on our subset of other days. 
 
 
-ADD OTHER MODELS?
+ADD OTHER MODELS
 
 ## Conclusion
 
