@@ -28,7 +28,7 @@ fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006
 modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
                                                      "eclipse", 
                                                      "not_eclipse"))|>
-  mutate(eclipse = as_factor(eclipse))|>
+  mutate(eclipse = as_factor(eclipse), folder_name = as_factor(folder_name))|>
   mutate(hour_numeric = as.numeric(hour))|>
   filter(hour>= eclipse_start & hour<= eclipse_end &
            day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
@@ -39,7 +39,7 @@ modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
 modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
                                                             "eclipse", 
                                                             "not_eclipse"))|>
-  mutate(eclipse = as_factor(eclipse))|>
+  mutate(eclipse = as_factor(eclipse), folder_name = as_factor(folder_name))|>
   mutate(hour_numeric = as.numeric(hour))|>
   filter(hour < eclipse_start & day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
                    "2024-04-09", "2024-04-11")) |>
@@ -64,7 +64,7 @@ partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
 # by day 
 
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
-                      day_factor,
+                      day_factor + s(folder_name, bs = "re"),
                     data = modelEclipse_df)
 
 
@@ -74,8 +74,8 @@ gam.check(bei_mod)
 
 grid <- modelEclipse_df |> 
   ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
-    day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A014_SD021",
+    day_factor = modelEclipse_df |> pull(day_factor) |> levels(),
   )
 
 gam_aug <- broom::augment(bei_mod, newdata = grid)
@@ -108,12 +108,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # model and visual including time before eclipse
 
 bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
-                      day_factor
+                      day_factor + s(folder_name, bs = "re")
                     , data = modelBeforeEclipse_df)
 summary(bei_mod2)
 
 grid <- modelBeforeEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A014_SD021",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -135,12 +135,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # Acoustic Evenness 
 
 aei_mod<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
-                      day_factor 
+                      day_factor + s(folder_name, bs = "re")
                     , data = modelEclipse_df)
 summary(aei_mod)
 
 grid <- modelEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD022",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -171,12 +171,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # AEI and the Dawn 
 
 aei_mod2<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
-                       day_factor
+                       day_factor + s(folder_name, bs = "re")
                      , data = modelBeforeEclipse_df)
 summary(aei_mod2)
 
 grid <- modelBeforeEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -197,12 +197,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # Acoustic Diversity 
 
 ADI_mod<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
-                      day_factor 
+                      day_factor + s(folder_name, bs = "re")
                     , data = modelEclipse_df)
 summary(ADI_mod)
 
 grid <- modelEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -235,12 +235,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # ADI and Dawn 
 
 ADI_mod2<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
-                       day_factor
+                       day_factor + s(folder_name, bs = "re")
                      , data = modelBeforeEclipse_df)
 summary(ADI_mod2)
 
 grid <- modelBeforeEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -260,12 +260,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # Acoustic Complexity 
 
 ACI_mod<- mgcv::gam(fullACI~ s(hour_numeric, by = day_factor)+
-                      day_factor 
+                      day_factor+ s(folder_name, bs = "re")
                     , data = modelEclipse_df)
 summary(ACI_mod)
 
 grid <- modelEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A017_SD024",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
@@ -298,12 +298,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 # Biophony
 
 biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
-                      day_factor 
+                      day_factor + s(folder_name, bs = "re")
                     , data = modelEclipse_df)
 summary(biophony_mod)
 
 grid <- modelEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40),
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A001_SD001",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
