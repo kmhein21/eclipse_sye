@@ -1,5 +1,5 @@
 ---
-title: "Organizing and Visualizing Biological Audio Data from the 2024 Total Solar Eclipse"
+title: "Visualizing and Modeling Biological Audio Data from the 2024 Total Solar Eclipse"
 author: "Kaitlin Heintzman"
 format: 
   pdf:
@@ -639,7 +639,9 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = biophony)) +
 COMMENTS 
 
 
-## Modeling 
+## Modeling
+
+\*  Generalized Additive Modeling
 
 ```{r}
 #| echo: false
@@ -663,9 +665,32 @@ modelBeforeEclipse_df<- fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
                    "2024-04-09", "2024-04-11")) |>
   mutate(day_factor = as.factor(day))
 
+
+partial_begin = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950), 
+                       fullADI = (9), aei = (0.7), hour_numeric = hms(38,11,14))
+second_df = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                   fullADI = (9), aei = (0.7), hour_numeric = hms(00,45,14))
+totality = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                  fullADI = (9), aei = (0.7),  hour_numeric = hms(52,23,15))
+fourth_df = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950), 
+                   fullADI = (9), aei = (0.7), hour_numeric = hms(00,00,16))
+partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                     fullADI = (9), aei = (0.7), hour_numeric = hms(38,35,16))
+
 ```
 
-From our visualization, we decided to focus on specifically the Bioacoustic index as it seemed like this index which would show a clear connection to the eclipse. To maintain additivity and account for the non-linear patterns in the data we analyzed the data using Generalized Additive Models. These models were made using a smoothing spline for hour separated by day, an additional spline for folder_name which would help us account for the different audiomoths/locations, and lastly a function of day. 
+To model this data we decided to use Generalized additive models so we could incorporate non-linear patterns that we were seeing while still maintaining additivity between the variables. A GAM model resembles linear regression, but replaces the linear components with smooth non-linear functions: 
+
+$$ y_i = \beta_0 + f_1(x_{i1}) + f_2(x_{i2}) + f_3(x_{i3})+...+ f_p(x_{ip}) + \epsilon_i$$
+\* Splines
+
+Include explanation behind splines and brief intro to how they are calculated
+
+Due to the extreme non-linearity that we observed in our visualizations we added a spline into our models, specifically 2 smoothing splines. 
+
+Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different audiomoths/locations, and lastly a linear function of day. 
+
+### Bioacoustic Index 
 
 ```{r}
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
@@ -679,14 +704,6 @@ summary(bei_mod)
 From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses the most flexible trend line with an edf of 8.861. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
 
 We can also note from this output that the model has a explained deviance value of 44%, meaning that using our smoothing spline and day variable explain  44% of the variability in the bioacoustic index.
-
-```{r}
-#| echo: false
-par(mfrow = c(3,2))
-plot(bei_mod)
-```
-
-When we plot the effects of each day we can see April 8th's flexibility. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibility as we expected with no major maximums or minimums. 
 
 ```{r}
 #| echo: false
@@ -726,7 +743,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-This plot is similar to the one above, but it compiles all of the data on top of eachother for easier comparison. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. To produce this graph, we needed to specify one of our folders which lies close to the middle of the response ("A014_SD021") to create predictions using our model.  
+When we visualize the days like above we can see the flexibility on April 8th. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibility as we expected with no major maximums or minimums. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. To produce this graph, we needed to specify one of our folders which lies close to the middle of the response ("A014_SD021") to create predictions using our model.  
 
 To expand our understanding of the relationships in this model we created the same GAM on the time from the dawn. 
 
@@ -765,7 +782,240 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 Looking at this graph we can see that there is nothing setting any of the days apart, and like what we found in the summary we can see there is no special pattern occurring in the morning on the 8th, and that the bioacoustic index on this day is quite similar to the patterns that occurred on our subset of other days. 
 
 
-ADD OTHER MODELS
+### Acoustic Evenness 
+
+```{r}
+#| echo: false
+aei_mod<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
+                      day_factor + s(folder_name, bs = "re")
+                    , data = modelEclipse_df)
+summary(aei_mod)
+```
+
+
+```{r}
+#| echo: false
+grid <- modelEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD022",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(aei_mod, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = aei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = aei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = aei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = aei), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 0.7, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = aei), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = aei), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 0.7, size = 3)+
+  geom_point(data = fourth_df, aes(x=hour_numeric, y = aei), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = aei), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 0.7, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = aei),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = aei), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 0.7, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Evenness")
+```
+
+```{r}
+#| echo: false
+aei_mod2<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
+                       day_factor + s(folder_name, bs = "re")
+                     , data = modelBeforeEclipse_df)
+summary(aei_mod2)
+```
+
+```{r}
+#| echo: false
+grid <- modelBeforeEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(aei_mod2, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelBeforeEclipse_df, aes(y = aei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Eveness Index")+
+  scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
+
+```
+
+### Acoustic Complexity
+
+```{r}
+#| echo: false
+ACI_mod<- mgcv::gam(fullACI~ s(hour_numeric, by = day_factor)+
+                      day_factor+ s(folder_name, bs = "re")
+                    , data = modelEclipse_df)
+summary(ACI_mod)
+```
+
+```{r}
+#| echo: false
+grid <- modelEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A017_SD024",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(ACI_mod, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = fullACI, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = fullACI), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = fullACI), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = fullACI), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 1950, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = fullACI), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = fullACI), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 1950, size = 3)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = fullACI), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = fullACI), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 1950, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = fullACI),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = fullACI), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 1950, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Complexity")+
+  scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
+
+```
+
+
+### Acoustic Diversity
+
+```{r}
+#| echo: false
+ADI_mod<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
+                      day_factor + s(folder_name, bs = "re")
+                    , data = modelEclipse_df)
+summary(ADI_mod)
+```
+
+```{r}
+#| echo: false
+grid <- modelEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(ADI_mod, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = fullADI, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = fullADI), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = fullADI), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = fullADI), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 9, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = fullADI), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = fullADI), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 9, size = 3)+
+  geom_point(data = fourth_df, aes(x=hour_numeric, y = fullADI), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = fullADI), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 9, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = fullADI),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = fullADI), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 9, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Diversity ")+
+  scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
+```
+
+```{r}
+#| echo: false
+ADI_mod2<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
+                       day_factor + s(folder_name, bs = "re")
+                     , data = modelBeforeEclipse_df)
+summary(ADI_mod2)
+```
+
+```{r}
+#| echo: false
+grid <- modelBeforeEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(ADI_mod2, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelBeforeEclipse_df, aes(y = fullADI, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Acoustic Diversity Index")+
+  scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
+
+
+```
+
+### Biophony
+
+```{r}
+#| echo: false
+biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
+                      day_factor + s(folder_name, bs = "re")
+                    , data = modelEclipse_df)
+summary(biophony_mod)
+```
+
+```{r}
+#| echo: false
+grid <- modelEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A001_SD001",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(biophony_mod, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = biophony, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 2.5, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 2.5, size = 3)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 2.5, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = biophony),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 2.5, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Biophony")
+
+```
+
+## Permutation Test
 
 ## Conclusion
 
