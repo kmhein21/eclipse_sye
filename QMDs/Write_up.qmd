@@ -792,6 +792,7 @@ aei_mod<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
 summary(aei_mod)
 ```
 
+For this model, we can see  there is significance from our predictors for most of the days and looking at the edf values we can see that the 8th is the most flexible day with an edf of 8.683. We can also see from this model that about 30.3% of the variability in acoustic evenness is explained by this model.
 
 ```{r}
 #| echo: false
@@ -825,6 +826,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
        y = "Acoustic Evenness")
 ```
 
+Looking at this visualization we note that April 8th possesses a very flexible line, with some minimums surrounding the time of totality. The other lines, although flexible do not possess the same non-linearity which is what we denoted from the model summary. 
+
 ```{r}
 #| echo: false
 aei_mod2<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
@@ -832,6 +835,8 @@ aei_mod2<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
                      , data = modelBeforeEclipse_df)
 summary(aei_mod2)
 ```
+
+After creating a model for the time corresponding to dawn we can see that majority for the days are not significant in this model, with April 8th being one of the least flexible days when looking at edf. We also see the deviance explained value decrease to 26% 
 
 ```{r}
 #| echo: false
@@ -854,6 +859,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
+Like bioacoustic evenness this plot above shows that April 8th is not a day out of the ordinary, and we can see the lack of flexibility in the majority of these lines. 
+
 ### Acoustic Complexity
 
 ```{r}
@@ -863,6 +870,8 @@ ACI_mod<- mgcv::gam(fullACI~ s(hour_numeric, by = day_factor)+
                     , data = modelEclipse_df)
 summary(ACI_mod)
 ```
+
+From this model summary we can see that the only day not significant is April 8th, and it also has an extremely low edf value (less than one). This suggests that this metric wasn't impacted by the eclipse, and we also will expect to see a pretty linear line across this time frame. 
 
 ```{r}
 #| echo: false
@@ -898,6 +907,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
+In this plot it is confirmed that April 8th really does not show any patterns around the time of the eclipse, and we can also see the extreme similarities between the majority of the lines. This shows us that this was not impacted during the time of the eclipse. 
 
 ### Acoustic Diversity
 
@@ -908,6 +918,10 @@ ADI_mod<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
                     , data = modelEclipse_df)
 summary(ADI_mod)
 ```
+
+For Acoustic diversity, the model summary is showing significance across all of the days, and again we can see that April 8th is the most flexible with an edf of 8.454. Second to that however is April 11th with a pretty close edf value of 7.369. 
+
+We note that the deviance explained in our Acoustic Diversity model is 31.5%
 
 ```{r}
 #| echo: false
@@ -942,6 +956,9 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
 ```
 
+As we noted we can see the flexibility in bith April 8th and April 11th, with the other lines not showing as much non-linearity. Although the 8th and 11th have comparable levels of non-linearity we can see that April 8th changes more over this time period, with a pretty drastic overall increase across the time of the eclipse. 
+
+
 ```{r}
 #| echo: false
 ADI_mod2<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
@@ -949,6 +966,10 @@ ADI_mod2<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
                      , data = modelBeforeEclipse_df)
 summary(ADI_mod2)
 ```
+
+Akin to the other models, we can see that April 8th is extremely unflexible during the dawn, with an edf of 1.514. April 11th has a close edf value in this secondary model, but the rest of the days are much more flexible. We can also see that April 8th is the only day which doesn't show any significance. 
+
+In this model, the deviance explained is 29.1%
 
 ```{r}
 #| echo: false
@@ -972,6 +993,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
+We can visualize that flexibility in the other days in this visualization above, but the main takeaway is that April 8th doesn't show any distinct pattern or difference from other days. This shows us that it is a regular day, and it highlights the difference in patterns during the time of the eclipse. 
+
 ### Biophony
 
 ```{r}
@@ -981,6 +1004,8 @@ biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
                     , data = modelEclipse_df)
 summary(biophony_mod)
 ```
+
+Lastly, in our biophony model we can see that here the 8th has an edf value of 6.558 which shows that there is some non-linearity. That being said, it is not high compared to the other days, which suggests that this metric was not impacted by the eclipse. 
 
 ```{r}
 #| echo: false
@@ -1014,6 +1039,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
        y = "Biophony")
 
 ```
+
+This visualization shows very clearly that all of the days during this time frame are very similar, and we don't see any particular patterns from April 8th or any other day. This suggests that biophony was not impacted during the time of the eclipse. 
 
 ## Permutation Test
 
