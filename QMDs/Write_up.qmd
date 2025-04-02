@@ -21,14 +21,14 @@ library(modelr)
 ```
 
 TO DO:
- better format 
-  figure sizing
-  titles
-  axis labels 
-  code thats included - go through 
- cut down on plots - only select most important 
- add more theoretical aspects of GAMs and smoothing spline
- Interpret second BEI model 
+ \*  better format 
+  \*figure sizing
+  \*titles
+  \*axis labels 
+  \*code thats included - go through 
+ \*cut down on plots - only select most important 
+ \*add more theoretical aspects of GAMs and smoothing spline
+\newpage
 
 ## Abstract: 
 
@@ -60,7 +60,7 @@ Within each time window, each AudioMoth recorded in a repeated cycle with 55 sec
 
 : Recording Parameters {.striped .hover}
 
-We used ArcGIS Pro (version XXXX, ESRI Incorporated, Redlands, California) to identify areas of forest-wetland interface or forested wetland occurring on public or University-owned land. Our intention was to place the recorders at locations where they could capture the sounds of both forest birds and pond-breeding amphibians (as well as other biotic sounds including any active insects or bats). Due to our northern location within the path of the eclipse in North America, the onset of spring was just beginning. Red-winged blackbirds (Agelaius phoeniceus) had returned to the area and were establishing breeding territories and both wood frogs (Lithobates sylvaticus) and spring peepers (Pseudacris crucifer) had begun to chorus at least 5 days prior to deployment of the recorders. To reduce the time required to deploy units, we located the devices near but out of view of hiking trails and within 20 miles of the St. Lawrence University campus (44.58931027483651º N, -75.1613716006626 º W).
+We used ArcGIS Pro (version XXXX, ESRI Incorporated, Redlands, California) to identify areas of forest-wetland interface or forested wetland occurring on public or University-owned land. Our intention was to place the recorders at locations where they could capture the sounds of both forest birds and pond-breeding amphibians (as well as other biotic sounds including any active insects or bats). Due to our northern location within the path of the eclipse in North America, the onset of spring was just beginning. Red-winged blackbirds (*Agelaius phoeniceus*) had returned to the area and were establishing breeding territories and both wood frogs (*Lithobates sylvaticus*) and spring peepers (*Pseudacris crucifer*) had begun to chorus at least 5 days prior to deployment of the recorders. To reduce the time required to deploy units, we located the devices near but out of view of hiking trails and within 20 miles of the St. Lawrence University campus (44.58931027483651º N, -75.1613716006626 º W).
 
 ## Analysis
 
@@ -68,7 +68,7 @@ A large inspiration for this study and the protocol that we followed was due to 
 
 ### Indices and Packages
 
-The analysis of this data uses many packages included "Tidyverse", "hms", "soundecology", "here", and "tuneR"
+The analysis of this data uses many packages included "Tidyverse", "hms", "soundecology", "here", "pandr", "mgcv", "modelr" and "tuneR"
 
 Using the $'soundecology'$ package we selected 5 specific indices of interest that we believed would be important in understanding the changes in acoustic activity. Due to the recording devices all data was subsetting from the left channel as the right channel values were not available. 
 
@@ -334,10 +334,6 @@ Through analyzing the first folder and indices returned from one audiomoth (A001
 
 ```{r}
 #| echo: false
-ggplot(data = A001_SD001, aes( x = as_hms(time), y = bei))+
-  geom_line()+
-  theme_minimal()+
-  facet_wrap(~date(time))
 
 ggplot(data = dawn, aes( x = hour, y = bei))+
   geom_line()+
@@ -345,7 +341,10 @@ ggplot(data = dawn, aes( x = hour, y = bei))+
   geom_line(data = afternoon, aes(x = hour, y = bei))+
   geom_line(data = night, aes(x = hour, y = bei))+
   theme_minimal()+
-  facet_wrap(~day)
+  facet_wrap(~day)+
+  labs( title = "Full Bioacoustic Evenness Patterns Over all Days")+
+  scale_x_continuous(name = "Hour", breaks = c(hms(00,45,5), hms(00,00,14), hms(00,00, 19),hms(00,00,23)))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
   
 ```
 
@@ -380,7 +379,9 @@ ggplot(data = eclipse_time, aes(x = hour, y = biophony))+
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
   facet_wrap(~day)+
   theme_minimal()+
-  labs(title = "Biophony over the Eclipse Duration")
+  labs(title = "Biophony over the Eclipse Duration")+
+  scale_x_continuous(name = "Hour", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
 Creating this similar graph across all of the days we can see that this stark decrease in sound is not common and does not seem to occur in any day at this time, other than on April 8th. Although this is not a statistical conclusion, it is an interesting pattern worthy of notice. 
@@ -420,7 +421,8 @@ ggplot(data = eclipse_time, aes(x = hour, y = bei))+
   geom_line()+
   facet_wrap(~day)+
   theme_minimal()+
-  labs(title = "Bioacoustic Index over the Eclipse Duration")
+  labs(title = "Bioacoustic Index over the Eclipse Duration")+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
 Faceting the graph we can get a better look at the patterns occurring at the times corresponding to totality on April 8th. From this we can see that this stark increase is not common across the other days, with the only other day where this pattern looks similar is on April 1st. Besides this one occurance, this pattern does not appear in any other day, and even on April 1st it is not as severe as the day of the eclipse. 
@@ -432,7 +434,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum), group = day)
   geom_line(alpha = 0.3)+
   geom_line(data = eclipseonly, aes(x = hour, y = sapply(ACI_all,sum)), col = "blue", lwd =1)+
   theme_minimal()+
-  labs(title = "Bioacoustic Index over the Duration of the Eclipse", y = "ACI")
+  labs(title = "Acoustic Complexity over the Duration of the Eclipse", y = "ACI")
 ```
 
 For the ACI there seems to be the potentially for an interesting pattern, however we created a faceted graph we can see that the ACI is often at this 1600 level and is actually quite common across all the days. 
@@ -444,7 +446,8 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum)))+
   geom_line()+
   facet_wrap(~day)+
   theme_minimal()+
-  labs(title = "Acoustic Complexity Index over the Eclipse Duration")
+  labs(title = "Acoustic Complexity Index over the Eclipse Duration", y = "ACI")+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
 ```{r}
@@ -466,7 +469,8 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum)))+
   geom_line()+
   facet_wrap(~day)+
   theme_minimal()+
-  labs(title = "Bioacoustic Index over the Eclipse Duration")
+  labs(title = "Acoustic Diversity over the Eclipse Duration", y = "ADI")+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
 The difficulty in assessing the plot above is that due to the noise in this index, it is difficult to assess whether this pattern is uncommon across the rest of the days. 
@@ -527,7 +531,8 @@ ggplot(onlyEclipseTime, aes(x = hour, y = fullACI, group = day))+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullACI), col = "blue")+
   facet_wrap(~folder_name)+
   theme_minimal()+
-  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))
+  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))+
+  scale_y_continuous(limits = c(1500,1900))
 
 ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
@@ -538,7 +543,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
 
 ```
 
-We can see in both of these graphs that there is not likely to be a significant pattern in this index. The most common pattern here is very flat and falls around the same y value for the majority of the days. 
+We can see in both of these graphs that there is not likely to be a significant pattern in this index. We can see that a majority of the data falls around the ~1650 mark for a majority of the days. 
 
 ### Acoustic Diversity 
 
@@ -688,7 +693,7 @@ Include explanation behind splines and brief intro to how they are calculated
 
 Due to the extreme non-linearity that we observed in our visualizations we added a spline into our models, specifically 2 smoothing splines. 
 
-Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different audiomoths/locations, and lastly a linear function of day. 
+Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different audiomoths/locations, and lastly a linear function of day. To create these models we used the gam() function from the mgcv packages, and to create our visualization we used the data_grid() function (from mgcv) as well as the augment() function from the broom package. This allowed us to create predicted values based on our model and to then visualize them alongside our GAMs.  
 
 ### Bioacoustic Index 
 
@@ -701,9 +706,9 @@ summary(bei_mod)
 
 ```
 
-From our model output we can see that using this spline on hour by day is significant in assessing the Bioacoustic index. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses the most flexible trend line with an edf of 8.861. The other days vary in their flexibility but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
+From our model output we can see from the F-values and p-values that our smoothing splines are extremely significant in the model. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses an extremely complex line line with an edf of 8.861. The other days vary in their complexity but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
 
-We can also note from this output that the model has a explained deviance value of 44%, meaning that using our smoothing spline and day variable explain  44% of the variability in the bioacoustic index.
+We can also note from this output that the model has a explained deviance value of 44%, meaning that using our smoothing spline and day variable explains 44% of the variability in the bioacoustic index.
 
 ```{r}
 #| echo: false
@@ -754,9 +759,9 @@ bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
 summary(bei_mod2)
 ```
 
-Using this model we can see that a majority of the splines are still significant, however the only non-significant spline is actually occurring on the 8th. In this summary we can also see based on the edf the 8th is actually the least flexible day during this time period. This helps us understand that there is not any special pattern that occurred on the 8th and provides evidence that it was a normal day. 
+Using this model we can see that a majority of the splines are still significant, however the only non-significant term is actually occurring on the 8th. In this summary we can also see based on the edf value of one that the 8th is actually linear during this time period. This helps us understand that there was not any special pattern that occurred on the 8th and provides evidence that it was a normal day. 
 
-We can also see that this model has an explained deviance value of 56.7%, meaning that our model explains 56.7% of the variability in the bioacoustic index during this time frame. 
+We can also see that this model has an explained deviance value of 56.7%, meaning that this model explains 56.7% of the variability in the bioacoustic index during this time frame. 
 
 ```{r}
 #| echo: false
@@ -792,7 +797,9 @@ aei_mod<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
 summary(aei_mod)
 ```
 
-For this model, we can see  there is significance from our predictors for most of the days and looking at the edf values we can see that the 8th is the most flexible day with an edf of 8.683. We can also see from this model that about 30.3% of the variability in acoustic evenness is explained by this model.
+For this model, we can see  there is significance from our predictors for most of the days (with a non-significant p-value for april 11th) and looking at the edf values we can see that the 8th is again the most flexible day with an edf of 8.683. 
+
+We can also see from this model that about 30.3% of the variability in acoustic evenness is explained by this model.
 
 ```{r}
 #| echo: false
@@ -836,7 +843,7 @@ aei_mod2<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
 summary(aei_mod2)
 ```
 
-After creating a model for the time corresponding to dawn we can see that majority for the days are not significant in this model, with April 8th being one of the least flexible days when looking at edf. We also see the deviance explained value decrease to 26% 
+After creating a model for the time corresponding to dawn we can see that majority for the days are not extremely significant in this model, and April 8th is almost linear with a edf value of 1.744. We also see the deviance explained value decrease to 26%, showing that 26% of the variability in Acoustic eveness is explained by this dawn model. 
 
 ```{r}
 #| echo: false
@@ -871,7 +878,9 @@ ACI_mod<- mgcv::gam(fullACI~ s(hour_numeric, by = day_factor)+
 summary(ACI_mod)
 ```
 
-From this model summary we can see that the only day not significant is April 8th, and it also has an extremely low edf value (less than one). This suggests that this metric wasn't impacted by the eclipse, and we also will expect to see a pretty linear line across this time frame. 
+From this model summary we can see that all of the smoothing terms are significant in this model, and on April 8th the line is pretty complex with an effective degrees of freedom of 7.497. This is not the most flexible day from this model however, as April 11th has a higher edf value of 8.748. This could suggest that although the data from April 8th possesses a non-liner effect, it may not due to the eclipse but potentially to other factors. Looking at a visualization for this metric will provide valuable insight to the patterns across the time of the eclipse. 
+
+This model also expresses that 34.9% of the deviance in Acoustic complexity is explained. 
 
 ```{r}
 #| echo: false
@@ -907,7 +916,9 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-In this plot it is confirmed that April 8th really does not show any patterns around the time of the eclipse, and we can also see the extreme similarities between the majority of the lines. This shows us that this was not impacted during the time of the eclipse. 
+In this plot we can confirm that April 8th really does not show any patterns around the time of the eclipse, and we can also see the extreme similarities between the majority of the lines. This shows us that although we observed those non-linear patterns this was likely not due to the eclipse. 
+
+Should we add a model from the dawn for non-significant models as well? 
 
 ### Acoustic Diversity
 
@@ -919,9 +930,9 @@ ADI_mod<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
 summary(ADI_mod)
 ```
 
-For Acoustic diversity, the model summary is showing significance across all of the days, and again we can see that April 8th is the most flexible with an edf of 8.454. Second to that however is April 11th with a pretty close edf value of 7.369. 
+For Acoustic diversity, the model summary is showing significance in our splines across all of the days, and we can see that April 8th is the most flexible with an edf of 8.454. Second to that however is April 11th with a pretty close edf value of 7.369. 
 
-We note that the deviance explained in our Acoustic Diversity model is 31.5%
+We note that  about 31.5% of the variability in Acoustic diversity is explained by this model. 
 
 ```{r}
 #| echo: false
@@ -967,9 +978,9 @@ ADI_mod2<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
 summary(ADI_mod2)
 ```
 
-Akin to the other models, we can see that April 8th is extremely unflexible during the dawn, with an edf of 1.514. April 11th has a close edf value in this secondary model, but the rest of the days are much more flexible. We can also see that April 8th is the only day which doesn't show any significance. 
+Akin to the other models, we can see that April 8th is presenting linear effects during the dawn, with an edf of 1.514. April 11th has a close edf value in this secondary model, but the rest of the days are much more complex. We can also see that April 8th is the only day where our spline term is not showing significance.
 
-In this model, the deviance explained is 29.1%
+In this model, the variability explained in Acoustic diversity has decreased to 29.1%
 
 ```{r}
 #| echo: false
@@ -1005,7 +1016,9 @@ biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
 summary(biophony_mod)
 ```
 
-Lastly, in our biophony model we can see that here the 8th has an edf value of 6.558 which shows that there is some non-linearity. That being said, it is not high compared to the other days, which suggests that this metric was not impacted by the eclipse. 
+Lastly, in our biophony model we can see that here the 8th has an edf value of 6.558 which shows that there is some non-linearity. We can see that two of the other days (April 6th and 7th) are more complex than this line, which suggests that the non-linearity may not be due to the changes during the eclipse. Like Acoustic complexity, a visualization will help us discern whether we should stick with this assumption. 
+
+In this model 62.5% of the variability in biophony is explained by our model. 
 
 ```{r}
 #| echo: false
@@ -1047,6 +1060,8 @@ This visualization shows very clearly that all of the days during this time fram
 ## Conclusion
 
 ## Citations 
+
+Packages 
 
 Eclipse Paper
 
