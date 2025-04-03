@@ -32,6 +32,11 @@ TO DO:
 
 ## Abstract: 
 
+1. Data collection and methods - how many, how long they recorded from (Erika)
+2. Using HPC and functions to create cleaned data frames to record 5 commonly used bioacoustic indices
+3. Creation of visualizations, (For example bioacustic index)  
+4. found patterns in 3 of the indices that may be associated with the eclipse, specifically around the time of totality
+
 ## Data Collection Methods :
 
 This protocol was written and carried out by Erika Barthelmess and other biology students at St. Lawrence university. 
