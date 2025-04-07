@@ -28,9 +28,16 @@ TO DO:
   \*code thats included - go through 
  \*cut down on plots - only select most important 
  \*add more theoretical aspects of GAMs and smoothing spline
+ 
+ potentially replace the full data visualization with just raw eclipse data for better readability 
+ 
 \newpage
 
 ## Abstract: 
+
+From May 30 to April 16th, data from 20 audio recording devices was collected by Erika Barthelmess from the St. Lawrence Biology department. These devices were strategically located to observe potential audiological changes in wildlife across the time of the total solar eclipse on April 8th, 2024. Using R studio and the HPC, we processed this audio data to produce clean and organized data frames, centered around 5 commonly used bioacoustic indices. From this tabular data we were then able to construct many visualizations displaying patterns across, time, day, and recording device. Due to non-linearity associated with our plots, we then constructed Generalized Additive Models based on day and recording device to assess patterns that may have occurred, specifically during the time of the eclipse on April 8th. From these visuals, we conclude in this project the possibility that 3 of our 5 indices are associated with audio changes during the time of the eclipse, specifically around the time of totality. 
+
+
 
 1. Data collection and methods - how many, how long they recorded from (Erika)
 2. Using HPC and functions to create cleaned data frames to record 5 commonly used bioacoustic indices
@@ -538,6 +545,7 @@ ggplot(onlyEclipseTime, aes(x = hour, y = fullACI, group = day))+
   theme_minimal()+
   scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))+
   scale_y_continuous(limits = c(1500,1900))
+  
 
 ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
@@ -548,7 +556,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
 
 ```
 
-We can see in both of these graphs that there is not likely to be a significant pattern in this index. We can see that a majority of the data falls around the ~1650 mark for a majority of the days. 
+We can see in both of these graphs that there is not likely to be a significant pattern in this index. From the facetting graph by recording device we can see there is not a lot of change happening during the time of totality, or across the full recording period for the day of the eclipse. In our second graph, we can see a majority of the days have a pretty linear smoothing curve, and this signals that the eclipse on April 8th likely did not have any influence on Acoustic Complexity.
 
 ### Acoustic Diversity 
 
@@ -571,10 +579,9 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullADI)) +
   facet_wrap(~ day)
 ```
 
-COMMENTS 
+Looking at our first graph, we can potentially see some sharp decreases around the time of totality from April 8th, and the appearance of higher results corresponding to other days potentially shows that the eclipse could have some influence. When we look at our visual facetted by day, we can see a majority of the days have very flat smoothing curves, yet on April 8th there seems to be 2 peaks close to the time of totality. This signals that this index could be  influenced by the eclipse. 
 
 ### Acoustic Evenness 
-
 
 ```{r}
 #| echo: false
@@ -595,7 +602,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = aei)) +
   facet_wrap(~ day)
 ```
 
-COMMENTS 
+Looking at the graph across recording device, it is very difficult to see any sort of interesting pattern due to the variation across the recording devices. When we display the data by day, we can see that about a third of the days have flat smoothing curves, however some of the days seem to have a dip or increase in the smoothing curve around the time corresponding to totality. This mix of results makes it hard for us to conclude from this visual whether the eclipse did influence Acoustic evenness or not. 
 
 ### Bioacoustic Index 
 
@@ -646,8 +653,11 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = biophony)) +
   facet_wrap(~ day)
 ```
 
-COMMENTS 
+Interestingly for biophony when we look at the patterns across recording device it seems like there could be some interesting patterns happening for a majority of the days, with either some increases or decreases around the time of totality. However, when we look at the smoothing curves across the days we can see that the majority of the days including April 8th are quite flat, overall suggesting that the eclipse is not influencing this index. 
 
+From these full data exploratory plots, 
+
+WHAT WE CONCLUDE FROM THESE GRAPHICS 
 
 ## Modeling
 
@@ -1059,8 +1069,6 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 ```
 
 This visualization shows very clearly that all of the days during this time frame are very similar, and we don't see any particular patterns from April 8th or any other day. This suggests that biophony was not impacted during the time of the eclipse. 
-
-## Permutation Test
 
 ## Conclusion
 
