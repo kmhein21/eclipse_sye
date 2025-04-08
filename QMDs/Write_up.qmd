@@ -19,17 +19,6 @@ library(pander)
 library(mgcv)
 library(modelr)
 ```
-
-TO DO:
- \*  better format 
-  \*figure sizing
-  \*titles
-  \*axis labels 
-  \*code thats included - go through 
- \*cut down on plots - only select most important 
- \*add more theoretical aspects of GAMs and smoothing spline
- 
- potentially replace the full data visualization with just raw eclipse data for better readability 
  
 \newpage
 
@@ -543,8 +532,10 @@ ggplot(onlyEclipseTime, aes(x = hour, y = fullACI, group = day))+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullACI), col = "blue")+
   facet_wrap(~folder_name)+
   theme_minimal()+
-  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))+
-  scale_y_continuous(limits = c(1500,1900))
+  scale_x_continuous(breaks = c(hms(0,00,14),hms(00,00,15), hms(00,00,16)))+
+  scale_y_continuous(limits = c(1500,1900))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))+
+  labs(title = "Acoustic Complexity Over All AudioMoths")
   
 
 ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
@@ -552,7 +543,8 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.2) +
   geom_smooth() +
   theme_minimal() +
-  facet_wrap(~ day)
+  facet_wrap(~ day)+
+  labs(title = "Acoustic Complexity Across Days")
 
 ```
 
@@ -569,14 +561,17 @@ ggplot(onlyEclipseTime, aes(x = hour, y = fullADI, group = day))+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= fullADI), col = "blue")+
   facet_wrap(~folder_name)+
   theme_minimal()+
-  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
-
+  scale_x_continuous(breaks = c(hms(0,00,14),hms(00,00,15), hms(00,00,16)))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))+
+  labs(title = "Acoustic Diversity Over All AudioMoths")
+  
 ggplot(data = onlyEclipseTime, aes(x = hour, y = fullADI)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 10, fill = "lightblue", alpha = 0.2) +
   geom_smooth() +
   theme_minimal() +
-  facet_wrap(~ day)
+  facet_wrap(~ day)+
+  labs(title = "Acoustic Diversity Across Days")
 ```
 
 Looking at our first graph, we can potentially see some sharp decreases around the time of totality from April 8th, and the appearance of higher results corresponding to other days potentially shows that the eclipse could have some influence. When we look at our visual facetted by day, we can see a majority of the days have very flat smoothing curves, yet on April 8th there seems to be 2 peaks close to the time of totality. This signals that this index could be  influenced by the eclipse. 
@@ -592,14 +587,17 @@ ggplot(onlyEclipseTime, aes(x = hour, y = aei, group = day))+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= aei), col = "blue")+
   facet_wrap(~folder_name)+
   theme_minimal()+
-  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+  scale_x_continuous(breaks = c(hms(0,00,14),hms(00,00,15), hms(00,00,16)))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))+
+  labs(title = "Acoustic Evenness Over All AudioMoths")
 
 ggplot(data = onlyEclipseTime, aes(x = hour, y = aei)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_smooth() +
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
   theme_minimal() +
-  facet_wrap(~ day)
+  facet_wrap(~ day)+
+  labs(title = "Acoustic Evenness Across Days")
 ```
 
 Looking at the graph across recording device, it is very difficult to see any sort of interesting pattern due to the variation across the recording devices. When we display the data by day, we can see that about a third of the days have flat smoothing curves, however some of the days seem to have a dip or increase in the smoothing curve around the time corresponding to totality. This mix of results makes it hard for us to conclude from this visual whether the eclipse did influence Acoustic evenness or not. 
@@ -614,15 +612,16 @@ ggplot(onlyEclipseTime, aes(x = hour, y = bei, group = day))+
   geom_line(alpha = 0.2)+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= bei), col = "blue")+
   facet_wrap(~folder_name)+
-  labs(title = "Bioacoustic index Across all Audiomoths")+
+  labs(title = "Bioacoustic index Across All Audiomoths")+
   theme_minimal()+
-  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16))) 
+  scale_x_continuous(breaks = c(hms(0,00,14),hms(00,00,15), hms(00,00,16)))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 
 ggplot(data = onlyEclipseTime, aes(x = hour, y = bei)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_smooth() +
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.2) +
-  labs(title = "Bioacoustic index Across all Days")+
+  labs(title = "Bioacoustic index Across Days")+
   theme_minimal() +
   facet_wrap(~ day)
 
@@ -641,14 +640,15 @@ ggplot(onlyEclipseTime, aes(x = hour, y = biophony, group = day))+
   geom_line(data = onlyEclipseDAY, aes(x = hour, y= biophony), col = "blue")+
   facet_wrap(~folder_name)+
   theme_minimal()+
-  labs(title = " Biophony across all Audiomoths")+
-  scale_x_continuous(limits = c(hms(00,00,15),hms(00,00,16)))
+  labs(title = " Biophony Across All Audiomoths")+
+  scale_x_continuous(breaks = c(hms(0,00,14),hms(00,00,15), hms(00,00,16)))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 
 ggplot(data = onlyEclipseTime, aes(x = hour, y = biophony)) +
   geom_line(aes(group = folder_name), alpha = 0.4) +
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 10, fill = "lightblue", alpha = 0.2) +
   geom_smooth() +
-  labs(title = " Biophony across all Days")+
+  labs(title = " Biophony Across Days")+
   theme_minimal() +
   facet_wrap(~ day)
 ```
@@ -702,23 +702,42 @@ partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
 To model this data we decided to use Generalized additive models so we could incorporate non-linear patterns that we were seeing while still maintaining additivity between the variables. A GAM model resembles linear regression, but replaces the linear components with smooth non-linear functions: 
 
 $$ y_i = \beta_0 + f_1(x_{i1}) + f_2(x_{i2}) + f_3(x_{i3})+...+ f_p(x_{ip}) + \epsilon_i$$
-\* Splines
+\* Smoothing Splines
 
 Include explanation behind splines and brief intro to how they are calculated
 
-Due to the extreme non-linearity that we observed in our visualizations we added a spline into our models, specifically 2 smoothing splines. 
+Utilizing a smoothing spline can help us capture non-linear patterns which are present in the model. A smoothing spline specifies a function g(x) such that minimizes the formula below. The function g(x) is known to be a differentiable cubic polynomial function at knots for each training observation $x_i$.
 
-Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different audiomoths/locations, and lastly a linear function of day. To create these models we used the gam() function from the mgcv packages, and to create our visualization we used the data_grid() function (from mgcv) as well as the augment() function from the broom package. This allowed us to create predicted values based on our model and to then visualize them alongside our GAMs.  
+$$ \Sigma_{i=1}^n  (y_i - g(x_i))^2 + \lambda \int g^{''}t^2  dt$$
+This formula is similar to the idea of minimizing the residual sum of squares which can be seen in the first portion of the formula, but is also specifies a shrinking parameter lambda, which will penalize the variability of our function g(x) and will control the "wiggliness" of the curve. In other words, the second portion of the above formula which is tuned by $\lambda$ influences the effective degrees of freedom which will appear in our model summaries, and this can then be used as an assessment of the flexibility in the curves. From the s() function of the mgcv package that is used to create a smoothing spline, this $\lambda$ is optimized using generalized cross-validation. 
+
+\* Final Models 
+
+Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different audiomoths and their respective locations, and lastly a linear function of day. To create these models we used the gam() function from the mgcv packages, and to create our visualization we used the data_grid() function (from mgcv) as well as the augment() function from the broom package. This allowed us to create predicted values based on our model and to then visualize them alongside our GAMs. To produce these visuals we also needed to specify a specific audiomoth which lied around the "center" of our observed index values. A table of these audiomoths and the indices that they were used for is below: 
+
+| Index         | AudioMoth        |
+|---------------|--------------------------------------------------|
+| ACI  | A017_SD024                    |
+| ADI | A016_SD022 |
+| AEI | A16_SD022             |
+| BEI | A014_SD021                       |
+| Biophony | A001_SD001  | 
+
+:  {.striped .hover}
 
 ### Bioacoustic Index 
 
 ```{r}
+#| echo: false
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
                       day_factor + s(folder_name, bs = "re"),
                     data = modelEclipse_df)
 
 summary(bei_mod)
+broom::tidy(bei_mod)
 
+#deviance explained
+1 - (bei_mod$deviance/bei_mod$null.deviance)
 ```
 
 From our model output we can see from the F-values and p-values that our smoothing splines are extremely significant in the model. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses an extremely complex line line with an edf of 8.861. The other days vary in their complexity but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
@@ -763,11 +782,12 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-When we visualize the days like above we can see the flexibility on April 8th. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibility as we expected with no major maximums or minimums. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. To produce this graph, we needed to specify one of our folders which lies close to the middle of the response ("A014_SD021") to create predictions using our model.  
+When we visualize the days like above we can see the flexibility on April 8th. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibility as we expected with no major maximums or minimums. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. 
 
 To expand our understanding of the relationships in this model we created the same GAM on the time from the dawn. 
 
 ```{r}
+#| echo: false
 bei_mod2<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
                       day_factor + s(folder_name, bs = "re")
                     , data = modelBeforeEclipse_df)
@@ -952,7 +972,7 @@ We note that  about 31.5% of the variability in Acoustic diversity is explained 
 ```{r}
 #| echo: false
 grid <- modelEclipse_df |> ungroup() |>
-  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD021",
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A016_SD022",
             day_factor = modelEclipse_df |> pull(day_factor) |> levels()
   )
 
