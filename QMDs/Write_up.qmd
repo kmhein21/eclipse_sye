@@ -1,5 +1,5 @@
 ---
-title: "Analyzing Changes in Audio Patterns During the 2024 Total Solar Eclipse"
+title: "Analyzing Audio Patterns During the 2024 Total Solar Eclipse"
 author: "Kaitlin Heintzman"
 format: 
   pdf:
@@ -24,15 +24,8 @@ library(modelr)
 
 ## Abstract: 
 
-From May 30 to April 16th, data from 20 audio recording devices was collected by Erika Barthelmess and students from the St. Lawrence Biology department. These devices were strategically located to observe potential audiological changes in wildlife across the time of the total solar eclipse on April 8th, 2024. Using R studio and a High Performance Computer, we processed this audio data to produce organized data frames, centered around 5 commonly used bioacoustic indices.From this tabular data we constructed many visualizations displaying patterns across time, day, and recording device. Due to the non-linearity present in our plots, generalized additive models based on day and recording device were implemented to assess patterns that may have occurred during the time of the eclipse. From these visuals and models, we conclude the possibility that 3 of our 5 indices are associated with audio changes during the time of the eclipse. This is highlighted by the presence of extrema around the time of totality. 
+From March 30 to April 16th, Erika Barthelmess and students from the St. Lawrence biology department collected data from 20 audio recording devices in the Northern New York area. These devices were strategically located to observe potential audiological changes in wildlife at the time of the total solar eclipse on April 8th, 2024. We processed this audio data to produce organized data frames, centered around 5 commonly used bioacoustic indices. From this tabular data, we constructed many visualizations displaying patterns across time, day, and recording device. Due to the non-linearity present in our plots, generalized additive models based on date, time of day, and recording device were implemented to assess patterns that may have occurred during the time of the eclipse. From these visuals and models, we conclude the possibility that 3 of our 5 indices are associated with audio changes during the time of the eclipse. 
 
-
-
-
-1. Data collection and methods - how many, how long they recorded from (Erika)
-2. Using HPC and functions to create cleaned data frames to record 5 commonly used bioacoustic indices
-3. Creation of visualizations, (For example bioacustic index)  
-4. found patterns in 3 of the indices that may be associated with the eclipse, specifically around the time of totality
 
 ## Data Collection Methods :
 
