@@ -1,0 +1,344 @@
+---
+title: "Analyzing Audio Patterns During the 2024 Total Solar Eclipse"
+author: "Kaitlin Heintzman"
+institute: "St. Lawrence University"
+date: April 25, 2025
+format:
+  revealjs:
+    transition: fade
+    theme: simple 
+    slide-number: true
+    footer: "Total Solar Eclipse Sound Analysis"
+embed-resources: true
+---
+```{r}
+library(tidyverse)
+library(lubridate)
+library(hms)
+library(forecast)
+library(soundecology)
+library(here)
+library(mgcv)
+library(modelr)
+library(pander)
+library(knitr)
+```
+
+```{r}
+A001_SD001<-readRDS(here("rds_files/A001_SD001.rds"))
+A002_SD013<-readRDS(here("rds_files/A002_SD013.rds"))
+A003_SD005<-readRDS(here("rds_files/A003_SD005.rds"))
+A004_SD012<-readRDS(here("rds_files/A004_SD012.rds"))
+A005_SD002<-readRDS(here("rds_files/A005_SD002.rds"))
+A006_SD006<-readRDS(here("rds_files/A006_SD006.rds"))
+A007_SD017<-readRDS(here("rds_files/A007_SD017.rds"))
+A008_SD007<-readRDS(here("rds_files/A008_SD007.rds"))
+A009_SD009<-readRDS(here("rds_files/A009_SD009.rds"))
+A010_SD014<-readRDS(here("rds_files/A010_SD014.rds"))
+A011_SD018<-readRDS(here("rds_files/A011_SD018.rds"))
+A013_SD016<-readRDS(here("rds_files/A013_SD016.rds"))
+A014_SD021<-readRDS(here("rds_files/A014_SD021.rds"))
+A015_SD010<-readRDS(here("rds_files/A015_SD010.rds"))
+A016_SD022<-readRDS(here("rds_files/A016_SD022.rds"))
+A017_SD024<-readRDS(here("rds_files/A017_SD024.rds"))
+A018_SD011<-readRDS(here("rds_files/A018_SD011.rds"))
+A019_SD008<-readRDS(here("rds_files/A019_SD008.rds"))
+A021_SD023<-readRDS(here("rds_files/A021_SD023.rds"))
+A022_SD019<-readRDS(here("rds_files/A022_SD019.rds"))
+
+eclipse_start<-hms(00,00,14)
+eclipse_end<-hms(00,50,16)
+```
+
+
+## Outline
+
+  \* Introduction
+  
+  \* Data Collection 
+  
+  \* Data Frame Creation 
+  
+  \* GAM
+  
+  \* Conclusion 
+
+## Introduction 
+
+Our goal was to look deeper into effects that the total solar eclipse has on wildlife activity.To do so, we used generalized additive models to observe 5 indices across the time of the eclipse and we found temporal patterns in 3 of these indices, suggesting that there is audiological variation during the eclipse.
+
+ This was an amazing and unique opportunity to look into such a rare phenomenon and to use data that was collected by SLU faculty. 
+	
+## Audio Recorder Placement
+
+	(map)
+	
+	20 audio recorders   
+	
+	ArcGIS was used to find forested wetland habitats so both avian and amphibian wildlife would be sampled
+	
+## Data Collection {.smaller}
+Heavy inspiration for this analysis was taken from: Paper Citation !
+	  
+Recorders collected audio from March 30th to April 16th 
+
+| Times         | Reasoning                                        |
+|---------------|--------------------------------------------------|
+| 5:45 - 7:15   | 30-45 minutes before sunrise                     |
+| 14:00 - 16:00 | full period of time corresponding to the eclipse |
+| 19:00 - 20:00 | \~30 minutes before and after sunset             |
+| 23:00 - 23:30 | sample nocturnal activity                        |
+
+: {.striped}
+
+Recorders sampled 55 seconds on and 5 seconds off. 
+
+This produced a total of 115,610 audio clips
+	 
+	  
+## Audio Indices {.smaller}
+All of these indices were obtained using the soundecology package in R - 
+
+Citation !
+
+Acoustic Complexity - Focused on expressing the spatial and temporal complexity in sound by capturing the intensity and frequency shifts across an audio file. 
+
+Acoustic Diversity - Generates proportions over set intervals to assess evenness and variety in sound distribution 
+
+Acoustic Evenness - Measure how sound is distributed across frequency bands, assess equality and inequality of the rate that sound is produced from a source
+
+Bioacoustic Index* - Assesses diversity and abundance of specifically biological noise in relation to the period of the file with the lowest sound. 
+
+Biophony - Measures the average frequency of biological sound
+
+
+## Visualize and Youtube 
+
+  play one audio (youtube)
+	Which visual?
+	
+```{r}
+#| echo: false
+eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)
+eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
+
+dawn<- A001_SD001|> filter(hour >= as_hms("05:45:00") & hour <= as_hms("07:15:00"))
+eclipse<- A001_SD001|> filter(hour >= as_hms("14:00:00") & hour <= as_hms("16:00:00"))
+afternoon<- A001_SD001|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("21:00:00"))
+night<- A001_SD001|> filter(hour >= as_hms("23:00:00") & hour <= as_hms("23:30:00"))
+
+ggplot(data = dawn, aes( x = hour, y = bei))+
+  geom_line()+
+  geom_line(data = eclipse, aes(x = hour, y = bei))+
+  geom_line(data = afternoon, aes(x = hour, y = bei))+
+  geom_line(data = night, aes(x = hour, y = bei))+
+  theme_minimal()+
+  facet_wrap(~day)+
+  labs( title = "Example of Full Patterns - Bioacoustic Evenness")+
+  scale_x_continuous(name = "Hour", breaks = c(hms(00,45,5), hms(00,00,14), hms(00,00, 19),hms(00,00,23)))+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
+  
+```
+
+
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "green", alpha = 0.3)+
+  geom_line(alpha = 0.3)+
+  geom_line(data = eclipseonly, aes(x = hour, y = bei), col = "blue", lwd =1)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Duration of the Eclipse")
+
+```
+
+```{r}
+#| echo: false
+ggplot(data = eclipse_time, aes(x = hour, y = bei))+
+  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
+  geom_line()+
+  facet_wrap(~day)+
+  theme_minimal()+
+  labs(title = "Bioacoustic Index over the Eclipse Duration")+
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
+```
+
+
+## Using R and HPC {.smaller}
+
+
+Creation of a local function would take our full folder of sound files and return a cleaned data frame with the information needed for the analysis
+	 
+```{r}
+table<- A001_SD001|> mutate(ACI = "<dbl [256]>", ADI = "<dbl [10]>")|>
+  select(-ACI_all,-ADI_all)
+head(table)|>kable(format = "html")|>
+  kableExtra::kable_styling(font_size = 18)|>
+  kableExtra::kable_classic_2()
+```
+
+The audio collected amassed to over a **terabyte** of data. Due to this massive size a desktop wouldn't be able to efficiently process this data. Our solution for this was to use St. Lawrence's HPC to run and store our files incrementally.  
+
+Even with the HPC, processing took a task time of 10 and a half hours per folder 
+	
+## Generalized Additive Modeling {.smaller}
+  
+$$ Index \sim spline(day, by = folder) + spline(folder, bs = "re") + day$$
+```{r}
+#| echo: false
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, 
+                 A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016,A014_SD021, A015_SD010, A016_SD022,
+                 A017_SD024, A018_SD011, A019_SD008, A021_SD023, A022_SD019)|>
+  group_by(folder_name)|>
+  mutate(fullACI = sapply(ACI_all,sum))|>
+  mutate(fullADI = sapply(ADI_all, sum))
+
+
+modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
+                                                     "eclipse", 
+                                                     "not_eclipse"))|>
+  mutate(eclipse = as_factor(eclipse), folder_name = as_factor(folder_name))|>
+  mutate(hour_numeric = as.numeric(hour))|>
+  filter(hour>= eclipse_start & hour<= eclipse_end &
+           day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
+                    "2024-04-09", "2024-04-11"))|>
+  mutate(day_factor = as.factor(day))|>
+  select(hour, hour_numeric, everything())
+bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
+                      day_factor + s(folder_name, bs = "re"),
+                    data = modelEclipse_df)
+
+
+broom::tidy(bei_mod)|>kable(format = "html")|>
+  kableExtra::kable_styling(font_size = 18)|>
+  kableExtra::kable_classic_2()
+```
+	
+::: {.callout-tip} 
+## Why GAM?
+  We can maintain additivity while incorporating non-linear functions!
+:::
+
+
+## Bioacoustic Model Visualization {.smaller}
+
+```{r}
+#| echo: false
+#| fig-align: center 
+
+partial_begin = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950), 
+                       fullADI = (9), aei = (0.7), hour_numeric = hms(38,11,14))
+second_df = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                   fullADI = (9), aei = (0.7), hour_numeric = hms(00,45,14))
+totality = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                  fullADI = (9), aei = (0.7),  hour_numeric = hms(52,23,15))
+fourth_df = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950), 
+                   fullADI = (9), aei = (0.7), hour_numeric = hms(00,00,16))
+partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                     fullADI = (9), aei = (0.7), hour_numeric = hms(38,35,16))
+
+grid <- modelEclipse_df |> 
+  ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A014_SD021",
+    day_factor = modelEclipse_df |> pull(day_factor) |> levels(),
+  )
+
+gam_aug <- broom::augment(bei_mod, newdata = grid)
+
+
+# visual across the time of eclipse
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor), linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 3.5, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 3.5, size = 3)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 3.5, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = bei),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Bioacoustic Index")+
+  scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
+
+```
+
+5 Day Subset was chosen based on the close proximity to April 8th and due to the similarity in precipitation and wind patterns. 
+	
+## Biophony Model Visualization {.smaller}
+
+```{r}
+#| echo: false
+biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
+                      day_factor + s(folder_name, bs = "re")
+                    , data = modelEclipse_df)
+grid <- modelEclipse_df |> ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A001_SD001",
+            day_factor = modelEclipse_df |> pull(day_factor) |> levels()
+  )
+
+gam_aug <- broom::augment(biophony_mod, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = biophony, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor),
+            linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 2.5, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 2.5, size = 3)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = biophony), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 2.5, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = biophony),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 2.5, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(colour = "eclipse_or_not",
+       y = "Biophony")
+```
+
+
+## Findings {.smaller}
+
+Based on our analysis we observed potential patterns in 3 of our indices:
+
+\* Bioacoustic Index
+
+\* Acoustic Evenness 
+
+\* Acoustic Diversity 
+
+These indices showed increases or decreases around the time of the eclipse, specifically with variation around the time of totality. 
+
+This suggests that wildlife is affected by the sudden changes in light that occurred during the solar eclipse or by some other eclipse-driven change. 
+
+
+## Future Projects
+
+	What could be done next 
+	  Time 
+	  Species
+	  Weather
+	
+## Acknowledgements 
+
+Thank you to Erika Barthelmess and her team of students who made this project possible by collecting the data. 
+  
+Thank you to the MCSS department and specifically Matt Higham for guiding me through this project.
+  
+Special Thanks to Ed Harcourt and Lisa Torrey for assistance in using and understanding the HPC process. 
+
+
