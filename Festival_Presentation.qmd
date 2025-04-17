@@ -53,21 +53,21 @@ eclipse_end<-hms(00,50,16)
 
 ## Outline
 
-  \* Introduction
+* Introduction
   
-  \* Data Collection 
+* Data Collection 
   
-  \* Data Frame Creation 
+* Data Frame Creation 
   
-  \* GAM
+* GAM
   
-  \* Conclusion 
+* Conclusion 
 
 ## Introduction 
 
-Our goal was to look deeper into effects that the total solar eclipse has on wildlife activity.To do so, we used generalized additive models to observe 5 indices across the time of the eclipse and we found temporal patterns in 3 of these indices, suggesting that there is audiological variation during the eclipse.
+* Our goal was to look deeper into effects that the total solar eclipse has on wildlife activity.To do so, we used generalized additive models to observe 5 indices across the time of the eclipse and we found temporal patterns in 3 of these indices, suggesting that there is audiological variation during the eclipse.
 
- This was an amazing and unique opportunity to look into such a rare phenomenon and to use data that was collected by SLU faculty. 
+* This was an amazing and unique opportunity to look into such a rare phenomenon and to use data that was collected by SLU faculty. 
 	
 ## Audio Recorder Placement
 
@@ -78,9 +78,9 @@ Our goal was to look deeper into effects that the total solar eclipse has on wil
 	ArcGIS was used to find forested wetland habitats so both avian and amphibian wildlife would be sampled
 	
 ## Data Collection {.smaller}
-Heavy inspiration for this analysis was taken from: Paper Citation !
+* Heavy inspiration for this analysis was taken from: Paper Citation !
 	  
-Recorders collected audio from March 30th to April 16th 
+* Recorders collected audio from March 30th to April 16th 
 
 | Times         | Reasoning                                        |
 |---------------|--------------------------------------------------|
@@ -91,83 +91,65 @@ Recorders collected audio from March 30th to April 16th
 
 : {.striped}
 
-Recorders sampled 55 seconds on and 5 seconds off. 
+* Recorders sampled 55 seconds on and 5 seconds off. 
 
-This produced a total of 115,610 audio clips
+* This produced a total of 115,610 audio clips
 	 
 	  
 ## Audio Indices {.smaller}
-All of these indices were obtained using the soundecology package in R - 
+
+* All of these indices were obtained using the soundecology package in R - 
 
 Citation !
 
-Acoustic Complexity - Focused on expressing the spatial and temporal complexity in sound by capturing the intensity and frequency shifts across an audio file. 
+* Acoustic Complexity - Focused on expressing the spatial and temporal complexity in sound by capturing the intensity and frequency shifts across an audio file. 
 
-Acoustic Diversity - Generates proportions over set intervals to assess evenness and variety in sound distribution 
+* Acoustic Diversity - Generates proportions over set intervals to assess evenness and variety in sound distribution 
 
-Acoustic Evenness - Measure how sound is distributed across frequency bands, assess equality and inequality of the rate that sound is produced from a source
+* Acoustic Evenness - Measure how sound is distributed across frequency bands, assess equality and inequality of the rate that sound is produced from a source
 
-Bioacoustic Index* - Assesses diversity and abundance of specifically biological noise in relation to the period of the file with the lowest sound. 
+* Bioacoustic Index* - Assesses diversity and abundance of specifically biological noise in relation to the period of the file with the lowest sound. 
 
-Biophony - Measures the average frequency of biological sound
+* Biophony - Measures the average frequency of biological sound
 
 
 ## Visualize and Youtube 
 
-  play one audio (youtube)
-	Which visual?
+* Youtube Link 
 	
 ```{r}
 #| echo: false
 eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)
 eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
 
-dawn<- A001_SD001|> filter(hour >= as_hms("05:45:00") & hour <= as_hms("07:15:00"))
-eclipse<- A001_SD001|> filter(hour >= as_hms("14:00:00") & hour <= as_hms("16:00:00"))
-afternoon<- A001_SD001|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("21:00:00"))
-night<- A001_SD001|> filter(hour >= as_hms("23:00:00") & hour <= as_hms("23:30:00"))
+single_day<-A001_SD001|>filter(day == "2024-04-08")
+
+dawn<- single_day|> filter(hour >= as_hms("05:45:00") & hour <= as_hms("07:15:00"))
+eclipse<- single_day|> filter(hour >= as_hms("14:00:00") & hour <= as_hms("16:00:00"))
+afternoon<- single_day|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("21:00:00"))
+night<- single_day|> filter(hour >= as_hms("23:00:00") & hour <= as_hms("23:30:00"))
 
 ggplot(data = dawn, aes( x = hour, y = bei))+
-  geom_line()+
-  geom_line(data = eclipse, aes(x = hour, y = bei))+
-  geom_line(data = afternoon, aes(x = hour, y = bei))+
-  geom_line(data = night, aes(x = hour, y = bei))+
+  geom_rect( aes(xmin = as_hms("05:45:00"), xmax = as_hms("07:15:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
+  geom_rect(data = dawn, aes(xmin = as_hms("14:00:00"), xmax = as_hms("16:00:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
+  geom_rect(data = dawn, aes(xmin = as_hms("19:00:00"), xmax = as_hms("21:00:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
+  geom_rect(data = dawn, aes(xmin = as_hms("23:00:00"), xmax = as_hms("23:30:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
+  geom_line(col = "darkblue")+
+  geom_line(data = eclipse, aes(x = hour, y = bei), col = "darkblue")+
+  geom_line(data = afternoon, aes(x = hour, y = bei), col = "darkblue")+
+  geom_line(data = night, aes(x = hour, y = bei), col = "darkblue")+
   theme_minimal()+
   facet_wrap(~day)+
-  labs( title = "Example of Full Patterns - Bioacoustic Evenness")+
+  labs( title = "Example of Full Pattern - Audio Recorder 1")+
   scale_x_continuous(name = "Hour", breaks = c(hms(00,45,5), hms(00,00,14), hms(00,00, 19),hms(00,00,23)))+
   theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
   
 ```
 
-
-```{r}
-#| echo: false
-ggplot(data = eclipse_time, aes(x = hour, y = bei, group = day))+
-  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "green", alpha = 0.3)+
-  geom_line(alpha = 0.3)+
-  geom_line(data = eclipseonly, aes(x = hour, y = bei), col = "blue", lwd =1)+
-  theme_minimal()+
-  labs(title = "Bioacoustic Index over the Duration of the Eclipse")
-
-```
-
-```{r}
-#| echo: false
-ggplot(data = eclipse_time, aes(x = hour, y = bei))+
-  geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3, fill = "lightblue", alpha = 0.3)+
-  geom_line()+
-  facet_wrap(~day)+
-  theme_minimal()+
-  labs(title = "Bioacoustic Index over the Eclipse Duration")+
-  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
-```
-
-
 ## Using R and HPC {.smaller}
 
 
-Creation of a local function would take our full folder of sound files and return a cleaned data frame with the information needed for the analysis
+* Function to take sound files and return cleaned data frame with information needed for analysis 
 	 
 ```{r}
 table<- A001_SD001|> mutate(ACI = "<dbl [256]>", ADI = "<dbl [10]>")|>
@@ -208,10 +190,6 @@ bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
                       day_factor + s(folder_name, bs = "re"),
                     data = modelEclipse_df)
 
-
-broom::tidy(bei_mod)|>kable(format = "html")|>
-  kableExtra::kable_styling(font_size = 18)|>
-  kableExtra::kable_classic_2()
 ```
 	
 ::: {.callout-tip} 
@@ -271,8 +249,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-5 Day Subset was chosen based on the close proximity to April 8th and due to the similarity in precipitation and wind patterns. 
-	
+5 Day Subset Explain
+
 ## Biophony Model Visualization {.smaller}
 
 ```{r}
@@ -313,32 +291,43 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ## Findings {.smaller}
 
-Based on our analysis we observed potential patterns in 3 of our indices:
+* Based on our analysis we observed potential patterns in 3 of our indices:
 
-\* Bioacoustic Index
+  + Bioacoustic Index
 
-\* Acoustic Evenness 
+  + Acoustic Evenness 
 
-\* Acoustic Diversity 
+  + Acoustic Diversity 
 
-These indices showed increases or decreases around the time of the eclipse, specifically with variation around the time of totality. 
+* These indices showed increases or decreases around the time of the eclipse, specifically with variation around the time of totality. 
 
-This suggests that wildlife is affected by the sudden changes in light that occurred during the solar eclipse or by some other eclipse-driven change. 
+* This suggests that wildlife is affected by the sudden changes in light that occurred during the solar eclipse or by some other eclipse-driven change. 
 
 
 ## Future Projects
 
-	What could be done next 
-	  Time 
-	  Species
-	  Weather
+* Time - Temporal autocorrelation: Adjusting for this through incorporation in the model and time series (Emilia Agostinelli)
+
+* Species - What wildlife are being affected: Looking into the varying audio patterns and the possibility of utilizing machine learning (Aidan Fauth)
 	
 ## Acknowledgements 
 
-Thank you to Erika Barthelmess and her team of students who made this project possible by collecting the data. 
+* Thank you to Erika Barthelmess and her team of students who made this project possible by collecting the data. 
   
-Thank you to the MCSS department and specifically Matt Higham for guiding me through this project.
+* Thank you to the MCSS department and specifically Matt Higham for guiding me through this project.
   
-Special Thanks to Ed Harcourt and Lisa Torrey for assistance in using and understanding the HPC process. 
+* Special Thanks to Ed Harcourt and Lisa Torrey for assistance in using and understanding the HPC process. 
+
+
+to do: 
+add map
+add link to youtube 
+
+bold BEI and Biophony or callout boxes
+change size of legend/text in model visualizations
+reduce amount of text - specifically R and HPC 
+change theme
+Erika's students
+
 
 
