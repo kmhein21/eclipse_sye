@@ -6,7 +6,7 @@ date: April 25, 2025
 format:
   revealjs:
     transition: fade
-    theme: simple 
+    theme: serif 
     slide-number: true
     footer: "Total Solar Eclipse Sound Analysis"
 embed-resources: true
@@ -65,7 +65,7 @@ eclipse_end<-hms(00,50,16)
 
 ## Introduction 
 
-* Our goal was to look deeper into effects that the total solar eclipse has on wildlife activity.To do so, we used generalized additive models to observe 5 indices across the time of the eclipse and we found temporal patterns in 3 of these indices, suggesting that there is audiological variation during the eclipse.
+* Our goal was to look deeper into effects that the total solar eclipse has on wildlife activity. To do so, we used generalized additive models to observe 5 indices across the time of the eclipse and we found temporal patterns in 3 of these indices, suggesting that there is audiological variation during the eclipse.
 
 * This was an amazing and unique opportunity to look into such a rare phenomenon and to use data that was collected by SLU faculty. 
 	
@@ -91,6 +91,9 @@ eclipse_end<-hms(00,50,16)
 
 : {.striped}
 
+
+<br>
+
 * Recorders sampled 55 seconds on and 5 seconds off. 
 
 * This produced a total of 115,610 audio clips
@@ -98,9 +101,9 @@ eclipse_end<-hms(00,50,16)
 	  
 ## Audio Indices {.smaller}
 
-* All of these indices were obtained using the soundecology package in R - 
+* <span style="background-color: lightgreen; color: black; padding: 2px 4px; border-radius: 3px;">Bioacoustic Index </span> -  Assesses diversity and abundance of specifically biological noise in relation to the period of the file with the lowest sound. 
 
-Citation !
+* <span style="background-color: coral; color: black; padding: 2px 4px; border-radius: 3px;"> Biophony </span>  - Measures the average frequency of biological sound
 
 * Acoustic Complexity - Focused on expressing the spatial and temporal complexity in sound by capturing the intensity and frequency shifts across an audio file. 
 
@@ -108,32 +111,32 @@ Citation !
 
 * Acoustic Evenness - Measure how sound is distributed across frequency bands, assess equality and inequality of the rate that sound is produced from a source
 
-* Bioacoustic Index* - Assesses diversity and abundance of specifically biological noise in relation to the period of the file with the lowest sound. 
+<br>
 
-* Biophony - Measures the average frequency of biological sound
-
+Villanueva-Rivera LJ, Pijanowski BC (2018). _soundecology: Soundscape Ecology_. R package
+  version 1.3.3, <https://CRAN.R-project.org/package=soundecology>.
 
 ## Visualize and Youtube 
 
-* Youtube Link 
+<https://youtu.be/3dftvaUn--Q> 
 	
 ```{r}
 #| echo: false
 eclipse_time<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)
 eclipseonly<-A001_SD001|> filter(hour>= eclipse_start & hour<= eclipse_end)|> filter(day == "2024-04-08")
 
-single_day<-A001_SD001|>filter(day == "2024-04-08")
+single_day<-A001_SD001|>filter(day == "2024-04-09")
 
 dawn<- single_day|> filter(hour >= as_hms("05:45:00") & hour <= as_hms("07:15:00"))
 eclipse<- single_day|> filter(hour >= as_hms("14:00:00") & hour <= as_hms("16:00:00"))
-afternoon<- single_day|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("21:00:00"))
+afternoon<- single_day|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("20:00:00"))
 night<- single_day|> filter(hour >= as_hms("23:00:00") & hour <= as_hms("23:30:00"))
 
 ggplot(data = dawn, aes( x = hour, y = bei))+
-  geom_rect( aes(xmin = as_hms("05:45:00"), xmax = as_hms("07:15:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
-  geom_rect(data = dawn, aes(xmin = as_hms("14:00:00"), xmax = as_hms("16:00:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
-  geom_rect(data = dawn, aes(xmin = as_hms("19:00:00"), xmax = as_hms("21:00:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
-  geom_rect(data = dawn, aes(xmin = as_hms("23:00:00"), xmax = as_hms("23:30:00"), ymin = 0, ymax = 10), fill = "lightblue1")+
+  geom_rect( aes(xmin = as_hms("05:45:00"), xmax = as_hms("07:15:00"), ymin = 0, ymax = 4), fill = "lightblue1")+
+  geom_rect(data = dawn, aes(xmin = as_hms("14:00:00"), xmax = as_hms("16:00:00"), ymin = 0, ymax = 4), fill = "lightblue1")+
+  geom_rect(data = dawn, aes(xmin = as_hms("19:00:00"), xmax = as_hms("20:00:00"), ymin = 0, ymax = 4), fill = "lightblue1")+
+  geom_rect(data = dawn, aes(xmin = as_hms("23:00:00"), xmax = as_hms("23:30:00"), ymin = 0, ymax = 4), fill = "lightblue1")+
   geom_line(col = "darkblue")+
   geom_line(data = eclipse, aes(x = hour, y = bei), col = "darkblue")+
   geom_line(data = afternoon, aes(x = hour, y = bei), col = "darkblue")+
@@ -142,7 +145,7 @@ ggplot(data = dawn, aes( x = hour, y = bei))+
   facet_wrap(~day)+
   labs( title = "Example of Full Pattern - Audio Recorder 1")+
   scale_x_continuous(name = "Hour", breaks = c(hms(00,45,5), hms(00,00,14), hms(00,00, 19),hms(00,00,23)))+
-  theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
+  theme(axis.text.x = element_text(angle = 45, vjust= 0.5), axis.text = element_text(size = 20))
   
 ```
 
@@ -158,6 +161,8 @@ head(table)|>kable(format = "html")|>
   kableExtra::kable_styling(font_size = 18)|>
   kableExtra::kable_classic_2()
 ```
+
+<br>
 
 The audio collected amassed to over a **terabyte** of data. Due to this massive size a desktop wouldn't be able to efficiently process this data. Our solution for this was to use St. Lawrence's HPC to run and store our files incrementally.  
 
@@ -242,7 +247,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
   geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
   scale_colour_viridis_d() +
-  theme_minimal() +
+  theme_minimal(base_size = 30) +
   labs(colour = "eclipse_or_not",
        y = "Bioacoustic Index")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
@@ -283,9 +288,10 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(data = partial_end, aes(x = hour_numeric, y = biophony), size = 4, col = "white")+
   geom_point(x = hms(00,37,16), y = 2.5, size = 2)+
   scale_colour_viridis_d() +
-  theme_minimal() +
+  theme_minimal(base_size = 30) +
   labs(colour = "eclipse_or_not",
-       y = "Biophony")
+       y = "Biophony")+
+    scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
 ```
 
 
@@ -319,12 +325,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 * Special Thanks to Ed Harcourt and Lisa Torrey for assistance in using and understanding the HPC process. 
 
 
-to do: 
+## to do: 
 add map
-add link to youtube 
-
-bold BEI and Biophony or callout boxes
-change size of legend/text in model visualizations
 reduce amount of text - specifically R and HPC 
 change theme
 Erika's students
