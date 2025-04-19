@@ -77,10 +77,13 @@ eclipse_end<-hms(00,50,16)
 	
 	ArcGIS was used to find forested wetland habitats so both avian and amphibian wildlife would be sampled
 	
+
+Heavy inspiration for this analysis was taken from: 
+
+Gerber, J. E., Howard, D., & Quinn, J. E. (2020). Soundscape shifts during the 2017 total solar eclipse: An application of dispersed automated recording units to study ephemeral acoustic events. Biodiversity, 21(1), 41–47. https://doi.org/10.1080/14888386.2020.1715834 
 ## Data Collection {.smaller}
-* Heavy inspiration for this analysis was taken from: Paper Citation !
 	  
-* Recorders collected audio from March 30th to April 16th 
+* Recorders collected audio from March 30th to April 16th
 
 | Times         | Reasoning                                        |
 |---------------|--------------------------------------------------|
@@ -94,10 +97,9 @@ eclipse_end<-hms(00,50,16)
 
 <br>
 
-* Recorders sampled 55 seconds on and 5 seconds off. 
+* Recorders sampled 55 seconds on and 5 seconds off
 
 * This produced a total of 115,610 audio clips
-	 
 	  
 ## Audio Indices {.smaller}
 
@@ -164,13 +166,22 @@ head(table)|>kable(format = "html")|>
 
 <br>
 
-The audio collected amassed to over a **terabyte** of data. Due to this massive size a desktop wouldn't be able to efficiently process this data. Our solution for this was to use St. Lawrence's HPC to run and store our files incrementally.  
+* Over a **terabyte** of data
 
-Even with the HPC, processing took a task time of 10 and a half hours per folder 
+* Due to massive size, we used St. Lawrence's HPC to run and store our files incrementally. 
+
+* With the HPC, each folder took 10 and a half hours to process. 
 	
 ## Generalized Additive Modeling {.smaller}
   
 $$ Index \sim spline(day, by = folder) + spline(folder, bs = "re") + day$$
+
+* Fit a smoothing function for day, and have it vary by folder
+
+* Adjust for folder differences, but treat this as a random effect
+
+* Incorporate a linear trend for day
+
 ```{r}
 #| echo: false
 fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, 
@@ -198,10 +209,12 @@ bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
 ```
 	
 ::: {.callout-tip} 
+
 ## Why GAM?
   We can maintain additivity while incorporating non-linear functions!
 :::
 
+* If time, EDF note? 
 
 ## Bioacoustic Model Visualization {.smaller}
 
@@ -254,7 +267,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-5 Day Subset Explain
+
 
 ## Biophony Model Visualization {.smaller}
 
@@ -304,6 +317,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   + Acoustic Evenness 
 
   + Acoustic Diversity 
+  
+<br>
 
 * These indices showed increases or decreases around the time of the eclipse, specifically with variation around the time of totality. 
 
@@ -312,9 +327,19 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ## Future Projects
 
-* Time - Temporal autocorrelation: Adjusting for this through incorporation in the model and time series (Emilia Agostinelli)
+* Accounting for temporal autocorrelation: (Emilia Agostinelli '26)
 
-* Species - What wildlife are being affected: Looking into the varying audio patterns and the possibility of utilizing machine learning (Aidan Fauth)
+  + Incorporating time into the model 
+  
+  + Utilizing time series approaches  
+  
+<br>
+
+* What species are being affected:  (Aidan Fauth '26)
+
+  + Identifying the wildlife present in the clips
+  
+  + Machine learning possibility 
 	
 ## Acknowledgements 
 
@@ -326,10 +351,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 
 ## to do: 
+
 add map
-reduce amount of text - specifically R and HPC 
-change theme
-Erika's students
 
 
 
