@@ -81,6 +81,7 @@ eclipse_end<-hms(00,50,16)
 Heavy inspiration for this analysis was taken from: 
 
 Gerber, J. E., Howard, D., & Quinn, J. E. (2020). Soundscape shifts during the 2017 total solar eclipse: An application of dispersed automated recording units to study ephemeral acoustic events. Biodiversity, 21(1), 41–47. https://doi.org/10.1080/14888386.2020.1715834 
+
 ## Data Collection {.smaller}
 	  
 * Recorders collected audio from March 30th to April 16th
@@ -174,9 +175,9 @@ head(table)|>kable(format = "html")|>
 	
 ## Generalized Additive Modeling {.smaller}
   
-$$ Index \sim spline(day, by = folder) + spline(folder, bs = "re") + day$$
+$$ Index \sim spline(hour, by = day) + spline(folder, bs = "re") + day$$
 
-* Fit a smoothing function for day, and have it vary by folder
+* Fit a smoothing function for time, and have it vary by day
 
 * Adjust for folder differences, but treat this as a random effect
 
@@ -202,6 +203,7 @@ modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08",
                     "2024-04-09", "2024-04-11"))|>
   mutate(day_factor = as.factor(day))|>
   select(hour, hour_numeric, everything())
+
 bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
                       day_factor + s(folder_name, bs = "re"),
                     data = modelEclipse_df)
