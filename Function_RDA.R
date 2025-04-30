@@ -68,20 +68,6 @@ eclipse_df<- function(folder) {
   saveRDS(final, file = output)
 }
 
-eclipse_df(here("A005_SD002"))
-#eclipse_df(here("WAV_5_test"))
+eclipse_df(here("A022_SD019"))
 
-#folder_group<-c(here("test_wavs"),here("WAV_5_test"))
-
-#map(folder_group, eclipse_df)
-
-#map("WAV_5_test", acoustic_complexity)
-
-#paths <- list.files(here("WAV_5_test"), pattern = "\\.WAV$",
-                         full.names = TRUE)
-#WAV_5 <- map(paths, readWave)
-
-#map(WAV_5, acoustic_complexity)
-
-#eclipse_df(here("WAV_5_test"))
 

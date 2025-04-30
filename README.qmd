@@ -1,0 +1,6 @@
+---
+title: "Analyzing Audio Patterns During the 2024 Total Solar Eclipse"
+format: gfm
+---
+
+

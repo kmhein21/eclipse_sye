@@ -356,5 +356,30 @@ ggplot(data = onlyEclipseDAY, aes(x = hour, y= bei))+
   theme_minimal()+
   labs(title = "BEI from April 8th")
 
+ggplot(data = onlyEclipseDAY, aes(x = hour, y= aei))+
+  geom_line()+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  labs(title = "AEI from April 8th")
+
+ggplot(data = onlyEclipseDAY, aes(x = hour, y= biophony))+
+  geom_line()+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  labs(title = "biophony from April 8th")
+
+ggplot(data = onlyEclipseDAY, aes(x = hour, y= fullADI))+
+  geom_line()+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  labs(title = "ADI from April 8th")
+
+ggplot(data = onlyEclipseDAY, aes(x = hour, y= fullACI))+
+  geom_line()+
+  facet_wrap(~folder_name)+
+  theme_minimal()+
+  labs(title = "ACI from April 8th")
+
+
 
 
