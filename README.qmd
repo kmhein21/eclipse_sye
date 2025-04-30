@@ -3,4 +3,75 @@ title: "Analyzing Audio Patterns During the 2024 Total Solar Eclipse"
 format: gfm
 ---
 
+```{r}
+#| output: false
+#| warning: false
+#| echo: false
+
+library(tidyverse)
+library(soundecology)
+library(here)
+library(hms)
+library(tuneR)
+library(pander)
+library(mgcv)
+library(modelr)
+```
+
+
+## Project Introduction
+
+This project organizes and model audio data to understand more about wildlife activity around an eclipse event. Data from the Total solar eclipse on April 8th, 2024 was analyzing using 5 common audiological indices and generalized additive modeling. 
+
+### Data 
+
+The data used in this project was collected by Dr. Erika Barthelmess and other biology students at St. Lawrence University. This team deployed 20 audio recorders in forested wetlands habitats across St. Lawrence county, New York to sample data between March 30th to April 16th. 
+
+## Data Organization 
+
+Using R studio, a function was created to process our .WAV files and create a cleaned data frame. Using an High Powered Computer, we were able to iterate this process over all 20 of our audio recorders. A portion of the final product is displayed below:
+
+(DISPLAY PORTION OF DATA)
+
+## Model 
+
+Our final generalized Additive Model consisted of three terms, and was used to later create visuals to isolate index patterns across the time of the eclipse. 
+
+$$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$
+s() function refers to the smoothing spline function from the mgcv package
+
+For our models, we used a subset of five days based on weather and proximity to the day of the eclipse, this ended up being April 6th, 7th, 8th, 9th, and 11th. 
+
+Code to create our model is below:
+```{r}
+#| eval: false
+index_model<- gam(index ~ s(hour, by = day)+ day + s(folder, bs = "re"), data = Eclipse_df)
+```
+
+## Visuals 
+
+(ADD VISUALS) 
+
+## Findings 
+
+From our analysis, we were able to find patterns in three of our indices that may suggest wildlife audio changes during the eclipse and totality. 
+
+\* Bioacoustic Index: very noticeable peak around the time of totality, with little to no other patterns on April 8th. Certainly a different pattern compared to the linearity seen in the other days.
+
+\* Acoustic Evenness Index
+
+\* Acoustic Diversity Index
+
+## Note 
+
+In our analysis, we assumed there was no autocorrelation between the audio clips we were given. This is almost certainly an incorrect assumption, and so the patterns in our visuals could potentially change if this autocorrelation was accounted for and removed. 
+
+
+
+
+
+
+
+
+
 
