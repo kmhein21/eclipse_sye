@@ -591,7 +591,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = aei)) +
   labs(title = "Acoustic Evenness Across Days")
 ```
 
-When we display the data by day, we can see that most days have flat smoothing curves, with the only fluctuation on the 8th and 6th. (ADD MORE) This mix of results makes it hard for us to conclude from this visual whether the eclipse did influence Acoustic evenness or not. 
+When we display the data by day, we can see that most days have flat smoothing curves, with fluctuations only on the 8th and 6th. We can see that on the 8th, there is a much steeper rise around that time of totality, with minimum on either side of its beginning and end. Since we see some of that curvature on the 6th, it is hard for us to conclude from this visual whether the eclipse did influence Acoustic evenness or not. 
 
 ## Bioacoustic Index 
 
@@ -609,7 +609,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = bei)) +
 
 ```
 
-In this index, there is potentially a pattern where the index increases around the time of totality. When we then facet by day we can see a very striking pattern, where the only increase seen across all the days occurs on April 8th around the time of totality. 
+In this index, we can clearly see a potential pattern, where the bioacoustic index increases around the time of totality. This pattern is very striking, as all the other days are quite linear and this increase on the 8th is really the only curvature across our subset. This increase is also very localized, the peaks rise and fall are quite close to its maximum. 
 
 ## Biophony
 
@@ -625,11 +625,11 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = biophony)) +
   facet_wrap(~ day)
 ```
 
-For biophony, when we look at the smoothing curves across the days we can see that the majority of the days including April 8th are quite flat, overall suggesting that the eclipse is not influencing this index. 
+For biophony, when we look at the smoothing curves across the days we can see that the basically all of the days including April 8th are linear, this visual suggests that the eclipse may not be influencing this index. 
 
 # Modeling 
 
-\*  Generalized Additive Modeling
+*  Generalized Additive Modeling
 
 ```{r}
 #| echo: false
@@ -670,14 +670,14 @@ partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
 To model this data we decided to use Generalized additive models so we could incorporate non-linear patterns that we were seeing while still maintaining additivity between the variables. A GAM model resembles linear regression, but replaces the linear components with smooth non-linear functions: 
 
 $$ y_i = \beta_0 + f_1(x_{i1}) + f_2(x_{i2}) + f_3(x_{i3})+...+ f_p(x_{ip}) + \epsilon_i$$
-\* Smoothing Splines
+* Smoothing Splines
 
 Utilizing a smoothing spline can help us capture non-linear patterns which are present in the model. A smoothing spline specifies a function g(x) such that minimizes the formula below. The function g(x) is known to be a differentiable cubic polynomial function at knots for each training observation $x_i$.
 
 $$ \Sigma_{i=1}^n  (y_i - g(x_i))^2 + \lambda \int g^{''}t^2  dt$$
 This formula is similar to the idea of minimizing the residual sum of squares which can be seen in the first portion of the formula, but is also specifies a shrinking parameter lambda, which will penalize the variability of our function g(x) and will control the "wiggliness" of the curve. In other words, the second portion of the above formula which is tuned by $\lambda$ influences the effective degrees of freedom which will appear in our model summaries, and this can then be used as an assessment of the flexibility in the curves. From the s() function of the mgcv package that is used to create a smoothing spline, this $\lambda$ is optimized using generalized cross-validation. 
 
-\* Final Models 
+* Final Models 
 
 Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different recorders and their respective locations, and lastly a linear function of day. To create these models we used the gam() function from the mgcv packages, and to create our visualization we used the data_grid() function (from mgcv) as well as the augment() function from the broom package. This allowed us to create predicted values based on our model and to then visualize them alongside our GAMs. To produce these visuals we also needed to specify a specific recorder which lied around the "center" of our observed index values. A table of the chosen audio recorders and the indices that they were used for is below: 
 
@@ -706,7 +706,7 @@ broom::tidy(bei_mod)
 1 - (bei_mod$deviance/bei_mod$null.deviance)
 ```
 
-From our model output we can see from the F-values and p-values that our smoothing splines are extremely significant in the model. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses an extremely complex line line with an edf of 8.861. The other days vary in their complexity but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
+(CHANGE MODEL SUMMARIES) From our model output we can see from the F-values and p-values that our smoothing splines are extremely significant in the model. From looking at the estimated degrees of freedom for the smooth terms we can see that April 8th possesses an extremely complex line line with an edf of 8.861. The other days vary in their complexity but we can see that they all do have non-linear effects with April 7th being the second most flexible after April 8th, with an edf of 7.464. 
 
 We can also note from this output that the model has a explained deviance value of 44%, meaning that using our smoothing spline and day variable explains 44% of the variability in the bioacoustic index.
 
@@ -748,6 +748,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
+(ADD INTRO TO THE VISUALS)
 When we visualize the days like above we can see the flexibility on April 8th. We can see a very high peak which does not appear in any of the other days, with the other days possessing some flexibility as we expected with no major maximums or minimums. Here we can see how the flexibility in the Bioacoustic index on the 8th and how that compares to the rigidity of the other days. 
 
 To expand our understanding of the relationships in this model we created the same GAM on the time from the dawn. 
@@ -1017,7 +1018,7 @@ biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
 summary(biophony_mod)
 ```
 
-Lastly, in our biophony model we can see that here the 8th has an edf value of 6.558 which shows that there is some non-linearity. We can see that two of the other days (April 6th and 7th) are more complex than this line, which suggests that the non-linearity may not be due to the changes during the eclipse. Like Acoustic complexity, a visualization will help us discern whether we should stick with this assumption. 
+Lastly, in our biophony model we can see that here the 8th has an edf value of 6.558 which shows that there is some non-linearity. We can see that two of the other days (April 6th and 7th) are more complex than this line, which suggests that the non-linearity may not be due to the changes during the eclipse. 
 
 In this model 62.5% of the variability in biophony is explained by our model. 
 
@@ -1056,17 +1057,18 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 This visualization shows very clearly that all of the days during this time frame are very similar, and we don't see any particular patterns from April 8th or any other day. This suggests that biophony was not impacted during the time of the eclipse. 
 
-# Conclusion
+# Conclusion (ADD MORE AND CONNECT POINTS)
 
 From our analysis, we are at a place to believe that there are three indices which may display patterns across the time of the eclipse. These three indices are the bioacoustic index, acoustic eveness index, and acoustic diversity index. 
 
-We believe that these potential patterns display the idea that widlife is impacted by some type of eclipse-driven change, and based on the patterns, we can suggest that they are affected by specifically a totality-driven change. Whether this is due to something we cannot percieve or it is the changes in light, we cannot be sure at this time. 
+We believe that these potential patterns display the idea that wildlife is impacted by some type of eclipse-driven change, and based on the patterns, we can suggest that they are affected by specifically a totality-driven change. Whether this is due to something we cannot perceive or it is the changes in light, we cannot be sure at this time. 
 
 We do want to note that in our models we made the assumption that the one minute audio clips were not correlated with each other. This assumption is likely to be incorrect, and therefore if this autocorrelation was to be accounted for it is possible our visualized patterns could change.
 
 
 
-# Citations 
+# Citations (COMPLETE)
+
 
 Packages 
 
