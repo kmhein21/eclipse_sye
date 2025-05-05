@@ -58,7 +58,7 @@ library(modelr)
 
 # Abstract
 
-From March 30 to April 16th, Erika Barthelmess and students from the St. Lawrence biology department collected data from 20 audio recording devices in the Northern New York area. These devices were strategically located to observe potential audio changes in wildlife at the time of the total solar eclipse on April 8th, 2024. We processed this audio data to produce organized data frames, centered around 5 commonly used audiological indices. From this tabular data, we constructed many visualizations displaying patterns across time, day, and recording device. Due to the non-linearity present in our plots, generalized additive models based on date, time of day, and recording device were implemented to assess patterns that may have occurred during the time of the eclipse. From these visuals and models, we conclude the possibility that 3 of our 5 indices are associated with audio changes during the time of the eclipse. 
+From March 30 to April 16th, Dr. Erika Barthelmess and students from the St. Lawrence biology department collected data from 20 audio recording devices in the Northern New York area. These devices were strategically located to observe potential audio changes in wildlife at the time of the total solar eclipse on April 8th, 2024. We processed this audio data to produce organized data frames, centered around 5 commonly used audiological indices. From this tabular data, we constructed many visualizations displaying patterns across time, day, and recording device. Due to the non-linearity present in our plots, we implemented generalized additive models based on date, time of day, and recording device to assess patterns that may have occurred during the time of the eclipse. From these visuals and models, we conclude the possibility that 3 of our 5 indices are associated with audio changes during the time of the eclipse. 
 
 
 # Data Collection Methods
@@ -67,7 +67,7 @@ This protocol was written by Dr. Erika Barthelmess from St. Lawrence University.
 
 Data was collected between March 30 and April 16, 2024 by deploying 20 AudioMothTM acoustic recorders throughout St. Lawrence County, New York. All locations were fully within the path of totality for the April 8, 2024 total solar eclipse. The partial eclipse began at 14:11:38, totality began at 15:23:52, maximum eclipse was at 15:25:29, totality ended at 15:27:05 and the partial eclipse ended at 16:35:38 (all times local, times from <https://www.timeanddate.com/eclipse/in/@5111484?iso=20240408>) for a total eclipse duration of 2 hours 24 minutes, with totality lasting 3 minutes and 13 seconds. 
 
-Each AudioMoth was configured to record within four temporal windows on each day of the deployment. The first window was from 05:45 to 07:15, the second from 14:00 to 16:50, third from 19:00 to 20:00 and the last from 23:00 to 23:30. (Table 1.)
+Each AudioMoth was configured to record within four temporal windows on each day of the deployment. The first window was from 05:45 to 07:15, the second from 14:00 to 16:50, third from 19:00 to 20:00 and the last from 23:00 to 23:30 (Table 1).
 
 | Times         | Reasoning                                        |
 |---------------|--------------------------------------------------|
@@ -78,7 +78,7 @@ Each AudioMoth was configured to record within four temporal windows on each day
 
 : Recording Times {.striped .hover}
 
-Within each time window, each AudioMoth recorded in a repeated cycle with 55 seconds of recording and 5 seconds to write data for every minute of the recording window (Table 2). Sample rate measures the density of recordings per unit time and therefore the range of frequencies that can be recorded. High sample rates record a higher range of frequencies but take up more space on the microSD card. We selected a sample rate of 96 kHz to capture sound frequencies up to about 48 kHz, which allowed us to capture common bird and amphibian songs and calls as well as at least some insects and bat echolocation sounds. Gain is a measure of the degree to which the microphone amplifies the sound as it is recorded. Higher gain enables detection of quieter sounds but can also result in clipping and distortion. After collecting pilot recordings near wetlands where wood frogs were calling we determined that a gain setting of 4 would help increase our detection of animal sounds.
+Within each time window, each AudioMoth recorded in a repeated cycle with 55 seconds of recording and 5 seconds to write data for every minute of the recording window (Table 2). Sample rate measures the density of recordings per unit time and therefore the range of frequencies that can be recorded. High sample rates record a higher range of frequencies but take up more space on the microSD card. We selected a sample rate of 96 kHz to capture sound frequencies up to about 48 kHz, which allowed us to capture common bird and amphibian songs and calls as well as at least some insects and bat echolocation sounds. Gain is a measure of the degree to which the microphone amplifies the sound as it is recorded. Higher gain enables detection of quieter sounds but can also result in clipping and distortion. After collecting pilot recordings near wetlands where wood frogs were calling, we determined that a gain setting of 4 would help increase our detection of animal sounds.
 
 | Parameters         | Setting                                        |
 |---------------|--------------------------------------------------|
@@ -89,14 +89,13 @@ Within each time window, each AudioMoth recorded in a repeated cycle with 55 sec
 
 : Recording Parameters {.striped .hover}
 
-We used ArcGIS Pro (version XXXX, ESRI Incorporated, Redlands, California) to identify areas of forest-wetland interface or forested wetland occurring on public or University-owned land. Our intention was to place the recorders at locations where they could capture the sounds of both forest birds and pond-breeding amphibians (as well as other biotic sounds including any active insects or bats). Due to our northern location within the path of the eclipse in North America, the onset of spring was just beginning. Red-winged blackbirds (*Agelaius phoeniceus*) had returned to the area and were establishing breeding territories and both wood frogs (*Lithobates sylvaticus*) and spring peepers (*Pseudacris crucifer*) had begun to chorus at least 5 days prior to deployment of the recorders. To reduce the time required to deploy units, we located the devices near but out of view of hiking trails and within 20 miles of the St. Lawrence University campus (44.58931027483651º N, -75.1613716006626 º W).
-
-In our analysis, we took a lot of inspiration from a paper published in 2020 titled "*Soundscape shifts during the 2017 total solar eclipse: An application of dispersed automated recording units to study ephemeral acoustic events*" by Jacob E. Gerber, Dakota Howard, and John E. Quinn.
+We used ArcGIS Pro to identify areas of forest-wetland interface or forested wetland occurring on public or University-owned land. Our intention was to place the recorders at locations where they could capture the sounds of both forest birds and pond-breeding amphibians (as well as other biotic sounds including any active insects or bats). Due to our northern location within the path of the eclipse in North America, the onset of spring was just beginning. Red-winged blackbirds (*Agelaius phoeniceus*) had returned to the area and were establishing breeding territories and both wood frogs (*Lithobates sylvaticus*) and spring peepers (*Pseudacris crucifer*) had begun to chorus at least 5 days prior to deployment of the recorders. To reduce the time required to deploy units, we located the devices near but out of view of hiking trails and within 20 miles of the St. Lawrence University campus (44.58931027483651º N, -75.1613716006626 º W).
 
 # Indices and Packages
 
-Using the $'soundecology'$ package, we selected 5 specific indices that appeared in our reference paper (@gerber2020soundscape), that we believed would be important in understanding the changes in acoustic activity. Due to settings on the recording devices, all data was from the left channel as the right channel values were not available. 
+In our analysis, we took a lot of inspiration from a paper published in 2020 titled "*Soundscape shifts during the 2017 total solar eclipse: An application of dispersed automated recording units to study ephemeral acoustic events*" by Jacob E. Gerber, Dakota Howard, and John E. Quinn.
 
+Using the `soundecology` package, we selected 5 specific indices that appeared in our reference paper (@gerber2020soundscape), that we believed would be important in understanding the changes in acoustic activity. Due to settings on the recording devices, all data was from the left channel as the right channel values were not available. 
 
 ## Acoustic Complexity Index
 
@@ -106,7 +105,7 @@ A higher ACI value indicates a more diverse soundscape compared to a lower value
 
 In the Gerber et. al paper in 2017, this index was not found to be significant in their model but it was apparent that ACI was greatest during totality (@gerber2020soundscape).
 
-This index is obtained using the acoustic_complexity() function within the soundecology package. The specific numerical values used are from subsetting \$acl_left_vals (@soundecology2018).
+This index is obtained using the `acoustic_complexity()` function within the soundecology package. The specific numerical values used are from subsetting `$acl_left_vals` (@soundecology2018).
 
 ## Acoustic Diverstiy Index
 
@@ -116,19 +115,19 @@ Similar to ACI, a higher ADI value corresponds to a increase in diversity within
 
 In the Gerber et. al paper in 2017, this index was not found to be significant in their model but it was apparent that ADI was highest at the times right before and after the eclipse (@gerber2020soundscape).
 
-This index is obtained using the acoustic_diversity() function in the soundecology package. The specific numerical values used are from subsetting \$left_band_values (@soundecology2018).
+This index is obtained using the `acoustic_diversity()` function in the soundecology package. The specific numerical values used are from subsetting `$left_band_values` (@soundecology2018).
 
-For both the Acoustic Diversity index and the Acoustic Complexity index, multiple values are stored per .WAV audio file. In this analysis the list of values were summed to produce the total ACI or ADI value per file, which made visualization easier. 
+For both the Acoustic Diversity index and the Acoustic Complexity index, multiple values are stored per .WAV audio file. In this analysis, the list of values were summed to produce the total ACI or ADI value per file, which made visualization easier. 
 
 ## Acoustic Evenness Index
 
 The acoustic evenness index (AEI) measures how even the distribution of sound is across different frequency bands. This index assesses the equality and inequality of sound power distribution in different ranges by calculating the Gini index over segmented portions of an audiofile. This index does not separate anthropogenic and biological sound. 
 
-A high AEI value signifies a more even soundscape, within the audio there isn't any sound domination from one type of sound/species. A low AEI signifies that the sound is not as even, there may only be a few loud or similar sounds which disrupt the consistency of the sound level.
+A high AEI value signifies a more even soundscape: within the audio, there is not any sound domination from one type of sound/species. A low AEI signifies that the sound is not as even: there may only be a few loud or similar sounds which disrupt the consistency of the sound level.
 
-In the paper by Gerber et. al in 2017, this was found to be a statistically significant predictor in their model. They found that the AEI was highest right before the eclipse began and it rose until the period of totality. The authors believe this is likely due to the increase in human sounds near their recording locations (@gerber2020soundscape).
+The paper by Gerber et. al found that the AEI was highest right before the eclipse began and it rose until the period of totality. The authors believe this is likely due to the increase in human sounds near their recording locations (@gerber2020soundscape).
 
-This index is found using the acoustic_evenness() function in the soundecology package. The specific numerical value used is from subsetting \$aei_left (@soundecology2018).
+This index is found using the `acoustic_evenness()` function in the soundecology package. The specific numerical value used is from subsetting `$aei_left` (@soundecology2018).
 
 ## Bioacoustic Index
 
@@ -136,21 +135,21 @@ The bioacoustic index (BEI) provides a measurement of the diversity and abundanc
 
 Higher values of this index signal an increase in species diversity, suggesting more species are making noise during the clip. 
 
-In our reference paper, this was found to be a non-significant predictor but, it seemed to be greatest at the period of totality (@gerber2020soundscape). 
+In our reference paper, the authors found that BEI was greatest at the period of totality (@gerber2020soundscape). 
 
-This is obtained using the bioacoustic_index() function in the soundecology package. The specific numerical value used is from subsetting \$left_area (@soundecology2018). The default minimum hertz value for this index was set at 2kHz. 
+This is obtained using the `bioacoustic_index()` function in the soundecology package. The specific numerical value used is from subsetting `$left_area` (@soundecology2018). The default minimum hertz value for this index was set at 2kHz. 
 
 ## Biophony
 
-Biophony is an index which calculates the average frequency of biotic sound (between 2-8kHz). The interpretation of this index is much more straightforward, high biophony means that there is more sound and low values mean less.
+Biophony is an index which calculates the average frequency of biotic sound (between 2-8kHz). The interpretation of this index is much more straightforward: high biophony means that there is more sound and low values mean less sound.
 
-Gerber et al. found that biophony was a significant predictor in thier model They found that biophony increased at the beginning and end of the eclipse, similar to the dawn and dusk choruses (@gerber2020soundscape). 
+Gerber et al. found that biophony increased at the beginning and end of the eclipse, similar to the dawn and dusk choruses (@gerber2020soundscape). 
 
-This index is obtained as a byproduct from the Normalized Difference Soundscape Index function and the numerical values used is from subsetting \$biophony_left (@soundecology2018).
+This index is obtained as a byproduct from the Normalized Difference Soundscape Index function and the numerical values used is from subsetting `$biophony_left` (@soundecology2018).
 
 # Initial visualization 
 
-Due to the large amount of recordings at our disposal, we began creating graphics using a subset of five audio files (.WAV) from a single audio recorder to explore the possibilities of the graphics and to search for the best ways to display the indices.
+Due to the large amount of recordings at our disposal, we began creating graphics using a subset of five audio files (.WAV) from a single audio recorder to explore the indices. Table 3 shows indices for 5 minutes from a single audiomoth on different days. 
 
 ```{r}
 #| echo: false 
@@ -183,7 +182,7 @@ ggplot(data = WAV_5_test, aes(x = time, y = sapply(ADI_all, sum)))+
   labs(x = "Time", y = "ADI", title = "First Graphic of Acoustic Diversity")
 ```
 
-To save space we have included only the Bioacoustic index and Acoustic Diversity example plots, but this was the initial visualization done for each of our indices. Although these initial visualizations did not help us assess patterns, the graphics helped us gain an understanding of the ranges that we could expect these values to fall in. 
+The plots above show the Bioacoustic index and Acoustic Diversity values. Although these initial visualizations did not help us assess patterns, the graphics helped us gain an understanding of the ranges that we could expect these values to fall in. 
 
 
 | Index         | Range                                        |
@@ -199,9 +198,9 @@ To save space we have included only the Bioacoustic index and Acoustic Diversity
 
 ## Creating a cleaned data frame
 
-To expand the collection of data, we generalized our code and created a function, "eclipse_df()" which would use a folder containing all .WAV files for one audio recorder as input and would return a cleaned data frame. This data frame would then be saved in our environment and would contain all the data that we would need to create our visuals and models. 
+To expand the collection of data, we generalized our code and created a function, `eclipse_df()` which would use a folder containing all .WAV files for one audio recorder as input and would return a cleaned data frame. This data frame would then be saved in our environment and would contain all of the data that we would need to create our visuals and models. 
 
-Initially, indices were calculated from all .WAV files and stored in their own data frames. For the bioacoustic index, acoustic evenness index, and biophony all values are subsetted from the original output of the soundecology function. These three indices are then bound into one tibble. 
+Initially, indices were calculated from all .WAV files and stored in their own data frames. For the bioacoustic index, acoustic evenness index, and biophony, all values are subsetted from the original output of the `soundecology` function. These three indices are then bound into one tibble. 
 
 ```{r}
 #| eval: false
@@ -210,7 +209,7 @@ BEI<-as.data.frame(BEI_ALL)|>
   pivot_longer(everything(), names_to= "bei_name", values_to = "BEI")
 ```
 
-For the acoustic complexity and the acoustic diversity to obtain the full list of values for each folder a for loop is incorporated into the function. This obtains all the left channel values and combines them into a list.
+For the acoustic complexity and the acoustic diversity, to obtain the full list of values for each folder, a for loop is incorporated into the function. This obtains all the left channel values and combines them into a list.
 
 ```{r}
 #| eval: false
@@ -224,7 +223,7 @@ for (i in 1:n){
 } 
 ```
 
-After they have been calculated the data frames are bound together into one. The code listed below is for the final data frame which creates all our indices, date/time information, and the audio recorder that the data corresponds to. 
+After they have been calculated the data frames are bound together into one. The code listed below is for the final data frame, which creates all our indices, date/time information, and the audio recorder that the data corresponds to. 
 
 ```{r}
 #| eval: false
@@ -243,7 +242,7 @@ full|> mutate(biophony = as.numeric(biophony),
     select(folder_name, everything())
 ```
 
-Initially, we tested this function on two folders which are a part of the larger collection of data from audio recorder 4. The two folders we chose correspond to April 7th and 8th. Graphs from the indexes across the four different recording times are shown below
+Initially, we tested this function on two folders which were a part of the larger collection of data from audio recorder 4. The two folders we chose correspond to April 7th and 8th. Graphs from the indexes across the four different recording times are shown below.
 
 ```{r}
 #| echo: false 
@@ -321,13 +320,13 @@ ggplot(data = dawn, aes(x = only_time, y = sapply(ACI, sum), color = as.factor(d
   labs(title = "Acoustic Complexity", x = "Time", y = "ACI")
 ```
 
-Visualizing these two data sets helped us understand the patterns that occur across a full day of recording. For example, a pattern in this visual above is that ADI, ACI, and biophony are higher during the dawn segment and then decrease to similar low levels across the rest of the day. Another thing these types of graphs shed light on are the potential differences between a normal day and the day of the eclipse. However, as this is just a comparison from two folders, we couldn't make any conclusions about the changes during the eclipse from just this graphic.
+Visualizing these two data sets helped us understand the patterns that occur across a full day of recording. For example, a pattern in this visual above is that ADI, ACI, and biophony are higher during the dawn segment and then decrease to similar low levels across the rest of the day. Another thing these types of graphs shed light on are the potential differences between a normal day and the day of the eclipse. However, as this is just a comparison from two audiomoths, we could not make any conclusions about the changes during the eclipse from just this graphic.
 
 ## Using the HPC
 
-To assist in efficiently expanding to the full set of our audio files, we decided to utilize the High Powered Computer (HPC) to run our function on the large files for each audio recorder and to extract the cleaned data. This would assist in speeding up the computation time, and decreasing the amount of space utilized by WAV files on a desktop. To avoid any chance of overwriting through this process, the function created a RDS as output so that it could be renamed as the audio recorder name upon loading into the environment. We ran, visualized, and analyzed all 20 audio recorder files. Running each folder on the HPC took roughly 10.5 hours.
+To assist in efficiently expanding to the full set of our audio files, we decided to utilize the High Powered Computer (HPC) to run our function on the large files for each audio recorder and to extract the cleaned data. This would assist in speeding up the computation time, and decreasing the amount of space utilized by WAV files on a desktop. We ran, visualized, and analyzed all data from the 20 audio recorders. Running each audiomoth's data on the HPC took roughly 10.5 hours.
 
-Through using the HPC, it was discovered that some of the folders contained empty .WAV files which would kill the HPC job before the RDS was finished and saved. To combat this, any folder which contained empty .WAV files, small .WAV files (<1 MB ), and alternate file types were deleted from the folder before running on the HPC. As this was only about 5-8 files this did not cause concern about missing data or unequal RDS file sizes. 
+Through using the HPC, it was discovered that some of the folders contained empty .WAV files which would kill the HPC job before the RDS was finished and saved. To combat this, any folder which contained empty .WAV files, small .WAV files (<1 MB ), and alternate file types were deleted from the folder before running on the HPC. As this was only about 5-8 files, this did not cause concern about missing data or unequal RDS file sizes. 
 
 ## Analyzing one full file from an audio recorder 
 
@@ -349,7 +348,7 @@ afternoon<- A001_SD001|> filter(hour >= as_hms("19:00:00") & hour <= as_hms("21:
 night<- A001_SD001|> filter(hour >= as_hms("23:00:00") & hour <= as_hms("23:30:00"))
 ```
 
-We started our analysis on the full time series, but this created a lot of crowding and was difficult to read. We decided to focus on the time interval 14:00:00 to 16:50:00, which corresponded to the eclipse. We then created two visuals: one which displays only the pattern from the day of the eclipse, and then a similar visual which shows all of the recording days. In these visuals we added a shaded region to show the time of totality (15:27:05 to 15:23:52). 
+We started our analysis on the full time series, but this created a lot of crowding and was difficult to read. We decided to focus on the time interval 14:00:00 to 16:50:00, which corresponded to the eclipse. We then created two visuals: one displays only the pattern from the day of the eclipse, and then a similar visual shows all of the recording days. In these visuals we added a shaded region to show the time of totality (15:27:05 to 15:23:52). 
 
 
 ```{r}
@@ -376,7 +375,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = biophony))+
   theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
-From the graph depicting biophony on the day of the eclipse, we can see there is a sharp decrease before totality begins, and during/after totality the biophony from this recorder seems to stay pretty low. When we look at the total recording days, there are days where the biophony is at similar levels. From this one folder, its hard to tell if biphony will be an index which shows potential patterns across the eclipse. 
+From the graph depicting biophony on the day of the eclipse, we can see there is a sharp decrease before totality begins, and during/after totality the biophony from this recorder seems to stay pretty low. When we look at the total recording days, there are days where the biophony is at similar levels. From this one audiomoth, it is hard to tell if biophony will be an index which shows potential patterns across the eclipse. We can also see that, even on the non-eclipse days, there is a lot of variability with how much biophony is present. 
 
 ```{r}
 #| echo: false
@@ -400,7 +399,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = aei))+
   theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
-On the day of the eclipse, we can see an increase of AEI right at the beginning of totality. This increase is one of the starkest increases in the full time interval. When we then look at all the days, we can see that this type of increase is pretty infrequent at this time. The pattern on the 8th during totality seems to stick out. 
+On the day of the eclipse, we can see an increase of AEI right at the beginning of totality. This increase is one of the starkest increases in the full time interval. When we then look at all of the days, we can see that this type of increase is pretty infrequent at this time. The pattern on the 8th during totality seems to stick out. Again, there is a lot of between-day variability in acoustic evenness. 
 
 ```{r}
 #| echo: false
@@ -424,7 +423,7 @@ ggplot(data = eclipse_time, aes(x = hour, y = bei))+
   theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
-In this graph we see another striking pattern, the bioacoustic index increasing significantly at the beginning of totality compared to the rest of this period. This peak is the highest across this eclipse interval, and the rest of the clip has pretty low BEI in comparison. Across all days, we notice during this time the BEI is often much lower, and the stark increase pattern at this time doesn't occur at any other recorder (besides potentially on April 1st).
+In this graph we see another striking pattern, the bioacoustic index increasing significantly at the beginning of totality compared to the rest of this period. This peak is the highest across this eclipse interval, and the rest of the clip has pretty low BEI in comparison. Across all days, we notice during this time the BEI is often much lower, and the stark increase pattern at this time doesn't occur at any other day (besides potentially on April 1st).
 
 ```{r}
 #| echo: false
@@ -438,6 +437,7 @@ ggplot(data = eclipseonly, aes(x = hour, y = sapply(ACI_all, sum), group = day))
 
 ```{r}
 #| echo: false
+#| warning: false
 ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum)))+
   geom_rect(xmin =  hms(52,23,15), xmax = hms(05,27,15), ymin = 0, ymax = 3000, fill = "lightblue", alpha = 0.3)+
   geom_line()+
@@ -448,8 +448,8 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ACI_all, sum)))+
   theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
-For the ACI, there seems to be the potential for an interesting pattern,
-on the 8th there is a sharp decrease during the time of totality. However, when we compare this to the rest of the days we can see that the ACI for this day is quite linear, and other days have more variation.
+For the ACI, there seems to be the potential for an interesting pattern: on
+on the 8th, there is a sharp decrease during the time of totality. However, when we compare this to the rest of the days, we can see that the ACI for this day is quite linear, and other days have more variation.
 
 ```{r}
 #| echo: false
@@ -472,9 +472,9 @@ ggplot(data = eclipse_time, aes(x = hour, y = sapply(ADI_all, sum)))+
   theme(axis.text.x = element_text(angle = 45, vjust= 0.5))
 ```
 
-Lastly, looking at the ADI across this folder we can see that there is potentially a decrease at the point of totality. Like biophony, after totality we see the acoustic diversity stay pretty low. When we try and look at the rest of the days we can see a large amount of variaiton in this index. This variation makes it difficult to really compare the patterns, but this low stagnant period around totality doesn't seem to occur in the other days, other than potentially April 7th.  
+Lastly, looking at the ADI in this audiomoth, we can see that there is potentially a decrease at the point of totality. Like biophony, after totality we see the acoustic diversity stay pretty low. When we try and look at the rest of the days we can see a large amount of variaiton in this index. This variation makes it difficult to really compare the patterns, but this low stagnant period around totality doesn't seem to occur in the other days, other than potentially April 7th.  
 
-This set of visuals allowed us to look into whether we could expect to observe any potential patterns across the time of the eclipse for our five indices. From these visuals, we felt confident that as we got into more visuals and modeling we would see some type of audiological changes during the time of the eclipse. 
+This set of visuals allowed us to look into whether we could expect to observe any potential patterns across the time of the eclipse for our five indices from a single audiomoth. From these visuals, we felt confident that as we got into more visuals and modeling we would see some type of audiological changes during the time of the eclipse. 
 
 # Full data visualization 
 
@@ -514,9 +514,9 @@ onlyEclipseDAY<-fullAudio|> filter(hour>= eclipse_start & hour<= eclipse_end)|> 
 ```
 
 
-Due to concerns about changes in weather, migration around this time of year, readability we utilized a subset of the recording days. To assess the weather conditions across the days we used the website: <https://www.wunderground.com/history/daily/us/ny/ogdensburg>. From looking here across our recording days, we decided to use the 2 days buffering the eclipse, however due to wind gusts around midday on the 10th we opted for the 11th. This created a subset of days which had similar weather patterns to the day of the eclipse, and were close to April 8th, this decreased concern about avian or amphibian migration that could alter the soundscape. Our final subset included the following days: April 6th, 7th, 8th, 9th, and 11th. 
+Due to concerns about changes in weather, migration around this time of year, and readability, we utilized a subset of the recording days. To assess the weather conditions across the days, we used the website: <https://www.wunderground.com/history/daily/us/ny/ogdensburg>. From looking here across our recording days, we decided to use the 2 days buffering the eclipse.  However, due to wind gusts around midday on the 10th, we opted for the 11th. This created a subset of days which had similar weather patterns to the day of the eclipse: partly cloudy with no rain and little wind. These days were close to April 8th, so we had less concern about avian or amphibian migration that could alter the soundscape. Our final subset included the following days: April 6th, 7th, 8th, 9th, and 11th. 
 
-We approached the full visualization of our data by looking across our five day subset to search for patterns during the eclipse that differed between the 8th and the rest of our chosen days. In our visualizations, we used a geom_smooth() layer to display a smoothed line so we could see overall patterns more clearly.
+We approached the full visualization of our data by looking across our five day subset to search for patterns during the eclipse that differed between the 8th and the rest of our chosen days. In our visualizations, we used a `geom_smooth()` layer to display a smoothed line so we could see overall patterns more clearly.
 
 ## Acoustic Complexity 
 
@@ -533,7 +533,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullACI)) +
 
 ```
 
-In this graph we note that all the days including the eclipse have a pretty linear smoothing curve. This signals that the eclipse on April 8th likely did not have any influence on Acoustic Complexity. 
+In this graph, we note that all the days including the eclipse have a pretty linear smoothing curve. This signals that the eclipse on April 8th likely did not have any influence on Acoustic Complexity. 
 
 ## Acoustic Diversity 
 
@@ -549,7 +549,7 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = fullADI)) +
   labs(title = "Acoustic Diversity Across Days")
 ```
 
-When we look at this visual, we can see basically all of the days from our subset are flat, however on April 8th there seems to be two peaks close to the time of totality. There is also see some non-linearity around the time of totality from the 6th and the 9th. This makes it difficult to make a claim about whether or not this index is showing a potential pattern at this time. 
+When we look at this visual, we can see basically all of the days from our subset are flat. However, on April 8th, there seems to be two peaks close to the time of totality. There is also some non-linearity around the time of totality from the 6th and the 9th. This makes it difficult to make a claim about whether or not this index is showing a potential pattern at this time. 
 
 ## Acoustic Evenness 
 
@@ -599,11 +599,9 @@ ggplot(data = onlyEclipseTime, aes(x = hour, y = biophony)) +
   facet_wrap(~ day)
 ```
 
-For biophony, when we look at the smoothing curves across the days we can see that basically all of the days besides the 11th are quite linear. Since April 8th is so flat, this suggests that the eclipse may not be influencing this index. 
+For biophony, when we look at the smoothing curves across the days we can see that basically all of the days besides the 11th are quite linear. Since April 8th is so similar to the other days, this suggests that the eclipse may not be influencing this index. 
 
 # Modeling 
-
-*  Generalized Additive Modeling
 
 ```{r}
 #| echo: false
@@ -641,15 +639,15 @@ partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
 
 ```
 
-To model this data we decided to use Generalized additive models so we could incorporate non-linear patterns that we were seeing while still maintaining additivity between the variables. A GAM model resembles linear regression, but replaces the linear components with smooth non-linear functions (@james2013introduction): 
+To model this data, we decided to use Generalized additive models so we could incorporate non-linear patterns that we were seeing while still maintaining additivity between the variables. A GAM model resembles linear regression, but replaces the linear components with smooth non-linear functions (@james2013introduction): 
 
-$$ y_i = \beta_0 + f_1(x_{i1}) + f_2(x_{i2}) + f_3(x_{i3})+...+ f_p(x_{ip}) + \epsilon_i$$
+$$ y_i = \beta_0 + f_1(x_{i1}) + f_2(x_{i2}) + f_3(x_{i3})+...+ f_p(x_{ip}) + \epsilon_i$$ 
 
-* Smoothing Splines
+where y_i is the response, $\beta_0$ is an intercept, $f_j(x_{ij})$ is a smoothing function for predictor j and $\epsilon_i$ is assumed to be N(0, $\simga^2$) and independent of all other $\epsilon_i$
 
-Utilizing a smoothing spline can help us capture non-linear patterns which are present in the model. A smoothing spline specifies a function g(x) such that minimizes the formula below (@james2013introduction). The function g(x) is known to be a differentiable cubic polynomial function at knots for each training observation $x_i$ (@james2013introduction).
+Utilizing a smoothing spline can help us capture non-linear patterns which are present in the model. A smoothing spline specifies a function g(x) that minimizes the formula below (@james2013introduction). The function g(x) is known to be a differentiable cubic polynomial function at knots for each training observation $x_i$ (@james2013introduction).
 
-$$ \Sigma_{i=1}^n  (y_i - g(x_i))^2 + \lambda \int g^{''}t^2  dt$$
+$$ \displaystyle{\Sigma_{i=1}^n}(y_i - g(x_i))^2 + \lambda \int g^{''}t^2  dt$$
 This formula is similar to the idea of minimizing the residual sum of squares which can be seen in the first portion of the formula, but is also specifies a shrinking parameter lambda, which will penalize the variability of our function g(x) and will control the "wiggliness" of the curve (@james2013introduction). In other words, the second portion of the above formula which is tuned by $\lambda$ influences the effective degrees of freedom which will appear in our model summaries, and this can then be used as an assessment of the flexibility in the curves. From the s() function of the mgcv package that is used to create a smoothing spline, this $\lambda$ is optimized using generalized cross-validation (@wood2011mgcv). 
 
 * Final Models 
