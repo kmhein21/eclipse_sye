@@ -65,7 +65,9 @@ From March 30 to April 16th, Dr. Erika Barthelmess and students from the St. Law
 
 This protocol was written by Dr. Erika Barthelmess from St. Lawrence University. She, along with Jessica Harmen, Evelyn Albrecht, and Kelsey Simler completed this protocol and collected data for this project. 
 
-Data was collected between March 30 and April 16, 2024 by deploying 20 AudioMothTM acoustic recorders throughout St. Lawrence County, New York. All locations were fully within the path of totality for the April 8, 2024 total solar eclipse. The partial eclipse began at 14:11:38, totality began at 15:23:52, maximum eclipse was at 15:25:29, totality ended at 15:27:05 and the partial eclipse ended at 16:35:38 (all times local, times from <https://www.timeanddate.com/eclipse/in/@5111484?iso=20240408>) for a total eclipse duration of 2 hours 24 minutes, with totality lasting 3 minutes and 13 seconds. 
+Data was collected between March 30 and April 16, 2024 by deploying 20 AudioMothTM acoustic recorders throughout St. Lawrence County, New York (Figure 1). All locations were fully within the path of totality for the April 8, 2024 total solar eclipse. The partial eclipse began at 14:11:38, totality began at 15:23:52, maximum eclipse was at 15:25:29, totality ended at 15:27:05 and the partial eclipse ended at 16:35:38 (all times local, times from <https://www.timeanddate.com/eclipse/in/@5111484?iso=20240408>) for a total eclipse duration of 2 hours 24 minutes, with totality lasting 3 minutes and 13 seconds. 
+
+![Audiomoth Locations](audio_moth_deployments.png)
 
 Each AudioMoth was configured to record within four temporal windows on each day of the deployment. The first window was from 05:45 to 07:15, the second from 14:00 to 16:50, third from 19:00 to 20:00 and the last from 23:00 to 23:30 (Table 1).
 
@@ -317,7 +319,9 @@ ggplot(data = dawn, aes(x = only_time, y = sapply(ACI, sum), color = as.factor(d
   scale_color_viridis_d()+
   theme_minimal()+
   guides(color = guide_legend("Day"))+
-  labs(title = "Acoustic Complexity", x = "Time", y = "ACI")
+  labs(title = "Acoustic Complexity", x = "Time", y = "ACI",
+       caption = "*Index from the two days match closely across the last three intervals*")
+       
 ```
 
 Visualizing these two data sets helped us understand the patterns that occur across a full day of recording. For example, a pattern in this visual above is that ADI, ACI, and biophony are higher during the dawn segment and then decrease to similar low levels across the rest of the day. Another thing these types of graphs shed light on are the potential differences between a normal day and the day of the eclipse. However, as this is just a comparison from two audiomoths, we could not make any conclusions about the changes during the eclipse from just this graphic.
@@ -643,16 +647,14 @@ To model this data, we decided to use Generalized additive models so we could in
 
 $$ y_i = \beta_0 + f_1(x_{i1}) + f_2(x_{i2}) + f_3(x_{i3})+...+ f_p(x_{ip}) + \epsilon_i$$ 
 
-where y_i is the response, $\beta_0$ is an intercept, $f_j(x_{ij})$ is a smoothing function for predictor j and $\epsilon_i$ is assumed to be N(0, $\simga^2$) and independent of all other $\epsilon_i$
+where y_i is the response, $\beta_0$ is an intercept, $f_j(x_{ij})$ is a smoothing function for predictor j and $\epsilon_i$ is assumed to be N(0, $\sigma^2$) and independent of all other $\epsilon_i$
 
 Utilizing a smoothing spline can help us capture non-linear patterns which are present in the model. A smoothing spline specifies a function g(x) that minimizes the formula below (@james2013introduction). The function g(x) is known to be a differentiable cubic polynomial function at knots for each training observation $x_i$ (@james2013introduction).
 
-$$ \displaystyle{\Sigma_{i=1}^n}(y_i - g(x_i))^2 + \lambda \int g^{''}t^2  dt$$
-This formula is similar to the idea of minimizing the residual sum of squares which can be seen in the first portion of the formula, but is also specifies a shrinking parameter lambda, which will penalize the variability of our function g(x) and will control the "wiggliness" of the curve (@james2013introduction). In other words, the second portion of the above formula which is tuned by $\lambda$ influences the effective degrees of freedom which will appear in our model summaries, and this can then be used as an assessment of the flexibility in the curves. From the s() function of the mgcv package that is used to create a smoothing spline, this $\lambda$ is optimized using generalized cross-validation (@wood2011mgcv). 
+$$ \sum_{i=1}^n (y_i - g(x_i))^2 + \lambda \int g^{''}t^2  dt$$
+This formula is similar to the idea of minimizing the residual sum of squares which can be seen in the first portion of the formula, but it also specifies a shrinking parameter $\lambda$ , which will penalize the variability of our function g(x) and will control the "wiggliness" of the curve (@james2013introduction). In other words, the second portion of the above formula, which is tuned by $\lambda$, influences the effective degrees of freedom which will appear in our model summaries. This can then be used as an assessment of the flexibility in the curves. From the `s()` function of the mgcv package that is used to create a smoothing spline, this $\lambda$ is optimized using generalized cross-validation (@wood2011mgcv). 
 
-* Final Models 
-
-Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional smoothing spline for folder_name which would help us account for the different recorders and their respective locations, and lastly a term for day. To create these models we used the gam() function from the mgcv package, and to create our visualization we used the data_grid() function (@wood2011mgcv) as well as the augment() function from the broom package. This allowed us to create predicted values based on our model and to then visualize them alongside our GAMs. To produce these visuals we also needed to specify a specific recorder which lied around the "center" of our observed index values. A table of the chosen audio recorders and the indices that they were used for is below: 
+Our final generalized additive models were made using a smoothing spline for hour separated by day, an additional term for audiomoth which would help us account for the different recorders and their respective locations, and lastly a term for day. To create these models we used the `gam()` function from the `mgcv` package, and to create our visualization, we used the `data_grid()` function (@wood2011mgcv) as well as the `augment()` function from the `broom` package. This allowed us to create predicted values based on our model and to then visualize them alongside our GAMs. To produce these visuals, we also needed to specify a specific recorder which lied around the "center" of our observed index values. The fitted curve for a different recorder would follow the same pattern, but would be shifted up or down. A table of the chosen audio recorders and the indices that they were used for is below: 
 
 | Index         | Audio Recorders        |
 |---------------|--------------------------------------------------|
@@ -675,7 +677,7 @@ bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
 broom::tidy(bei_mod)
 ```
 
-To analyze our model outputs, we focused on the estimated degrees of freedom, as this provides us with an estimate of the flexibility in the lines. We were able to compare this numerical flexibility on the 8th with the other days we have included in our subset, as well as compare the trend lines we see in our model visualizations. From our model for Bioacoustic index, can see that April 8th possesses the most complex line, with an edf of 8.86. The other days vary in their complexity, but we can see that they all have non-linear effects and April 7th is the second most complex to the day of the eclipse (edf: 7.46). 
+To analyze our model outputs, we focused on the estimated degrees of freedom, as this provides us with an estimate of the flexibility in the lines. We were able to compare this numerical flexibility on the 8th with the other days we have included in our subset, as well as compare the trend lines we see in our model visualizations. From our model for Bioacoustic index, we can see that April 8th possesses the most complex line, with an edf of 8.86. The other days vary in their complexity, but we can see that they all have non-linear effects and April 7th is the second most complex to the day of the eclipse (edf: 7.46). 
 
 
 ```{r}
@@ -717,11 +719,11 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-Note the icons that are in our model visuals, these align specifically with the changes during the eclipse. The first and last icon correspond to the beginning (14:11:38) and end (16:35:38) of the partial eclipse, and the center corresponds to peak totality (15:25:29). 
+Note the icons that are in our model visuals. These align specifically with the changes during the eclipse. The first and last icon correspond to the beginning (14:11:38) and end (16:35:38) of the partial eclipse, and the center corresponds to peak totality (15:25:29). 
 
-In this visualization, we can really see the flexibility on April 8th compared to the other days. Although in the model summary, the other days had some high edf values, their trend lines appear linear in our graphic. On April 8th, we can see an abrupt peak that aligns with that peak at totality. This peak is pretty localized as well, with the rest of the trend line showing minimal curvature. These aspects suggest that this index is displaying some type of reaction wildlife is having to the time of totality. 
+In this visualization, we can really see the flexibility on April 8th compared to the other days. Although in the model summary, the other days had some high edf values, their trend lines appear more linear in our graphic. On April 8th, we can see an abrupt peak that aligns with that peak at totality. This peak is pretty localized as well, with the rest of the trend line showing minimal curvature. These aspects suggest that this index is displaying some type of reaction wildlife is having to the time of totality. 
 
-To understand if the only oddity across the 8th was at the time of the eclipse we created a similar model visualization that corresponds to the dawn. 
+To understand if the only oddity across the 8th was at the time of the eclipse, we created a similar model visualization that corresponds to the dawn. 
 
 ```{r}
 #| echo: false
@@ -752,7 +754,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-Looking at the model summary and the visual, we can see that there isn't anything off about April 8th. Based on its low edf value and the trend line, we can see that this day was pretty linear, and it didn't stick out compared to the other days. This helps provide evidence that the eclipse is causing a change in this index, since the day itself doesn't show any overall differences that could cause the irregular peak we saw. 
+Looking at the model summary and the visual, we can see that there isn't anything distinguishable about April 8th. Based on its low edf value and the trend line, we can see that this day was pretty linear, and it didn't stick out compared to the other days. This helps provide evidence that the eclipse is causing a change in this index, since the day itself prior to the eclipse does not show any overall differences that could cause the irregular peak we saw. 
 
 
 ## Acoustic Evenness 
@@ -765,7 +767,7 @@ aei_mod<- mgcv::gam(aei~ s(hour_numeric, by = day_factor)+
 broom::tidy(aei_mod)
 ```
 
-Similar to the bioacoustic index model, here we can see that April 8th is again the most flexible (edf: 8.68). In this model, the 8th is actually extremely more flexible than the other days, with the second highest being the 6th (edf: 5.46). We also see a close third on April 9th, with an edf of 5.37. As we recall from our full visualization for AEI, this makes sense as we ended up seeing a lot of curvature in the 6th, 8th, and 9th. 
+Similar to the bioacoustic index model, here we can see that April 8th is again the most flexible (edf: 8.68). In this model, the 8th is actually much more flexible than the other days, with the second highest being the 6th (edf: 5.46). We also see a close third on April 9th, with an edf of 5.37. As we recall from our full visualization for AEI, this makes sense as we ended up seeing a lot of curvature in the 6th, 8th, and 9th. 
 
 
 ```{r}
@@ -831,7 +833,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-After creating an acoustic evenness model for the dawn, we can see again that April 8th is pretty linear (edf: 1.74). In our visual, we see the 8th doesn't stick out compared to our other days, again suggesting that there isn't anything off about this index or the day itself. Although this helps show that the 8th was a "normal" day, it doesn't provide a lot more evidence to our claim that the eclipse affected this index. 
+After creating an acoustic evenness model for the dawn, we can see again that April 8th is pretty linear (edf: 1.74). In our visual, we see the 8th doesn't stick out compared to our other days, again suggesting that there is not anything off about this index or the day itself. Although this helps show that the 8th was a "normal" day, it doesn't provide a lot more evidence to our claim that the eclipse affected this index. 
 
 ## Acoustic Complexity
 
@@ -891,7 +893,7 @@ ADI_mod<- mgcv::gam(fullADI~ s(hour_numeric, by = day_factor)+
 broom::tidy(ADI_mod)
 ```
 
-Looking at the acoustic diversity, the estimated degrees of freedom are the highest yet again (8.454). For this metric the 2nd highest is from April 11th, and it is pretty close at 7.369. From our model summary, we also note that all of the other days are also showing some type of non-linearity through their edf values. 
+Looking at the acoustic diversity, the estimated degrees of freedom are the highest yet again on the day of the eclipse (8.454). For this metric, the 2nd highest is from April 11th at 7.369. From our model summary, we also note that all of the other days are also showing some type of non-linearity through their edf values. 
 
 ```{r}
 #| echo: false
@@ -926,7 +928,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
 ```
 
-As we noted, we can see that all of the days are showing some type of flexibility. When we look specifically at the 11th, we can see its quite wavy, and we see some dips around this period of the eclipse. When we look at the trend from the 8th, we note that there are two maximums surrounding the time of totality. In between these peaks is a minimum around the time that totality was ending. Compared to the trends we see from the 11th, these patterns align more with the changes occurring because of the eclipse. This suggests to us that the acoustic diversity is being affected by the eclipse, yet due to the curvature in the other lines, we don't have the strongest evidence. 
+As we noted, we can see that all of the days are showing some type of flexibility. When we look specifically at the 11th, we can see it is quite wavy, and we see some dips around this period of the eclipse. When we look at the trend from the 8th, we note that there are two maximums surrounding the time of totality. In between these peaks is a minimum around the time that totality was ending. Compared to the trends we see from the 11th, these patterns align more with the changes occurring because of the eclipse. This suggests to us that the acoustic diversity is being affected by the eclipse, yet due to the curvature in the other lines, we do not have the strongest evidence. 
 
 ```{r}
 #| echo: false
@@ -958,7 +960,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-To try and get some more evidence, we looked at a model from the dawn. Like the other metrics we calculated dawn models for, April 8th displays a pretty linear trend line and a low edf value (1.514). Since the 8th doesn't vary too much from the other days, this shows April 8th was a regular day for acoustic diversity measurement. Like AEI though, this fact doesn't help us solidify any more evidence for the patterns we saw around totality. 
+To try and get some more evidence, we looked at a model from the dawn. Like the other metrics we calculated dawn models for, April 8th displays a pretty linear trend line and a low edf value (1.514). Since the 8th does not vary too much from the other days, April 8th seems to be a "regular" day for acoustic diversity measurement.
 
 ## Biophony
 
@@ -970,7 +972,7 @@ biophony_mod<- mgcv::gam(biophony~ s(hour_numeric, by = day_factor)+
 broom::tidy(biophony_mod)
 ```
 
-Lastly, in our biophony model all of the days have higher non-linearity with edf values above five. Interestingly, in this summary the 8th is not one of the most complex lines (edf: 6.558). This began to suggest that we were not going to see a pattern that would align with the eclipse on this day, and if we did, we could potentially also see similar non-linearity in the other days.
+Lastly, in our biophony model, all of the days have higher non-linearity with edf values above five. Interestingly, in this summary, the 8th is not one of the most complex lines (edf: 6.558). This began to suggest that we were not going to see a pattern that would align with the eclipse on this day, and if we did, we could potentially also see similar non-linearity in the other days.
 
 ```{r}
 #| echo: false
@@ -1005,11 +1007,11 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
 
 ```
 
-This visualization shows very clearly that all of the days during this time frame are very similar, and we don't see any particular patterns from April 8th or any other day. Like we expected, all are displaying a lot of curvature, and we aren't seeing any patterns that really align with totality, or the beginning and end of the partial eclipse. This provides evidence that biophony was not impacted during the time of eclipse. 
+This visualization shows very clearly that all of the days during this time frame are very similar, and we don't see any particular patterns from April 8th or any other day. Like we expected, all are displaying a lot of curvature, and we are not seeing any patterns that really align with totality, or the beginning and end of the partial eclipse. This provides no evidence that biophony was impacted during the time of eclipse. 
 
 # Conclusion 
 
-From our analysis, we are at a place to believe that the bioacoustic index, acoustic evenness index, and acoustic diversity index may display patterns across the time of the eclipse. Looking at model summaries and visualizations, we say that the bioacoustic has the most evidence of a potential pattern with a pretty pronounced maximum around peak totality. The acoustic diversity and acoustic evenness indices show a bit less evidence of patterns, but the curvature around totality provide enough evidence for us to claim there is the potential these are affected as well. We believe that these potential patterns display that wildlife is impacted by some type of eclipse-driven change, and based on the patterns, we can suggest that they are affected by specifically a totality-driven change. Whether this is due to something we cannot perceive or it is the changes in light, we cannot be sure at this time. 
+From our analysis, we are at a place to believe that the bioacoustic index, acoustic evenness index, and acoustic diversity index may display patterns across the time of the eclipse. Looking at model summaries and visualizations, we say that the bioacoustic index has the most evidence of a potential pattern with a pretty pronounced maximum around peak totality. The acoustic diversity and acoustic evenness indices show a bit less evidence of patterns, but the curvature around totality provide enough evidence for us to claim there is the potential these are affected as well. We believe that these potential patterns display that wildlife is impacted by some type of eclipse-driven change, and based on the patterns, we can suggest that they are affected by specifically a totality-driven change. Whether this is due to something we cannot perceive or it is the changes in light, we cannot be sure at this time. 
 
 We do want to note that we made the assumption that the one minute audio clips were not correlated with each other. This assumption is likely to be incorrect, and we believe that some of these clips would have autocorrelation between them. Looking to future work with this data, it would be interesting to account for this within the models and to see if and how the patterns would change. 
 
