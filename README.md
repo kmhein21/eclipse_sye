@@ -16,9 +16,13 @@ county, New York to sample data between March 30th to April 16th.
 
 ## Visuals
 
-(ADD VISUALS)
+![](README_files/figure-commonmark/unnamed-chunk-2-1.png)
 
-Talk about how it was created
+These visuals were produced to display the temporal patterns across our
+five indices. Along the top are icons which correspond to relevant times
+during the eclipse. Here, we have included the visual for the
+bioacoustic index, which seems to show an interesting pattern around the
+time of totality.
 
 ## Data Organization
 
@@ -33,8 +37,10 @@ Our final generalized Additive Model consisted of three terms, and was
 used to later create visuals to isolate index patterns across the time
 of the eclipse.
 
-$$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$ `s()`
-function refers to the smoothing spline function from the `mgcv` package
+$$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$
+
+`s()` function refers to the smoothing spline function from the `mgcv`
+package
 
 For our models, we used a subset of five days based on weather and
 proximity to the day of the eclipse, this ended up being April 6th, 7th,
@@ -65,8 +71,10 @@ that may suggest wildlife audio changes during the eclipse and totality.
   time of totality are two peaks, and between them is a local minimum.
   This minimum falls around the time of peak totality.
 
-For more information on this project and our findings, please visit our
-\[Paper\] or \[Presentation\]
+For more information on this project and our findings, please view our
+[Paper](https://github.com/kmhein21/eclipse_sye/blob/main/Write_Up/Write_up.pdf)
+or
+[Presentation](https://github.com/kmhein21/eclipse_sye/blob/main/Presentation_files/Festival_Presentation.html).
 
 ## Note
 

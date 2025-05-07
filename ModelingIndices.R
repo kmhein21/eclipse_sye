@@ -99,7 +99,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
   geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
   scale_colour_viridis_d() +
-  theme_minimal() +
+  theme_minimal()+
   labs(colour = "eclipse_or_not",
        y = "Bioacoustic Index")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))

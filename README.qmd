@@ -16,6 +16,48 @@ library(tuneR)
 library(pander)
 library(mgcv)
 library(modelr)
+
+A001_SD001<-readRDS(here("rds_files/A001_SD001.rds"))
+A002_SD013<-readRDS(here("rds_files/A002_SD013.rds"))
+A003_SD005<-readRDS(here("rds_files/A003_SD005.rds"))
+A004_SD012<-readRDS(here("rds_files/A004_SD012.rds"))
+A005_SD002<-readRDS(here("rds_files/A005_SD002.rds"))
+A006_SD006<-readRDS(here("rds_files/A006_SD006.rds"))
+A007_SD017<-readRDS(here("rds_files/A007_SD017.rds"))
+A008_SD007<-readRDS(here("rds_files/A008_SD007.rds"))
+A009_SD009<-readRDS(here("rds_files/A009_SD009.rds"))
+A010_SD014<-readRDS(here("rds_files/A010_SD014.rds"))
+A011_SD018<-readRDS(here("rds_files/A011_SD018.rds"))
+A013_SD016<-readRDS(here("rds_files/A013_SD016.rds"))
+A014_SD021<-readRDS(here("rds_files/A014_SD021.rds"))
+A015_SD010<-readRDS(here("rds_files/A015_SD010.rds"))
+A016_SD022<-readRDS(here("rds_files/A016_SD022.rds"))
+A017_SD024<-readRDS(here("rds_files/A017_SD024.rds"))
+A018_SD011<-readRDS(here("rds_files/A018_SD011.rds"))
+A019_SD008<-readRDS(here("rds_files/A019_SD008.rds"))
+A021_SD023<-readRDS(here("rds_files/A021_SD023.rds"))
+A022_SD019<-readRDS(here("rds_files/A022_SD019.rds"))
+
+fullAudio<-rbind(A001_SD001, A002_SD013, A003_SD005, A004_SD012,A005_SD002, A006_SD006, A007_SD017, A008_SD007, A009_SD009, A010_SD014, A011_SD018, A013_SD016, A014_SD021, A015_SD010, A016_SD022, A017_SD024, A018_SD011, A019_SD008, A021_SD023, A022_SD019)|>
+  group_by(folder_name)|>
+  mutate(fullACI = sapply(ACI_all,sum))|>
+  mutate(fullADI = sapply(ADI_all, sum))|>
+  filter(day == "2024-04-06" | day == "2024-04-07"| day == "2024-04-08"| day == "2024-04-09" | day == "2024-04-11")
+
+eclipse_start<-hms(00,00,14)
+eclipse_end<-hms(00,50,16)
+
+partial_begin = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950), 
+                       fullADI = (9), aei = (0.7), hour_numeric = hms(38,11,14))
+second_df = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                   fullADI = (9), aei = (0.7), hour_numeric = hms(00,45,14))
+totality = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                  fullADI = (9), aei = (0.7),  hour_numeric = hms(52,23,15))
+fourth_df = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950), 
+                   fullADI = (9), aei = (0.7), hour_numeric = hms(00,00,16))
+partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
+                     fullADI = (9), aei = (0.7), hour_numeric = hms(38,35,16))
+
 ```
 
 
@@ -29,9 +71,56 @@ The data used in this project was collected by Dr. Erika Barthelmess and other b
 
 ## Visuals 
 
-(ADD VISUALS) 
+```{r}
+#| echo: false
 
-Talk about how it was created 
+
+modelEclipse_df<-fullAudio|> mutate(eclipse = ifelse(day == "2024-04-08", 
+                                                     "eclipse", 
+                                                     "not_eclipse"))|>
+  mutate(eclipse = as_factor(eclipse))|>
+  mutate(hour_numeric = as.numeric(hour))|>
+  filter(hour>= eclipse_start & hour<= eclipse_end &
+           day %in% c("2024-04-06", "2024-04-07", "2024-04-08",
+                    "2024-04-09", "2024-04-11"))|>
+  mutate(day_factor = as.factor(day), folder_name = as_factor(folder_name))|>
+  select(hour, hour_numeric, everything())
+
+bei_mod<- mgcv::gam(bei~ s(hour_numeric, by = day_factor)+
+                      day_factor + s(folder_name, bs = "re"),
+                    data = modelEclipse_df)
+grid <- modelEclipse_df |> 
+  ungroup() |>
+  data_grid(hour_numeric = seq_range(hour_numeric, n = 40), folder_name = "/A014_SD021",
+    day_factor = modelEclipse_df |> pull(day_factor) |> levels(),
+  )
+
+gam_aug <- broom::augment(bei_mod, newdata = grid)
+
+ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
+  geom_point(data = modelEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
+  geom_line(aes(colour = day_factor), linewidth = 2) +
+  geom_point(data = totality, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = partial_begin, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,10,14), y = 3.5, size = 2)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = second_df, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,44,14), y = 3.5, size = 3)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = bei), pch = 15, size = 6)+
+  geom_point(data = fourth_df, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,01,16), y = 3.5, size = 3)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = bei),pch = 15 , size = 6)+
+  geom_point(data = partial_end, aes(x = hour_numeric, y = bei), size = 4, col = "white")+
+  geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
+  scale_colour_viridis_d() +
+  theme_minimal()+
+  labs(colour = "eclipse_or_not",
+       y = "Bioacoustic Index")+
+  scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
+```
+
+These visuals were produced to display the temporal patterns across our five indices. Along the top are icons which correspond to relevant times during the eclipse. Here, we have included the visual for the bioacoustic index, which seems to show an interesting pattern around the time of totality.
 
 ## Data Organization 
 
@@ -42,6 +131,8 @@ Using R studio, a function was created to process our .WAV files and create a cl
 Our final generalized Additive Model consisted of three terms, and was used to later create visuals to isolate index patterns across the time of the eclipse. 
 
 $$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$
+\n 
+
 `s()` function refers to the smoothing spline function from the `mgcv` package
 
 For our models, we used a subset of five days based on weather and proximity to the day of the eclipse, this ended up being April 6th, 7th, 8th, 9th, and 11th. 
@@ -63,7 +154,7 @@ From our analysis, we were able to find patterns in three of our indices that ma
 
 * Acoustic Diversity Index: Again, a lot more curvature visible in our trend line for April 8th compared to the other days. Bordering the time of totality are two peaks, and between them is a local minimum. This minimum falls around the time of peak totality. 
 
-For more information on this project and our findings, please visit our [Paper] or [Presentation]
+For more information on this project and our findings, please view our [Paper](https://github.com/kmhein21/eclipse_sye/blob/main/Write_Up/Write_up.pdf)  or [Presentation](https://github.com/kmhein21/eclipse_sye/blob/main/Presentation_files/Festival_Presentation.html).  
 
 ## Note 
 
