@@ -7,6 +7,11 @@ wildlife activity around an eclipse event. Data from the total solar
 eclipse on April 8th, 2024 was analyzed using 5 common audiological
 indices and generalized additive modeling.
 
+For more information on this project and our findings, please view our
+[Paper](https://github.com/kmhein21/eclipse_sye/blob/main/Write_Up/Write_up.pdf)
+or
+[Presentation](https://github.com/kmhein21/eclipse_sye/blob/main/Presentation_files/Festival_Presentation.html).
+
 ### Data
 
 The data used in this project was collected by Dr. Erika Barthelmess and
@@ -36,7 +41,7 @@ Our final generalized Additive Model consisted of three terms, and was
 used to later create visuals to isolate index patterns across the time
 of the eclipse.
 
-$$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$
+$$index \sim  s(hour, by = day)+ day + s(audiomoth, bs = "re")$$
 
 `s()` function refers to the smoothing spline function from the `mgcv`
 package
@@ -44,12 +49,6 @@ package
 For our models, we used a subset of five days based on weather and
 proximity to the day of the eclipse, this ended up being April 6th, 7th,
 8th, 9th, and 11th.
-
-Code to create our model is below:
-
-``` r
-index_model<- gam(index ~ s(hour, by = day)+ day + s(folder, bs = "re"), data = Eclipse_df)
-```
 
 ## Findings
 

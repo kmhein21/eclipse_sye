@@ -65,6 +65,8 @@ partial_end = tibble(bei = (3.5), biophony = (2.5), fullACI = (1950),
 
 This project organizes and models audio data to understand more about wildlife activity around an eclipse event. Data from the total solar eclipse on April 8th, 2024 was analyzed using 5 common audiological indices and generalized additive modeling. 
 
+For more information on this project and our findings, please view our [Paper](https://github.com/kmhein21/eclipse_sye/blob/main/Write_Up/Write_up.pdf)  or [Presentation](https://github.com/kmhein21/eclipse_sye/blob/main/Presentation_files/Festival_Presentation.html). 
+
 ### Data 
 
 The data used in this project was collected by Dr. Erika Barthelmess and other biology students at St. Lawrence University. This team deployed 20 audio recorders in forested wetlands habitats across St. Lawrence county, New York to sample data between March 30th to April 16th. 
@@ -118,7 +120,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(x = hms(00,37,16), y = 3.5, size = 2)+
   scale_colour_viridis_d() +
   theme_minimal()+
-  labs(colour = "eclipse_or_not",
+  labs(colour = "Date",
        y = "Bioacoustic Index")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
 ```
@@ -133,18 +135,12 @@ Using R studio, a function was created to process our .WAV files and create a cl
 
 Our final generalized Additive Model consisted of three terms, and was used to later create visuals to isolate index patterns across the time of the eclipse. 
 
-$$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$
+$$index \sim  s(hour, by = day)+ day + s(audiomoth, bs = "re")$$
 \n 
 
 `s()` function refers to the smoothing spline function from the `mgcv` package
 
 For our models, we used a subset of five days based on weather and proximity to the day of the eclipse, this ended up being April 6th, 7th, 8th, 9th, and 11th. 
-
-Code to create our model is below:
-```{r}
-#| eval: false
-index_model<- gam(index ~ s(hour, by = day)+ day + s(folder, bs = "re"), data = Eclipse_df)
-```
 
 ## Findings 
 
