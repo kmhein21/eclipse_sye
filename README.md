@@ -2,7 +2,7 @@
 
 ## Project Introduction
 
-This project organizes and model audio data to understand more about
+This project organizes and models audio data to understand more about
 wildlife activity around an eclipse event. Data from the total solar
 eclipse on April 8th, 2024 was analyzed using 5 common audiological
 indices and generalized additive modeling.
@@ -18,8 +18,8 @@ county, New York to sample data between March 30th to April 16th.
 
 ![](README_files/figure-commonmark/unnamed-chunk-3-1.png)
 
-These visuals were produced to display the temporal patterns across our
-five indices. Along the top are icons which correspond to relevant times
+Visuals were produced to display the temporal patterns across our five
+indices. Along the top are icons which correspond to relevant times
 during the eclipse. Here, we have included the visual for the
 bioacoustic index, which seems to show an interesting pattern around the
 time of totality.
@@ -28,8 +28,7 @@ time of totality.
 
 Using R studio, a function was created to process our .WAV files and
 create a cleaned data frame. Using an High Powered Computer, we were
-able to iterate this process over all 20 of our audio recorders. A
-portion of the final product is displayed below:
+able to iterate this process over all 20 of our audio recorders.
 
 ## Model
 
@@ -81,4 +80,4 @@ or
 In our analysis, we assumed there was no autocorrelation between the
 audio clips we were given. This is almost certainly an incorrect
 assumption, and so the patterns in our visuals could potentially change
-if this autocorrelation was accounted for and removed.
+if this autocorrelation was accounted for.
