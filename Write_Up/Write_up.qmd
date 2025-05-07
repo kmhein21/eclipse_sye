@@ -748,8 +748,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
             linewidth = 2) +
   scale_colour_viridis_d() +
   theme_minimal() +
-  labs(colour = "eclipse_or_not",
-       y = "bei")+
+  labs(colour = "Date",
+       y = "Bioacoustic Index")+
   scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
 
 ```
@@ -827,8 +827,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
             linewidth = 2) +
   scale_colour_viridis_d() +
   theme_minimal() +
-  labs(colour = "eclipse_or_not",
-       y = "Acoustic Eveness Index")+
+  labs(colour = "Date",
+       y = "Acoustic Eveness")+
   scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
 
 ```
@@ -924,7 +924,7 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   scale_colour_viridis_d() +
   theme_minimal() +
   labs(colour = "Date",
-       y = "Acoustic Diversity ")+
+       y = "Acoustic Diversity")+
   scale_x_continuous(name = "Time", breaks = c(eclipse_start, hms(00,00,15), hms(00,00,16), eclipse_end))
 ```
 
@@ -953,8 +953,8 @@ ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
             linewidth = 2) +
   scale_colour_viridis_d() +
   theme_minimal() +
-  labs(colour = "eclipse_or_not",
-       y = "Acoustic Diversity Index")+
+  labs(colour = "Date",
+       y = "Acoustic Diversity")+
   scale_x_continuous(name = "Time", breaks = c(hms(00,45,5), hms(00,15,6), hms(00,45,6),hms(00,15,7)))
 
 
