@@ -16,7 +16,7 @@ county, New York to sample data between March 30th to April 16th.
 
 ## Visuals
 
-![](README_files/figure-commonmark/unnamed-chunk-2-1.png)
+![](README_files/figure-commonmark/unnamed-chunk-3-1.png)
 
 These visuals were produced to display the temporal patterns across our
 five indices. Along the top are icons which correspond to relevant times

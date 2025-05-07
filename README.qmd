@@ -96,7 +96,10 @@ grid <- modelEclipse_df |>
   )
 
 gam_aug <- broom::augment(bei_mod, newdata = grid)
+```
 
+```{r}
+#| echo: false
 ggplot(data = gam_aug, aes(x = hour_numeric, y = .fitted)) +
   geom_point(data = modelEclipse_df, aes(y = bei, colour = day_factor), alpha = 0.1) +
   geom_line(aes(colour = day_factor), linewidth = 2) +
