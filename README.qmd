@@ -27,6 +27,12 @@ This project organizes and model audio data to understand more about wildlife ac
 
 The data used in this project was collected by Dr. Erika Barthelmess and other biology students at St. Lawrence University. This team deployed 20 audio recorders in forested wetlands habitats across St. Lawrence county, New York to sample data between March 30th to April 16th. 
 
+## Visuals 
+
+(ADD VISUALS) 
+
+Talk about how it was created 
+
 ## Data Organization 
 
 Using R studio, a function was created to process our .WAV files and create a cleaned data frame. Using an High Powered Computer, we were able to iterate this process over all 20 of our audio recorders. A portion of the final product is displayed below:
@@ -36,7 +42,7 @@ Using R studio, a function was created to process our .WAV files and create a cl
 Our final generalized Additive Model consisted of three terms, and was used to later create visuals to isolate index patterns across the time of the eclipse. 
 
 $$index \sim  s(hour, by = day)+ day + s(folder, bs = "re")$$
-s() function refers to the smoothing spline function from the mgcv package
+`s()` function refers to the smoothing spline function from the `mgcv` package
 
 For our models, we used a subset of five days based on weather and proximity to the day of the eclipse, this ended up being April 6th, 7th, 8th, 9th, and 11th. 
 
@@ -46,9 +52,6 @@ Code to create our model is below:
 index_model<- gam(index ~ s(hour, by = day)+ day + s(folder, bs = "re"), data = Eclipse_df)
 ```
 
-## Visuals 
-
-(ADD VISUALS) 
 
 ## Findings 
 
@@ -59,6 +62,8 @@ From our analysis, we were able to find patterns in three of our indices that ma
 * Acoustic Evenness Index: More complex of a pattern, in the trend line for April 8th there is a lot more visible curvature than other days. A peak is observed around the time of totality, and this peak is surrounded by minimums. 
 
 * Acoustic Diversity Index: Again, a lot more curvature visible in our trend line for April 8th compared to the other days. Bordering the time of totality are two peaks, and between them is a local minimum. This minimum falls around the time of peak totality. 
+
+For more information on this project and our findings, please visit our [Paper] or [Presentation]
 
 ## Note 
 
